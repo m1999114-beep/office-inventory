@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>公司倉盤點系統 v11.2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: { colors: { darkBg: '#0f172a', darkCard: '#1e293b' } }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #0f172a; color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
+        .glow-card { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid rgba(148, 163, 184, 0.1); }
+        .glow-card:active { transform: scale(0.98); transition: 0.1s; }
+        .category-btn { transition: all 0.2s; border: 1px solid #334155; }
+        .category-btn.active { background-color: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+        .dashboard-card:active { transform: scale(0.95); opacity: 0.8; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+<body class="pb-20 pt-4 px-4 min-h-screen">
+
+    <div class="max-w-md mx-auto space-y-5">
+        
+        <div class="flex justify-between items-center pb-1">
+            <div>
+                <h1 class="text-xl font-black text-white tracking-wider">🏢 公司倉盤點</h1>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] text-slate-400">最後更新</p>
+                <div id="lastUpdateBadge" class="flex items-center gap-1 justify-end">
+                    <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+                    <span class="text-xs font-bold text-slate-300" id="lastLogTime">讀取中...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+            <div onclick="filterByStatus('low')" class="dashboard-card bg-red-900/20 p-3 rounded-xl border border-red-500/30 text-center cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-1"><span class="flex h-2 w-2 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span></div>
+                <p class="text-2xl">⚠️</p>
+                <p class="text-xl font-black text-red-400 mt-1" id="statLow">-</p>
+                <p class="text-[10px] text-red-300/70">補貨建議</p>
+            </div>
+            
+            <div onclick="filterByStatus('zero')" class="dashboard-card bg-orange-900/20 p-3 rounded-xl border border-orange-500/30 text-center cursor-pointer">
+                <p class="text-2xl">🚫</p>
+                <p class="text-xl font-black text-orange-400 mt-1" id="statZero">-</p>
+                <p class="text-[10px] text-orange-300/70">零庫存</p>
+            </div>
+
+            <div onclick="filterByCategory('all')" class="dashboard-card bg-slate-800 p-3 rounded-xl border border-slate-700 text-center cursor-pointer">
+                <p class="text-2xl">📊</p>
+                <p class="text-xl font-black text-blue-400 mt-1" id="statQty">-</p>
+                <p class="text-[10px] text-slate-500">庫存總數</p>
+            </div>
+        </div>
+
+        <div>
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="filterByCategory('wire')" id="btn-wire" class="category-btn flex flex-col items-center justify-center p-2 rounded-xl bg-slate-800 text-slate-400"><span class="text-lg mb-1">🔌</span><span class="text-[10px] font-bold">電線</span></button>
+                <button onclick="filterByCategory('terminal')" id="btn-terminal" class="category-btn flex flex-col items-center justify-center p-2 rounded-xl bg-slate-800 text-slate-400"><span class="text-lg mb-1">🔩</span><span class="text-[10px] font-bold">端子</span></button>
+                <button onclick="filterByCategory('hardware')" id="btn-hardware" class="category-btn flex flex-col items-center justify-center p-2 rounded-xl bg-slate-800 text-slate-400"><span class="text-lg mb-1">🛠️</span><span class="text-[10px] font-bold">五金</span></button>
+                <button onclick="filterByCategory('misc')" id="btn-misc" class="category-btn flex flex-col items-center justify-center p-2 rounded-xl bg-slate-800 text-slate-400"><span class="text-lg mb-1">🩹</span><span class="text-[10px] font-bold">耗材</span></button>
+            </div>
+            <button onclick="filterByCategory('all')" id="btn-all" class="w-full mt-2 text-xs text-slate-500 py-2 hover:text-white transition bg-slate-800/50 rounded-lg active">顯示全部項目</button>
+        </div>
+
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">🔍</span>
+            <input type="text" id="searchInput" oninput="filterData()" class="block w-full pl-10 pr-3 py-3 border border-slate-700 rounded-xl bg-slate-900 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-base" placeholder="輸入名稱或代碼...">
+        </div>
+
+        <div id="loading" class="text-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-2"></div><p class="text-slate-500 text-xs">同步資料庫...</p></div>
+        <div id="inventoryList" class="space-y-2 pb-10"></div>
+    </div>
+
+    <div id="modal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 w-full max-w-sm rounded-2xl border border-slate-600 p-6 shadow-2xl">
+            <div class="flex justify-between items-start mb-6">
+                <div><h3 class="text-xl font-bold text-white">盤點修正</h3><p id="modalItem" class="text-slate-400 text-sm mt-1">品名</p></div>
+                <button onclick="closeModal()" class="text-slate-400 text-3xl">×</button>
+            </div>
+            <div class="space-y-5">
+                <div class="bg-purple-900/20 p-3 rounded border border-purple-500/30 text-center"><p class="text-xs text-purple-300 mb-1">系統紀錄</p><p class="text-3xl font-black text-white" id="currentStockDisplay">-</p></div>
+                <div>
+                    <label class="text-xs text-slate-400 mb-1 block">盤點後實際數量</label>
+                    <div class="relative">
+                        <input type="number" id="inputQty" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-4xl font-bold text-white text-center focus:border-purple-500 focus:outline-none" placeholder="0">
+                        <span class="absolute right-4 top-8 text-slate-500 text-sm" id="modalUnit">單位</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="changeQty(-1)" class="bg-slate-700 text-white py-3 rounded-lg font-bold text-xl active:bg-slate-600">-1</button>
+                    <button onclick="changeQty(1)" class="bg-slate-700 text-white py-3 rounded-lg font-bold text-xl active:bg-slate-600">+1</button>
+                </div>
+                <button id="confirmBtn" onclick="submitAction()" class="w-full py-4 rounded-xl font-bold text-white text-lg bg-purple-600 active:bg-purple-700 shadow-lg shadow-purple-900/50">確認更新</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxcExyV9BkpX8P7qIPLSvbPZsKCv8Rl76QCeHmsXYgmJWPDieXFllU50YI7WxIqlhwzow/exec"; 
+        let currentData = [], displayData = [], selectedItem = null;
+
+        window.onload = loadData;
+
+        async function loadData() {
+            const loading = document.getElementById('loading');
+            loading.classList.remove('hidden');
+            document.getElementById('inventoryList').innerHTML = '';
+            
+            try {
+                const res = await fetch(API_URL);
+                const response = await res.json();
+                
+                currentData = response.stock.map(item => ({
+                    id: item.id, name: item.name, spec: item.spec, unit: item.unit,
+                    warehouseQty: Number(item.warehouseQty) || 0,
+                    safeQty: Number(item.safeQty) || 0,
+                    alias: item.alias || ''
+                }));
+                
+                loading.classList.add('hidden');
+                updateStats(currentData);
+                
+                // 更新最後動態
+                if(response.lastLog) {
+                    const log = response.lastLog;
+                    const time = new Date(log.time).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+                    document.getElementById('lastLogTime').innerText = `${time} ${log.person}`;
+                    document.getElementById('lastUpdateBadge').querySelector('span').classList.add('bg-green-500');
+                }
+
+                filterByCategory('all');
+            } catch (err) { loading.innerHTML = `<div class='text-red-400'>連線失敗</div>`; }
+        }
+
+        function updateStats(data) {
+            const low = data.filter(i => i.warehouseQty < i.safeQty && i.safeQty > 0).length;
+            const zero = data.filter(i => i.warehouseQty <= 0).length;
+            const total = data.reduce((acc, c) => acc + c.warehouseQty, 0);
+
+            document.getElementById('statLow').innerText = low;
+            document.getElementById('statZero').innerText = zero;
+            document.getElementById('statQty').innerText = total.toFixed(0);
+        }
+
+        function filterByStatus(status) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-all').classList.remove('active');
+            
+            if(status === 'low') {
+                displayData = currentData.filter(i => i.warehouseQty < i.safeQty && i.safeQty > 0);
+            } else if (status === 'zero') {
+                displayData = currentData.filter(i => i.warehouseQty <= 0);
+            }
+            renderList(displayData);
+        }
+
+        function filterByCategory(category) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-all').classList.remove('active');
+            
+            if(category === 'all') {
+                document.getElementById('btn-all').classList.add('active');
+                displayData = currentData;
+            } else {
+                document.getElementById(`btn-${category}`).classList.add('active');
+                displayData = currentData.filter(item => {
+                    const name = (item.name + item.spec).toLowerCase();
+                    if (category === 'wire') return name.includes('線') || name.includes('纜');
+                    if (category === 'terminal') return name.includes('端子');
+                    if (category === 'hardware') return name.includes('管') || name.includes('接頭') || name.includes('盒') || name.includes('牙圈');
+                    if (category === 'misc') return name.includes('膠帶') || name.includes('套管') || name.includes('紮線') || name.includes('束帶');
+                    return false;
+                });
+            }
+            renderList(displayData);
+        }
+
+        function filterData() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            displayData = currentData.filter(item => (item.name + item.spec + item.alias).toLowerCase().includes(keyword));
+            renderList(displayData);
+        }
+
+        function renderList(data) {
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = '';
+            if (data.length === 0) { list.innerHTML = '<div class="text-center text-slate-500 py-10">無項目</div>'; return; }
+            
+            data.forEach(item => {
+                const isZero = item.warehouseQty <= 0;
+                const isLow = item.warehouseQty < item.safeQty && item.safeQty > 0;
+                
+                let statusBadge = '';
+                if(isZero) statusBadge = '<span class="text-[10px] bg-red-900/50 text-red-300 px-1.5 py-0.5 rounded ml-2">零庫存</span>';
+                else if(isLow) statusBadge = '<span class="text-[10px] bg-yellow-900/50 text-yellow-300 px-1.5 py-0.5 rounded ml-2">補貨</span>';
+
+                list.innerHTML += `
+                    <div onclick="openModal('${item.id}')" class="glow-card relative p-4 rounded-xl flex justify-between items-center cursor-pointer transition active:scale-[0.98]">
+                        <div class="flex-1">
+                            <div class="flex items-center">
+                                <h3 class="font-bold text-white text-base">${item.name}</h3>
+                                ${statusBadge}
+                            </div>
+                            <p class="text-sm text-slate-400 mt-0.5">${item.spec}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-black ${isZero ? 'text-slate-600' : (isLow ? 'text-yellow-400' : 'text-purple-400')}">${item.warehouseQty}</div>
+                            <div class="text-[10px] text-slate-500">${item.unit}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function openModal(id) {
+            selectedItem = currentData.find(i => i.id == id);
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modalItem').innerText = `${selectedItem.name} ${selectedItem.spec}`;
+            document.getElementById('modalUnit').innerText = selectedItem.unit;
+            document.getElementById('currentStockDisplay').innerText = selectedItem.warehouseQty;
+            document.getElementById('inputQty').value = selectedItem.warehouseQty;
+            document.getElementById('inputQty').select(); 
+        }
+
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        function changeQty(delta) { const input = document.getElementById('inputQty'); input.value = (Number(input.value) || 0) + delta; }
+
+        async function submitAction() {
+            const qty = Number(document.getElementById('inputQty').value);
+            const btn = document.getElementById('confirmBtn');
+            if(qty < 0) return alert("數量不能為負");
+            btn.innerText = "更新中..."; btn.classList.add('opacity-50');
+            await fetch(API_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ action: "warehouse_audit", id: selectedItem.id, qty: qty, person: "庫存盤點" }) 
+            });
+            closeModal(); loadData();
+            btn.innerText = "確認更新"; btn.classList.remove('opacity-50');
+        }
+    </script>
+</body>
+</html>
