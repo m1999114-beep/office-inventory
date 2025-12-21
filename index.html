@@ -2,11 +2,13 @@
 <html lang="zh-TW" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>物料戰情室 v19.0</title>
+    <meta name="description" content="工程物料庫存管理系統 - 即時盤點、追蹤、統計">
+    <meta name="keywords" content="物料管理,庫存系統,盤點,工程管理">
+    <title>物料戰情室 v19.0 - 工程物料庫存管理系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { 
@@ -61,9 +63,37 @@
         body { 
             background: #000000;
             color: #ffffff; 
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            line-height: 1.6;
+            /* WCAG AA 對比度優化 */
+            color: #f5f5f5; /* 提升對比度 */
+        }
+        
+        /* 確保最小觸摸目標 44x44px (WCAG 2.5.5) */
+        button, a, [role="button"], .clickable {
+            min-width: 44px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 鍵盤導航優化 (WCAG 2.1.1) */
+        *:focus-visible {
+            outline: 3px solid #8b5cf6;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        
+        /* 減少動畫 (WCAG 2.3.3) */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
         
         /* 優雅的捲軸 */
@@ -123,6 +153,7 @@
             padding: 1px;
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), transparent 50%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             opacity: 0;
@@ -198,11 +229,28 @@
             to { transform: rotate(360deg); } 
         }
         
-        /* 按鈕微交互 - 極致改進 */
+        /* 按鈕微交互 - 極致改進 + 可訪問性 */
         .btn-interactive {
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            /* 確保觸摸目標 */
+            min-width: 44px;
+            min-height: 44px;
+            /* 提升對比度 */
+            border: 2px solid transparent;
+        }
+        
+        .btn-interactive:focus {
+            outline: 3px solid #8b5cf6;
+            outline-offset: 2px;
+        }
+        
+        .btn-interactive:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
         
         .btn-interactive::before {
@@ -482,9 +530,23 @@
             } 
         }
         
-        /* 搜尋欄 - 極致設計 */
+        /* 搜尋欄 - 極致設計 + 可訪問性 */
         .search-container {
             position: relative;
+        }
+        
+        .search-input {
+            /* 提升對比度 */
+            color: #ffffff;
+        }
+        
+        .search-input::placeholder {
+            color: #9ca3af; /* 確保 placeholder 對比度 */
+            opacity: 1;
+        }
+        
+        .search-input:focus::placeholder {
+            color: #6b7280;
         }
         
         .search-container::before {
@@ -707,10 +769,63 @@
             will-change: transform;
         }
         
-        /* 無障礙改進 */
-        .focus-visible:focus {
-            outline: 2px solid #8b5cf6;
-            outline-offset: 2px;
+        /* 無障礙改進 - 全面優化 */
+        .focus-visible:focus,
+        button:focus-visible,
+        input:focus-visible,
+        [role="button"]:focus-visible {
+            outline: 3px solid #8b5cf6;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+        
+        /* 語義化標籤樣式 */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        /* 提升文字對比度 */
+        .text-gray-400 {
+            color: #a1a1aa; /* 提升對比度 */
+        }
+        
+        .text-gray-500 {
+            color: #71717a; /* 提升對比度 */
+        }
+        
+        /* 錯誤狀態對比度優化 */
+        .text-red-400 {
+            color: #f87171; /* 確保對比度 */
+        }
+        
+        /* 成功狀態對比度優化 */
+        .text-green-400 {
+            color: #4ade80; /* 確保對比度 */
+        }
+        
+        /* 屏幕閱讀器專用 */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* 加載狀態可訪問性 */
+        [aria-busy="true"] {
+            cursor: wait;
+        }
+        
+        [aria-disabled="true"] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
         
         /* 空狀態優化 */
@@ -749,6 +864,7 @@
             padding: 1px;
             background: linear-gradient(135deg, #8b5cf6, #a78bfa);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             opacity: 0;
@@ -840,31 +956,31 @@
 </head>
 <body>
     <!-- Toast 容器 -->
-    <div id="toastBox" class="toast-container"></div>
+    <div id="toastBox" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
     
     <!-- Bottom Sheet Overlay -->
-    <div id="bottomSheetOverlay" class="bottom-sheet-overlay" onclick="closeBottomSheet()"></div>
+    <div id="bottomSheetOverlay" class="bottom-sheet-overlay" onclick="closeBottomSheet()" role="button" aria-label="關閉盤點視窗" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){closeBottomSheet();event.preventDefault();}"></div>
     
     <!-- 主容器 -->
     <div class="relative min-h-screen pb-24 safe-bottom">
         
         <!-- Header -->
-        <header id="header" class="glass-strong sticky top-0 z-50 safe-top">
+        <header id="header" class="glass-strong sticky top-0 z-50 safe-top" role="banner">
             <div class="px-5 py-5">
                 <div class="flex justify-between items-center mb-3">
                     <div>
                         <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 via-purple-500 to-purple-600 animate-gradient">
                             物料戰情室
                         </h1>
-                        <p class="text-xs text-gray-400 mt-1 font-semibold tracking-wide">v19.0 Pro Edition</p>
+                        <p class="text-xs text-gray-400 mt-1 font-semibold tracking-wide" aria-label="版本號">v19.0 Pro Edition</p>
                     </div>
-                    <div id="statusBadge" class="status-badge text-xs px-4 py-2.5 rounded-full bg-white/5 text-gray-400 border border-white/10 font-semibold backdrop-blur-sm">
+                    <div id="statusBadge" class="status-badge text-xs px-4 py-2.5 rounded-full bg-white/5 text-gray-400 border border-white/10 font-semibold backdrop-blur-sm" role="status" aria-live="polite" aria-atomic="true">
                         連線中...
                     </div>
                 </div>
                 <div class="flex items-center gap-2.5 text-xs">
-                    <span class="text-gray-500 font-medium">操作人員</span>
-                    <span id="headerOperator" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600/30 to-purple-500/20 text-purple-300 font-bold border border-purple-500/40 shadow-lg shadow-purple-500/20">黃俊瑋</span>
+                    <span class="text-gray-500 font-medium" aria-label="當前操作人員標籤">操作人員</span>
+                    <span id="headerOperator" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600/30 to-purple-500/20 text-purple-300 font-bold border border-purple-500/40 shadow-lg shadow-purple-500/20" aria-label="當前操作人員" role="status">黃俊瑋</span>
                 </div>
             </div>
         </header>
@@ -920,68 +1036,55 @@
         <div id="page-list" class="page">
             <div class="px-5 py-5 space-y-5">
                 <!-- 搜尋欄 -->
-                <div class="search-container glass rounded-3xl p-5">
+                <div class="search-container glass rounded-3xl p-5" role="search">
+                    <label for="searchInput" class="sr-only">搜尋物料</label>
                     <div class="flex items-center gap-4">
-                        <svg class="w-6 h-6 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input 
-                            type="text" 
+                            type="search" 
                             id="searchInput" 
                             placeholder="搜尋品名、規格..." 
                             class="search-input flex-1 bg-transparent text-white placeholder-gray-500 text-base font-semibold focus:outline-none"
                             autocomplete="off"
+                            aria-label="搜尋物料品名或規格"
+                            aria-describedby="searchHint"
                         >
                     </div>
+                    <div id="searchHint" class="sr-only">輸入關鍵字以搜尋物料</div>
                 </div>
                 
                 <!-- 分類標籤 -->
-                <div class="flex gap-3 overflow-x-auto pb-3 scrollbar-hide" style="-webkit-overflow-scrolling: touch;" id="categoryChips">
-                    <button class="cat-chip active px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="all">
+                <div class="flex gap-3 overflow-x-auto pb-3 scrollbar-hide" style="-webkit-overflow-scrolling: touch;" id="categoryChips" role="tablist" aria-label="物料分類篩選">
+                    <button class="cat-chip active px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="all" role="tab" aria-selected="true" aria-controls="inventoryList" tabindex="0">
                         <span>全部</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="wire">
+                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="wire" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔌 電線</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="terminal">
+                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="terminal" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔗 端子</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="consumable">
+                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="consumable" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>📦 耗材</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="pipe">
+                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="pipe" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔩 管材</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="hardware">
+                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="hardware" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔧 五金</span>
                     </button>
                 </div>
                 
                 <!-- 庫存列表 -->
-                <div id="inventoryList" class="space-y-3"></div>
+                <div id="inventoryList" class="space-y-3" role="list" aria-label="物料列表"></div>
                 
                 <!-- 空狀態 -->
-                <div id="emptyState" class="hidden empty-state text-center py-24">
-                    <div class="text-8xl mb-6 opacity-40 filter drop-shadow-2xl">📭</div>
+                <div id="emptyState" class="hidden empty-state text-center py-24" role="status" aria-live="polite">
+                    <div class="text-8xl mb-6 opacity-40 filter drop-shadow-2xl" aria-hidden="true">📭</div>
                     <p class="text-gray-400 text-lg font-bold mb-2">找不到符合的品項</p>
                     <p class="text-gray-600 text-sm font-medium">嘗試調整篩選條件或搜尋關鍵字</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Audit 頁面 -->
-        <div id="page-audit" class="page">
-            <div class="px-5 py-10">
-                <div class="glass-strong rounded-3xl p-10 text-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
-                    <div class="relative z-10">
-                        <div class="text-7xl mb-6 filter drop-shadow-2xl">📝</div>
-                        <h3 class="text-2xl font-extrabold text-white mb-4">盤點模式</h3>
-                        <p class="text-sm text-gray-400 mb-10 leading-relaxed font-medium">點擊庫存列表中的項目<br>即可快速進行盤點作業</p>
-                        <button onclick="switchPage('list')" class="btn-interactive glass px-10 py-5 rounded-2xl text-base font-extrabold text-white hover:bg-white/10 shadow-xl">
-                            前往庫存列表 →
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -995,21 +1098,21 @@
                         <span>系統設定</span>
                     </h3>
                     <div class="space-y-3">
-                        <button id="exportBtn" class="btn-interactive w-full flex items-center justify-between p-5 rounded-2xl bg-white/5 hover:bg-white/10 transition border-2 border-white/10 hover:border-white/20">
+                        <button id="exportBtn" class="btn-interactive w-full flex items-center justify-between p-5 rounded-2xl bg-white/5 hover:bg-white/10 transition border-2 border-white/10 hover:border-white/20" aria-label="匯出 CSV 檔案">
                             <div class="flex items-center gap-4">
-                                <span class="text-3xl">📥</span>
+                                <span class="text-3xl" aria-hidden="true">📥</span>
                                 <span class="text-base font-bold text-white">匯出 CSV</span>
                             </div>
-                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </button>
-                        <button id="refreshBtn" class="btn-interactive w-full flex items-center justify-between p-5 rounded-2xl bg-white/5 hover:bg-white/10 transition border-2 border-white/10 hover:border-white/20">
+                        <button id="refreshBtn" class="btn-interactive w-full flex items-center justify-between p-5 rounded-2xl bg-white/5 hover:bg-white/10 transition border-2 border-white/10 hover:border-white/20" aria-label="重新載入資料">
                             <div class="flex items-center gap-4">
-                                <span class="text-3xl">🔄</span>
+                                <span class="text-3xl" aria-hidden="true">🔄</span>
                                 <span class="text-base font-bold text-white">重新載入</span>
                             </div>
-                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </button>
@@ -1044,24 +1147,24 @@
         </div>
         
         <!-- Loading 狀態 -->
-        <div id="loadingState" class="fixed inset-0 z-50 flex flex-col items-center justify-center glass-strong">
-            <div class="relative">
+        <div id="loadingState" class="fixed inset-0 z-50 flex flex-col items-center justify-center glass-strong" role="status" aria-live="polite" aria-busy="true" aria-label="載入資料中">
+            <div class="relative" aria-hidden="true">
                 <div class="loader"></div>
                 <div class="absolute inset-0 loader" style="border-top-color: #a78bfa; animation-delay: 0.2s; animation-duration: 1.2s;"></div>
             </div>
             <p class="text-gray-300 mt-10 text-lg font-bold">載入資料中...</p>
-            <p id="loadingTimer" class="text-gray-600 text-sm mt-3 font-semibold"></p>
+            <p id="loadingTimer" class="text-gray-600 text-sm mt-3 font-semibold" aria-live="polite"></p>
         </div>
         
         <!-- Error 狀態 -->
-        <div id="errorState" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6">
+        <div id="errorState" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6" role="alert" aria-live="assertive">
             <div class="glass-strong rounded-3xl p-10 text-center max-w-sm w-full relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl"></div>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl" aria-hidden="true"></div>
                 <div class="relative z-10">
-                    <div class="text-7xl mb-6 filter drop-shadow-2xl">⚠️</div>
+                    <div class="text-7xl mb-6 filter drop-shadow-2xl" aria-hidden="true">⚠️</div>
                     <h3 class="text-2xl font-extrabold text-red-400 mb-4">載入失敗</h3>
                     <p id="errorMsg" class="text-sm text-gray-400 mb-10 leading-relaxed font-medium"></p>
-                    <button id="retryBtn" class="btn-interactive bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white px-10 py-5 rounded-2xl font-extrabold w-full transition shadow-xl shadow-red-600/30">
+                    <button id="retryBtn" class="btn-interactive bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white px-10 py-5 rounded-2xl font-extrabold w-full transition shadow-xl shadow-red-600/30" aria-label="重新連線載入資料">
                         🔄 重新連線
                     </button>
                 </div>
@@ -1070,30 +1173,26 @@
     </div>
     
     <!-- Bottom Sheet (盤點視窗) -->
-    <div id="bottomSheet" class="bottom-sheet">
-        <div class="bottom-sheet-handle"></div>
+    <div id="bottomSheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="bottomSheetTitle" aria-hidden="true">
+        <div class="bottom-sheet-handle" aria-hidden="true"></div>
         <div class="px-6 pb-6 overflow-y-auto" style="max-height: calc(85vh - 60px);">
             <div id="bottomSheetContent"></div>
         </div>
     </div>
     
     <!-- 底部導航 -->
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" role="navigation" aria-label="主要導航">
         <div class="flex justify-around items-center py-3 px-3">
-            <button onclick="switchPage('dashboard')" class="nav-item active flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl" data-page="dashboard">
-                <span class="nav-icon text-2xl transition-all">🏠</span>
+            <button onclick="switchPage('dashboard')" class="nav-item active flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl" data-page="dashboard" aria-label="總覽頁面" aria-current="page">
+                <span class="nav-icon text-2xl transition-all" aria-hidden="true">🏠</span>
                 <span class="text-[10px] font-bold tracking-wide">總覽</span>
             </button>
-            <button onclick="switchPage('list')" class="nav-item flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl" data-page="list">
-                <span class="nav-icon text-2xl transition-all">📦</span>
+            <button onclick="switchPage('list')" class="nav-item flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl" data-page="list" aria-label="列表頁面">
+                <span class="nav-icon text-2xl transition-all" aria-hidden="true">📦</span>
                 <span class="text-[10px] font-bold tracking-wide">列表</span>
             </button>
-            <button onclick="switchPage('audit')" class="nav-item flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl" data-page="audit">
-                <span class="nav-icon text-2xl transition-all">📝</span>
-                <span class="text-[10px] font-bold tracking-wide">盤點</span>
-            </button>
-            <button onclick="switchPage('settings')" class="nav-item flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl" data-page="settings">
-                <span class="nav-icon text-2xl transition-all">⚙️</span>
+            <button onclick="switchPage('settings')" class="nav-item flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl" data-page="settings" aria-label="設定頁面">
+                <span class="nav-icon text-2xl transition-all" aria-hidden="true">⚙️</span>
                 <span class="text-[10px] font-bold tracking-wide">設定</span>
             </button>
         </div>
@@ -1236,6 +1335,7 @@
         function showLoading() {
             state.isLoading = true;
             el.loadingState.classList.remove('hidden');
+            el.loadingState.setAttribute('aria-busy', 'true');
             el.errorState.classList.add('hidden');
             setStatus('loading', '連線中...');
         }
@@ -1251,6 +1351,7 @@
         function showContent() {
             state.isLoading = false;
             el.loadingState.classList.add('hidden');
+            el.loadingState.setAttribute('aria-busy', 'false');
             el.errorState.classList.add('hidden');
             setStatus('online', '線上');
         }
@@ -1265,9 +1366,20 @@
             };
             var div = document.createElement('div');
             div.className = 'toast';
-            div.innerHTML = '<span class="text-xl">' + (icons[type] || icons.info) + '</span>' + 
+            div.setAttribute('role', 'alert');
+            div.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+            div.setAttribute('aria-atomic', 'true');
+            div.innerHTML = '<span class="text-xl" aria-hidden="true">' + (icons[type] || icons.info) + '</span>' + 
                            '<span class="text-sm font-medium">' + escapeHtml(msg) + '</span>';
             el.toastBox.appendChild(div);
+            
+            // 屏幕閱讀器提示
+            var announcement = document.createElement('div');
+            announcement.className = 'sr-only';
+            announcement.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+            announcement.textContent = (icons[type] || icons.info) + ' ' + msg;
+            document.body.appendChild(announcement);
+            setTimeout(function() { announcement.remove(); }, 1000);
             
             setTimeout(function() { 
                 div.style.animation = 'toastOut 0.3s ease forwards';
@@ -1458,16 +1570,21 @@
             if (state.filtered.length === 0) {
                 el.inventoryList.innerHTML = '';
                 el.emptyState.classList.remove('hidden');
+                el.inventoryList.setAttribute('aria-label', '沒有符合條件的物料');
                 return;
             }
             
             el.emptyState.classList.add('hidden');
+            el.inventoryList.setAttribute('aria-label', '物料列表，共 ' + state.filtered.length + ' 項');
             
+            // 使用 DocumentFragment 提升性能
             var fragment = document.createDocumentFragment();
             for (var i = 0; i < state.filtered.length; i++) {
                 var div = document.createElement('div');
                 div.innerHTML = renderItem(state.filtered[i], i);
-                fragment.appendChild(div.firstChild);
+                var item = div.firstChild;
+                item.setAttribute('role', 'listitem');
+                fragment.appendChild(item);
             }
             el.inventoryList.innerHTML = '';
             el.inventoryList.appendChild(fragment);
@@ -1485,31 +1602,44 @@
             
             var pct = Math.min((total / Math.max(safeQty * 2, 1)) * 100, 100);
             var colorClass = 'stock-green';
-            if (total === 0) colorClass = 'stock-red';
-            else if (total < safeQty) colorClass = 'stock-yellow';
+            var statusText = '庫存充足';
+            if (total === 0) {
+                colorClass = 'stock-red';
+                statusText = '無庫存';
+            } else if (total < safeQty) {
+                colorClass = 'stock-yellow';
+                statusText = '庫存不足';
+            }
             
             var cat = getCategory(item);
             var icon = getCategoryIcon(cat);
             
-            return '<div class="card-item glass rounded-3xl p-6 gpu-accelerated list-item-enter" onclick="openBottomSheet(\'' + escapeHtml(id) + '\')" data-id="' + escapeHtml(id) + '" style="animation-delay: ' + (idx * 0.03) + 's">' +
+            return '<div class="card-item glass rounded-3xl p-6 gpu-accelerated list-item-enter" ' +
+                'onclick="openBottomSheet(\'' + escapeHtml(id) + '\')" ' +
+                'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){openBottomSheet(\'' + escapeHtml(id) + '\');event.preventDefault();}" ' +
+                'data-id="' + escapeHtml(id) + '" ' +
+                'role="button" ' +
+                'tabindex="0" ' +
+                'aria-label="' + escapeHtml(name) + '，規格：' + escapeHtml(spec) + '，公司倉：' + wQty + '，現場倉：' + sQty + '，' + statusText + '" ' +
+                'style="animation-delay: ' + (idx * 0.03) + 's">' +
                 '<div class="flex items-start justify-between gap-5">' +
                     '<div class="flex-1 min-w-0">' +
                         '<div class="flex items-center gap-3 mb-3">' +
-                            '<span class="text-3xl filter drop-shadow-lg">' + icon + '</span>' +
+                            '<span class="text-3xl filter drop-shadow-lg" aria-hidden="true">' + icon + '</span>' +
                             '<h3 class="font-extrabold text-white text-lg truncate">' + escapeHtml(name) + '</h3>' +
                         '</div>' +
                         '<p class="text-xs text-gray-400 mb-4 font-semibold">' + escapeHtml(spec) + ' · ' + escapeHtml(unit) + '</p>' +
-                        '<div class="stock-bar">' +
+                        '<div class="stock-bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="庫存水平：' + pct.toFixed(0) + '%">' +
                             '<div class="stock-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="text-right flex-shrink-0">' +
                         '<div class="mb-4">' +
-                            '<p class="big-number text-4xl font-extrabold text-purple-400 leading-none" id="w-' + escapeHtml(id) + '">' + wQty + '</p>' +
+                            '<p class="big-number text-4xl font-extrabold text-purple-400 leading-none" id="w-' + escapeHtml(id) + '" aria-label="公司倉庫存">' + wQty + '</p>' +
                             '<p class="text-[10px] text-gray-500 font-bold mt-1.5 tracking-wide">公司倉</p>' +
                         '</div>' +
                         '<div>' +
-                            '<p class="big-number text-4xl font-extrabold text-cyan-400 leading-none" id="s-' + escapeHtml(id) + '">' + sQty + '</p>' +
+                            '<p class="big-number text-4xl font-extrabold text-cyan-400 leading-none" id="s-' + escapeHtml(id) + '" aria-label="現場倉庫存">' + sQty + '</p>' +
                             '<p class="text-[10px] text-gray-500 font-bold mt-1.5 tracking-wide">現場倉</p>' +
                         '</div>' +
                     '</div>' +
@@ -1539,51 +1669,60 @@
                 var activeClass = isActive ? 'bg-gradient-to-r from-purple-600 to-purple-500 text-white border-purple-400/50 shadow-lg shadow-purple-500/30' : 'bg-white/5 text-gray-300 border-white/10';
                 operatorButtons += '<button onclick="setOperator(\'' + escapeHtml(op) + '\")" ' +
                     'class="operator-btn btn-interactive px-5 py-3 rounded-2xl text-sm font-bold border-2 transition-all ' + activeClass + '" ' +
-                    'data-operator="' + escapeHtml(op) + '">' +
+                    'data-operator="' + escapeHtml(op) + '" ' +
+                    'aria-label="選擇操作人員 ' + escapeHtml(op) + '" ' +
+                    'aria-pressed="' + (isActive ? 'true' : 'false') + '">' +
                     escapeHtml(op) +
                     '</button>';
             }
             
             el.bottomSheetContent.innerHTML = 
                 '<div class="mb-8">' +
-                    '<h2 class="text-3xl font-extrabold text-white mb-3 leading-tight">' + escapeHtml(item.name) + '</h2>' +
+                    '<h2 id="bottomSheetTitle" class="text-3xl font-extrabold text-white mb-3 leading-tight">' + escapeHtml(item.name) + '</h2>' +
                     '<p class="text-sm text-gray-400 font-semibold">' + escapeHtml(item.spec) + ' · ' + escapeHtml(item.unit) + '</p>' +
                 '</div>' +
                 '<div class="glass rounded-3xl p-5 mb-6">' +
                     '<div class="flex items-center gap-2.5 mb-4">' +
-                        '<span class="text-xl">👤</span>' +
+                        '<span class="text-xl" aria-hidden="true">👤</span>' +
                         '<p class="text-xs text-gray-400 font-bold uppercase tracking-wider">操作人員</p>' +
                     '</div>' +
-                    '<div class="flex gap-3">' + operatorButtons + '</div>' +
+                    '<div class="flex gap-3" role="group" aria-label="選擇操作人員">' + operatorButtons + '</div>' +
                 '</div>' +
                 '<div class="space-y-6">' +
                     '<div class="glass-strong rounded-3xl p-6 relative overflow-hidden">' +
-                        '<div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>' +
+                        '<div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl" aria-hidden="true"></div>' +
                         '<p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-5 relative z-10">公司倉庫存</p>' +
-                        '<div class="flex items-center justify-between gap-5 relative z-10">' +
-                            '<button onclick="adjustQty(\'w\', -1)" class="btn-interactive w-16 h-16 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-3xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20">−</button>' +
+                        '<div class="flex items-center justify-between gap-5 relative z-10" role="group" aria-label="調整公司倉庫存">' +
+                            '<button onclick="adjustQty(\'w\', -1)" class="btn-interactive w-16 h-16 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-3xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20" aria-label="減少公司倉庫存">−</button>' +
                             '<div class="text-center flex-1">' +
-                                '<p class="big-number text-6xl font-extrabold text-purple-400 leading-none" id="bs-w-' + id + '">' + wQty + '</p>' +
+                                '<p class="big-number text-6xl font-extrabold text-purple-400 leading-none" id="bs-w-' + id + '" aria-live="polite" aria-atomic="true">' + wQty + '</p>' +
                             '</div>' +
-                            '<button onclick="adjustQty(\'w\', 1)" class="btn-interactive w-16 h-16 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-3xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20">+</button>' +
+                            '<button onclick="adjustQty(\'w\', 1)" class="btn-interactive w-16 h-16 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-3xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20" aria-label="增加公司倉庫存">+</button>' +
                         '</div>' +
                     '</div>' +
                     '<div class="glass-strong rounded-3xl p-6 relative overflow-hidden">' +
-                        '<div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl"></div>' +
+                        '<div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl" aria-hidden="true"></div>' +
                         '<p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-5 relative z-10">現場倉庫存</p>' +
-                        '<div class="flex items-center justify-between gap-5 relative z-10">' +
-                            '<button onclick="adjustQty(\'s\', -1)" class="btn-interactive w-16 h-16 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-3xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20">−</button>' +
+                        '<div class="flex items-center justify-between gap-5 relative z-10" role="group" aria-label="調整現場倉庫存">' +
+                            '<button onclick="adjustQty(\'s\', -1)" class="btn-interactive w-16 h-16 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-3xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20" aria-label="減少現場倉庫存">−</button>' +
                             '<div class="text-center flex-1">' +
-                                '<p class="big-number text-6xl font-extrabold text-cyan-400 leading-none" id="bs-s-' + id + '">' + sQty + '</p>' +
+                                '<p class="big-number text-6xl font-extrabold text-cyan-400 leading-none" id="bs-s-' + id + '" aria-live="polite" aria-atomic="true">' + sQty + '</p>' +
                             '</div>' +
-                            '<button onclick="adjustQty(\'s\', 1)" class="btn-interactive w-16 h-16 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-3xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20">+</button>' +
+                            '<button onclick="adjustQty(\'s\', 1)" class="btn-interactive w-16 h-16 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-3xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20" aria-label="增加現場倉庫存">+</button>' +
                         '</div>' +
                     '</div>' +
                 '</div>';
             
             el.bottomSheet.classList.add('open');
+            el.bottomSheet.setAttribute('aria-hidden', 'false');
             el.bottomSheetOverlay.classList.add('open');
             document.body.style.overflow = 'hidden';
+            
+            // 聚焦到第一個可聚焦元素
+            setTimeout(function() {
+                var firstButton = el.bottomSheetContent.querySelector('button');
+                if (firstButton) firstButton.focus();
+            }, 100);
         }
         
         function setOperator(operator) {
@@ -1608,6 +1747,7 @@
 
         function closeBottomSheet() {
             el.bottomSheet.classList.remove('open');
+            el.bottomSheet.setAttribute('aria-hidden', 'true');
             el.bottomSheetOverlay.classList.remove('open');
             document.body.style.overflow = '';
             state.currentItem = null;
@@ -1840,11 +1980,40 @@
                 if (!btn) return;
                 
                 var chips = el.categoryChips.querySelectorAll('.cat-chip');
-                chips.forEach(function(chip) { chip.classList.remove('active'); });
+                chips.forEach(function(chip) { 
+                    chip.classList.remove('active');
+                    chip.setAttribute('aria-selected', 'false');
+                    chip.setAttribute('tabindex', '-1');
+                });
                 btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+                btn.setAttribute('tabindex', '0');
                 
                 state.category = btn.getAttribute('data-cat');
                 applyFiltersDebounced();
+            });
+            
+            // 鍵盤導航分類標籤
+            el.categoryChips.addEventListener('keydown', function(e) {
+                var chips = Array.from(el.categoryChips.querySelectorAll('.cat-chip'));
+                var currentIndex = chips.indexOf(e.target);
+                
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    var nextIndex = e.key === 'ArrowRight' 
+                        ? (currentIndex + 1) % chips.length
+                        : (currentIndex - 1 + chips.length) % chips.length;
+                    chips[nextIndex].focus();
+                    chips[nextIndex].click();
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    chips[0].focus();
+                    chips[0].click();
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    chips[chips.length - 1].focus();
+                    chips[chips.length - 1].click();
+                }
             });
             
             // 按鈕
@@ -1857,9 +2026,11 @@
             
             // 鍵盤快捷鍵
             document.addEventListener('keydown', function(e) {
+                // ESC 關閉 Bottom Sheet
                 if (e.key === 'Escape' && el.bottomSheet.classList.contains('open')) {
                     closeBottomSheet();
                 }
+                // Enter/Space 觸發按鈕（已在 HTML 中處理）
             });
         }
 
