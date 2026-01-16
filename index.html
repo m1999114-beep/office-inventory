@@ -2,13 +2,30 @@
 <html lang="zh-TW" class="dark">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="物料戰情室">
     <meta name="description" content="工程物料庫存管理系統 - 即時盤點、追蹤、統計">
     <meta name="keywords" content="物料管理,庫存系統,盤點,工程管理">
-    <title>物料戰情室 v19.0 - 工程物料庫存管理系統</title>
+    <title>物料戰情室 v19.1 - 工程物料庫存管理系統</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="shortcut icon" type="image/png" href="icon-192.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS Safari PWA Icons -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- PWA Theme -->
+    <meta name="mobile-web-app-capable" content="yes">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { 
@@ -69,6 +86,14 @@
             line-height: 1.6;
             /* WCAG AA 對比度優化 */
             color: #f5f5f5; /* 提升對比度 */
+            /* 增大基礎字體提升易讀性 */
+            font-size: 16px;
+        }
+        
+        @media (min-width: 640px) {
+            body {
+                font-size: 17px;
+            }
         }
         
         /* 確保最小觸摸目標 44x44px (WCAG 2.5.5) */
@@ -184,24 +209,7 @@
             overflow: hidden;
         }
         
-        .stock-bar-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.3) 50%, 
-                transparent 100%);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
+        /* 移除 shimmer 動畫，簡化特效 */
         
         .stock-green { 
             background: linear-gradient(90deg, #10b981, #34d399); 
@@ -229,11 +237,10 @@
             to { transform: rotate(360deg); } 
         }
         
-        /* 按鈕微交互 - 極致改進 + 可訪問性 */
+        /* 按鈕微交互 - 實用為主，簡化特效 */
         .btn-interactive {
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.2s ease;
             position: relative;
-            overflow: hidden;
             cursor: pointer;
             /* 確保觸摸目標 */
             min-width: 44px;
@@ -253,99 +260,35 @@
             pointer-events: none;
         }
         
-        .btn-interactive::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 70%);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                        height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.3s;
-            opacity: 0;
-        }
-        
-        .btn-interactive:active::before {
-            width: 400px;
-            height: 400px;
-            opacity: 1;
-        }
-        
         .btn-interactive:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            opacity: 0.9;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
         .btn-interactive:active { 
-            transform: scale(0.94) translateY(0); 
-            transition: all 0.15s;
+            transform: scale(0.97); 
+            transition: all 0.1s;
         }
         
-        /* 分類按鈕 - 極致設計 */
+        /* 分類按鈕 - 實用為主，簡化特效 */
         .cat-chip {
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.2s ease;
             white-space: nowrap;
             position: relative;
-            overflow: hidden;
-        }
-        
-        .cat-chip::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c084fc);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        
-        .cat-chip::after {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(168, 85, 247, 0.3));
-            border-radius: inherit;
-            opacity: 0;
-            transition: opacity 0.4s;
-            z-index: -1;
-            filter: blur(8px);
-        }
-        
-        .cat-chip.active::before {
-            opacity: 1;
-        }
-        
-        .cat-chip.active::after {
-            opacity: 1;
-        }
-        
-        .cat-chip span {
-            position: relative;
-            z-index: 1;
-            transition: transform 0.3s;
         }
         
         .cat-chip.active { 
-            color: white;
-            box-shadow: 
-                0 6px 32px rgba(139, 92, 246, 0.5),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transform: scale(1.08) translateY(-1px);
-        }
-        
-        .cat-chip.active span {
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa) !important;
+            color: white !important;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+            border-color: rgba(255, 255, 255, 0.2) !important;
         }
         
         .cat-chip:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
         
-        /* 底部導航 - 極致優化 */
+        /* 底部導航 - 簡化特效 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -353,17 +296,15 @@
             right: 0;
             z-index: 100;
             background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.9));
-            backdrop-filter: blur(40px) saturate(200%);
-            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-top: 1px solid rgba(255, 255, 255, 0.12);
             padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 
-                0 -12px 48px rgba(0, 0, 0, 0.7),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
         }
         
         .nav-item {
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.2s ease;
             cursor: pointer;
             user-select: none;
             position: relative;
@@ -375,11 +316,11 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%) scaleX(0);
-            width: 40px;
-            height: 3px;
-            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+            width: 32px;
+            height: 2px;
+            background: #8b5cf6;
             border-radius: 0 0 999px 999px;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.2s ease;
         }
         
         .nav-item.active {
@@ -391,54 +332,35 @@
         }
         
         .nav-item.active .nav-icon {
-            transform: scale(1.2) translateY(-2px);
-            filter: drop-shadow(0 4px 12px rgba(139, 92, 246, 0.6));
+            transform: scale(1.1);
         }
         
         .nav-item:active {
-            transform: scale(0.92);
+            transform: scale(0.96);
         }
         
-        .nav-item:active .nav-icon {
-            transform: scale(1.1) translateY(-1px);
-        }
-        
-        /* Bottom Sheet - 極致改進 */
+        /* Bottom Sheet - 簡化特效 */
         .bottom-sheet {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.99), rgba(5, 5, 5, 0.98));
-            backdrop-filter: blur(50px) saturate(200%);
-            -webkit-backdrop-filter: blur(50px) saturate(200%);
-            border-top-left-radius: 36px;
-            border-top-right-radius: 36px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.98), rgba(5, 5, 5, 0.97));
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.3s ease;
             z-index: 200;
             max-height: 85vh;
             padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
-            box-shadow: 
-                0 -20px 80px rgba(0, 0, 0, 0.9),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.05);
+            box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.8);
         }
         
         .bottom-sheet.open {
             transform: translateY(0);
-        }
-        
-        .bottom-sheet::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 200px;
-            background: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.1), transparent 70%);
-            pointer-events: none;
         }
         
         .bottom-sheet-overlay {
@@ -465,7 +387,134 @@
             margin: 16px auto;
         }
         
-        /* Toast - 極致改進 */
+        /* 轉移輸入框 - 手機友善 */
+        .transfer-input-container {
+            padding: 20px 0;
+        }
+        
+        .transfer-input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #9ca3af;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .transfer-input-number {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 32px;
+            font-weight: 900;
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+            outline: none;
+            transition: all 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .transfer-input-number:focus {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+        
+        .transfer-quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .transfer-quick-btn {
+            padding: 16px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .transfer-quick-btn:active {
+            transform: scale(0.95);
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+        
+        .transfer-action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .transfer-action-btn {
+            flex: 1;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .transfer-action-btn.confirm {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: #ffffff;
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.4);
+        }
+        
+        .transfer-action-btn.confirm:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+        }
+        
+        .transfer-action-btn.cancel {
+            background: rgba(255, 255, 255, 0.05);
+            color: #9ca3af;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transfer-action-btn.cancel:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .transfer-info {
+            text-align: center;
+            padding: 16px;
+            background: rgba(6, 182, 212, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+        
+        .transfer-info-text {
+            font-size: 14px;
+            color: #67e8f9;
+            font-weight: 600;
+        }
+        
+        .transfer-info-number {
+            font-size: 24px;
+            color: #ffffff;
+            font-weight: 900;
+            margin-top: 4px;
+        }
+        
+        /* Toast - 簡化特效 */
         .toast-container { 
             position: fixed; 
             bottom: 90px; 
@@ -474,59 +523,46 @@
             z-index: 9999; 
             display: flex; 
             flex-direction: column; 
-            gap: 12px; 
+            gap: 10px; 
             width: 90%; 
             max-width: 420px;
             pointer-events: none;
         }
         
         .toast { 
-            background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(26, 26, 26, 0.95)); 
-            backdrop-filter: blur(32px) saturate(200%);
-            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            background: rgba(20, 20, 20, 0.95); 
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.15); 
-            padding: 18px 24px; 
-            border-radius: 24px; 
-            animation: toastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            padding: 14px 20px; 
+            border-radius: 16px; 
+            animation: toastIn 0.3s ease; 
             display: flex; 
             align-items: center; 
-            gap: 16px;
-            box-shadow: 
-                0 16px 64px rgba(0, 0, 0, 0.7),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             pointer-events: auto;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .toast::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.1), transparent 60%);
-            pointer-events: none;
         }
         
         @keyframes toastIn { 
             0% { 
                 opacity: 0; 
-                transform: translateY(30px) scale(0.9); 
+                transform: translateY(20px); 
             } 
             100% { 
                 opacity: 1; 
-                transform: translateY(0) scale(1); 
+                transform: translateY(0); 
             } 
         }
         
         @keyframes toastOut { 
             0% { 
                 opacity: 1; 
-                transform: translateY(0) scale(1); 
+                transform: translateY(0); 
             } 
             100% { 
                 opacity: 0; 
-                transform: translateY(-20px) scale(0.95); 
+                transform: translateY(-10px); 
             } 
         }
         
@@ -580,47 +616,27 @@
             border-color: rgba(139, 92, 246, 0.6);
         }
         
-        /* 卡片動畫 - 極致優化 */
+        /* 卡片動畫 - 實用為主，簡化特效 */
         .card-item {
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.2s ease;
             cursor: pointer;
-            will-change: transform, box-shadow;
             position: relative;
-            overflow: hidden;
-        }
-        
-        .card-item::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-                rgba(139, 92, 246, 0.15), transparent 60%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
         }
         
         .card-item:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.7),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                0 0 40px rgba(139, 92, 246, 0.2);
-        }
-        
-        .card-item:hover::after {
-            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
         
         .card-item:active {
-            transform: translateY(-1px) scale(0.99);
-            transition: all 0.15s;
+            transform: translateY(0);
+            transition: all 0.1s;
         }
         
-        /* 頁面切換 - 極致改進 */
+        /* 頁面切換 - 簡化動畫 */
         .page {
             display: none;
-            animation: pageIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: pageIn 0.3s ease;
         }
         
         .page.active {
@@ -630,27 +646,48 @@
         @keyframes pageIn {
             0% { 
                 opacity: 0; 
-                transform: translateY(30px) scale(0.98); 
-                filter: blur(4px);
+                transform: translateY(10px);
             }
             100% { 
                 opacity: 1; 
-                transform: translateY(0) scale(1); 
-                filter: blur(0);
+                transform: translateY(0);
             }
         }
         
-        /* 數字顯示 - 極致優化 */
+        /* 數字顯示 - 極致優化 - 增大字體提升易讀性 */
         .big-number {
             font-variant-numeric: tabular-nums;
-            letter-spacing: -0.04em;
-            font-weight: 800;
-            text-shadow: 0 2px 20px rgba(139, 92, 246, 0.3);
-            background: linear-gradient(135deg, #ffffff, rgba(255, 255, 255, 0.9));
+            letter-spacing: -0.02em;
+            font-weight: 900;
+            text-shadow: 0 2px 20px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, #ffffff, rgba(255, 255, 255, 0.95));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             transition: all 0.3s;
+            /* 提升易讀性 */
+            line-height: 1.1;
+        }
+        
+        /* Header 大數字 - 超大顯示 */
+        .header-big-number {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.05em;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        @media (max-width: 640px) {
+            .header-big-number {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-big-number {
+                font-size: 2.5rem;
+            }
         }
         
         .big-number.text-purple-400 {
@@ -709,49 +746,19 @@
             50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
         }
         
-        /* 統計卡片 - 極致增強 */
+        /* 統計卡片 - 簡化特效 */
         .stat-card {
             position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.2), transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s;
+            transition: all 0.2s ease;
         }
         
         .stat-card:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 
-                0 16px 48px rgba(0, 0, 0, 0.7),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                0 0 30px rgba(139, 92, 246, 0.3);
-        }
-        
-        .stat-card:hover::before,
-        .stat-card:hover::after {
-            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
         
         .stat-card:active {
-            transform: translateY(-2px) scale(1);
+            transform: translateY(0);
         }
         
         /* 安全區域適配 */
@@ -785,13 +792,17 @@
             line-height: 1.2;
         }
         
-        /* 提升文字對比度 */
+        /* 提升文字對比度 - 進一步優化易讀性 */
+        .text-gray-300 {
+            color: #d4d4d8; /* 提升對比度 */
+        }
+        
         .text-gray-400 {
-            color: #a1a1aa; /* 提升對比度 */
+            color: #b8b8c0; /* 提升對比度 */
         }
         
         .text-gray-500 {
-            color: #71717a; /* 提升對比度 */
+            color: #9ca3af; /* 提升對比度 */
         }
         
         /* 錯誤狀態對比度優化 */
@@ -802,6 +813,19 @@
         /* 成功狀態對比度優化 */
         .text-green-400 {
             color: #4ade80; /* 確保對比度 */
+        }
+        
+        /* 改善卡片內文字對比度 */
+        .glass p, .glass span, .glass h3 {
+            color: #f5f5f5;
+        }
+        
+        .glass .text-gray-400 {
+            color: #c4c4cc;
+        }
+        
+        .glass .text-gray-500 {
+            color: #a1a1aa;
         }
         
         /* 屏幕閱讀器專用 */
@@ -897,23 +921,57 @@
             animation: numberPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         
-        /* 列表項目進入動畫 */
+        /* 可編輯數字輸入框 */
+        .editable-number {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .editable-number:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+        
+        .editable-number-input {
+            background: rgba(139, 92, 246, 0.2);
+            border: 2px solid rgba(139, 92, 246, 0.6);
+            border-radius: 12px;
+            padding: 8px 16px;
+            text-align: center;
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+            width: 100%;
+            max-width: 200px;
+            outline: none;
+            font-family: inherit;
+        }
+        
+        .editable-number-input:focus {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.8);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25);
+        }
+        
+        /* 列表項目進入動畫 - 簡化 */
         .list-item-enter {
-            animation: listItemEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+            animation: listItemEnter 0.3s ease backwards;
         }
         
         @keyframes listItemEnter {
             0% {
                 opacity: 0;
-                transform: translateY(20px) scale(0.95);
+                transform: translateY(10px);
             }
             100% {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
         
-        /* 優化工地現場物料列表 */
+        /* 優化F22廠區物料列表 */
         .site-item {
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -959,28 +1017,45 @@
     <div id="toastBox" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
     
     <!-- Bottom Sheet Overlay -->
-    <div id="bottomSheetOverlay" class="bottom-sheet-overlay" onclick="closeBottomSheet()" role="button" aria-label="關閉盤點視窗" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){closeBottomSheet();event.preventDefault();}"></div>
+    <div id="bottomSheetOverlay" class="bottom-sheet-overlay" onclick="closeBottomSheet();closeTransferInput();" role="button" aria-label="關閉視窗" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){closeBottomSheet();closeTransferInput();event.preventDefault();}"></div>
     
     <!-- 主容器 -->
     <div class="relative min-h-screen pb-24 safe-bottom">
         
         <!-- Header -->
         <header id="header" class="glass-strong sticky top-0 z-50 safe-top" role="banner">
-            <div class="px-5 py-5">
+            <div class="px-5 py-6">
+                <!-- 主要統計數字 - 最上方 -->
+                <div class="grid grid-cols-3 gap-3 mb-5">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-400 font-bold mb-2.5 tracking-wide" aria-label="總品項標籤">總品項</p>
+                        <p id="headerTotalItems" class="header-big-number big-number text-white leading-none">-</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-400 font-bold mb-2.5 tracking-wide" aria-label="F22廠區標籤">F22廠區</p>
+                        <p id="headerSiteItems" class="header-big-number big-number text-cyan-400 leading-none">-</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-400 font-bold mb-2.5 tracking-wide" aria-label="低庫存標籤">低庫存</p>
+                        <p id="headerLowStock" class="header-big-number big-number text-yellow-400 leading-none">-</p>
+                    </div>
+                </div>
+                
+                <!-- 標題和狀態 -->
                 <div class="flex justify-between items-center mb-3">
                     <div>
-                        <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 via-purple-500 to-purple-600 animate-gradient">
+                        <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 via-purple-500 to-purple-600 animate-gradient">
                             物料戰情室
                         </h1>
-                        <p class="text-xs text-gray-400 mt-1 font-semibold tracking-wide" aria-label="版本號">v19.0 Pro Edition</p>
+                        <p class="text-xs text-gray-500 mt-1 font-semibold tracking-wide" aria-label="版本號">v19.1 Pro Edition</p>
                     </div>
-                    <div id="statusBadge" class="status-badge text-xs px-4 py-2.5 rounded-full bg-white/5 text-gray-400 border border-white/10 font-semibold backdrop-blur-sm" role="status" aria-live="polite" aria-atomic="true">
+                    <div id="statusBadge" class="status-badge text-sm px-4 py-2.5 rounded-full bg-white/5 text-gray-400 border border-white/10 font-semibold backdrop-blur-sm" role="status" aria-live="polite" aria-atomic="true" title="網絡連接狀態">
                         連線中...
                     </div>
                 </div>
-                <div class="flex items-center gap-2.5 text-xs">
-                    <span class="text-gray-500 font-medium" aria-label="當前操作人員標籤">操作人員</span>
-                    <span id="headerOperator" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600/30 to-purple-500/20 text-purple-300 font-bold border border-purple-500/40 shadow-lg shadow-purple-500/20" aria-label="當前操作人員" role="status">黃俊瑋</span>
+                <div class="flex items-center gap-2.5 text-sm">
+                    <span class="text-gray-400 font-semibold" aria-label="當前操作人員標籤">操作人員</span>
+                    <span id="headerOperator" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600/30 to-purple-500/20 text-purple-300 font-bold border border-purple-500/40 shadow-lg shadow-purple-500/20 text-base" aria-label="當前操作人員" role="status">黃俊瑋</span>
                 </div>
             </div>
         </header>
@@ -988,45 +1063,31 @@
         <!-- Dashboard 頁面 -->
         <div id="page-dashboard" class="page active">
             <div class="px-5 py-6 space-y-6">
-                <!-- 統計卡片 -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="stat-card glass rounded-3xl p-6 text-center relative">
-                        <div class="absolute top-3 right-3 text-2xl opacity-20">📊</div>
-                        <p class="stat-label text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">總品項</p>
-                        <p id="totalItems" class="big-number text-5xl font-extrabold text-white leading-none">-</p>
-                    </div>
-                    <div class="stat-card glass rounded-3xl p-6 text-center relative">
-                        <div class="absolute top-3 right-3 text-2xl opacity-20">⚠️</div>
-                        <p class="stat-label text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">低庫存</p>
-                        <p id="lowStock" class="big-number text-5xl font-extrabold text-yellow-400 leading-none">-</p>
-                    </div>
-                </div>
-                
                 <!-- 分類統計條 -->
                 <div class="glass rounded-3xl p-6">
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="text-xl">📈</span>
-                        <h3 class="text-base font-bold text-white">分類統計</h3>
+                        <span class="text-2xl">📈</span>
+                        <h3 class="text-lg font-bold text-white">分類統計</h3>
                     </div>
-                    <div id="categoryBar" class="h-3 rounded-full bg-white/5 flex overflow-hidden mb-4"></div>
-                    <div id="categoryLegend" class="flex flex-wrap gap-4 text-xs text-gray-400"></div>
+                    <div id="categoryBar" class="h-4 rounded-full bg-white/5 flex overflow-hidden mb-4"></div>
+                    <div id="categoryLegend" class="flex flex-wrap gap-4 text-sm text-gray-300"></div>
                 </div>
                 
-                <!-- 工地現場物料清單 -->
+                <!-- F22廠區物料清單 -->
                 <div class="glass rounded-3xl p-6">
                     <div class="flex items-center justify-between mb-5">
                         <div class="flex items-center gap-2.5">
-                            <span class="text-2xl">🏗️</span>
-                            <h3 class="text-lg font-bold text-white">工地現場物料</h3>
+                            <span class="text-3xl">🏗️</span>
+                            <h3 class="text-xl font-bold text-white">F22廠區物料</h3>
                         </div>
-                        <span id="siteItemCount" class="text-xs px-3.5 py-1.5 rounded-full bg-gradient-to-r from-cyan-500/30 to-cyan-400/20 text-cyan-300 font-bold border border-cyan-400/40 shadow-lg shadow-cyan-500/20">-</span>
+                        <span id="siteItemCount" class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/30 to-cyan-400/20 text-cyan-300 font-bold border border-cyan-400/40 shadow-lg shadow-cyan-500/20">-</span>
                     </div>
                     <div id="siteItemsList" class="space-y-2.5 max-h-96 overflow-y-auto">
                         <!-- 物料項目將在這裡動態生成 -->
                     </div>
                     <div id="siteItemsEmpty" class="hidden text-center py-12">
                         <div class="text-5xl mb-3 opacity-40">📭</div>
-                        <p class="text-gray-500 text-sm font-medium">工地現場暫無物料</p>
+                        <p class="text-gray-500 text-sm font-medium">F22廠區暫無物料</p>
                     </div>
                 </div>
             </div>
@@ -1036,45 +1097,63 @@
         <div id="page-list" class="page">
             <div class="px-5 py-5 space-y-5">
                 <!-- 搜尋欄 -->
-                <div class="search-container glass rounded-3xl p-5" role="search">
+                <div class="search-container glass rounded-3xl p-6" role="search">
                     <label for="searchInput" class="sr-only">搜尋物料</label>
                     <div class="flex items-center gap-4">
-                        <svg class="w-6 h-6 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg class="w-7 h-7 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input 
                             type="search" 
                             id="searchInput" 
-                            placeholder="搜尋品名、規格..." 
-                            class="search-input flex-1 bg-transparent text-white placeholder-gray-500 text-base font-semibold focus:outline-none"
+                            placeholder="搜尋品名、規格、速記碼..." 
+                            class="search-input flex-1 bg-transparent text-white placeholder-gray-400 text-lg font-semibold focus:outline-none"
                             autocomplete="off"
                             aria-label="搜尋物料品名或規格"
                             aria-describedby="searchHint"
+                            list="searchHistory"
+                            style="font-size: 1.125rem;"
                         >
+                        <datalist id="searchHistory"></datalist>
                     </div>
                     <div id="searchHint" class="sr-only">輸入關鍵字以搜尋物料</div>
+                    <div id="searchResultsCount" class="text-sm text-gray-400 mt-3 hidden"></div>
                 </div>
                 
                 <!-- 分類標籤 -->
                 <div class="flex gap-3 overflow-x-auto pb-3 scrollbar-hide" style="-webkit-overflow-scrolling: touch;" id="categoryChips" role="tablist" aria-label="物料分類篩選">
-                    <button class="cat-chip active px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="all" role="tab" aria-selected="true" aria-controls="inventoryList" tabindex="0">
+                    <button class="cat-chip active px-7 py-3.5 rounded-full text-base font-bold bg-white/5 text-gray-200 border border-white/10" data-cat="all" role="tab" aria-selected="true" aria-controls="inventoryList" tabindex="0">
                         <span>全部</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="wire" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
+                    <button class="cat-chip px-7 py-3.5 rounded-full text-base font-bold bg-white/5 text-gray-200 border border-white/10" data-cat="wire" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔌 電線</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="terminal" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
+                    <button class="cat-chip px-7 py-3.5 rounded-full text-base font-bold bg-white/5 text-gray-200 border border-white/10" data-cat="terminal" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔗 端子</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="consumable" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
+                    <button class="cat-chip px-7 py-3.5 rounded-full text-base font-bold bg-white/5 text-gray-200 border border-white/10" data-cat="consumable" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>📦 耗材</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="pipe" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
+                    <button class="cat-chip px-7 py-3.5 rounded-full text-base font-bold bg-white/5 text-gray-200 border border-white/10" data-cat="pipe" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔩 管材</span>
                     </button>
-                    <button class="cat-chip px-6 py-3 rounded-full text-sm font-bold bg-white/5 text-gray-300 border border-white/10" data-cat="hardware" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
+                    <button class="cat-chip px-7 py-3.5 rounded-full text-base font-bold bg-white/5 text-gray-200 border border-white/10" data-cat="hardware" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔧 五金</span>
                     </button>
+                </div>
+                
+                <!-- 批量操作欄 -->
+                <div id="batchActions" class="hidden glass rounded-2xl p-5 mb-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-base font-bold text-white">已選擇 <span id="selectedCount">0</span> 項</span>
+                            <button onclick="clearSelection()" class="text-sm text-gray-300 hover:text-white font-semibold">清除</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="batchAdjust('w', 1)" class="btn-interactive px-5 py-2.5 rounded-xl bg-purple-600/20 text-purple-300 text-base font-bold border border-purple-500/40">公司倉 +1</button>
+                            <button onclick="batchAdjust('s', 1)" class="btn-interactive px-5 py-2.5 rounded-xl bg-cyan-600/20 text-cyan-300 text-base font-bold border border-cyan-500/40">F22廠區 +1</button>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- 庫存列表 -->
@@ -1127,6 +1206,22 @@
                     <div id="operatorSelector" class="flex flex-col gap-3"></div>
                 </div>
                 
+                <!-- PWA 安裝選項（可選，不強制） -->
+                <div id="pwaInstallSection" class="glass rounded-3xl p-6 hidden">
+                    <h3 class="text-lg font-extrabold text-white mb-5 flex items-center gap-2">
+                        <span>📱</span>
+                        <span>安裝到手機</span>
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-4 leading-relaxed">
+                        可選功能：將應用安裝到主屏幕，像 App 一樣使用。<br>
+                        <span class="text-gray-500 text-xs">不影響網頁正常使用，可隨時卸載</span>
+                    </p>
+                    <button onclick="installPWA()" class="btn-interactive w-full flex items-center justify-center gap-3 p-5 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white font-extrabold shadow-xl shadow-purple-600/30">
+                        <span class="text-2xl">📲</span>
+                        <span>安裝到主屏幕</span>
+                    </button>
+                </div>
+                
                 <div class="glass rounded-3xl p-6">
                     <h3 class="text-lg font-extrabold text-white mb-5 flex items-center gap-2">
                         <span>ℹ️</span>
@@ -1135,7 +1230,7 @@
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between items-center py-2 border-b border-white/5">
                             <span class="text-gray-400 font-semibold">版本</span>
-                            <span class="text-white font-extrabold">v19.0 Pro</span>
+                            <span class="text-white font-extrabold">v19.1 Pro</span>
                         </div>
                         <div class="flex justify-between items-center py-2">
                             <span class="text-gray-400 font-semibold">已載入品項</span>
@@ -1180,6 +1275,14 @@
         </div>
     </div>
     
+    <!-- 轉移數量輸入框 (手機友善) -->
+    <div id="transferInputSheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="transferInputTitle" aria-hidden="true">
+        <div class="bottom-sheet-handle" aria-hidden="true"></div>
+        <div class="px-6 pb-6">
+            <div id="transferInputContent"></div>
+        </div>
+    </div>
+    
     <!-- 底部導航 -->
     <nav class="bottom-nav" role="navigation" aria-label="主要導航">
         <div class="flex justify-around items-center py-3 px-3">
@@ -1218,7 +1321,13 @@
             currentItem: null,
             isLoading: false,
             updateTimers: {},
-            currentOperator: '黃俊瑋' // 預設操作人員
+            currentOperator: '黃俊瑋', // 預設操作人員
+            pendingUpdates: {}, // 待同步的操作（用於錯誤恢復）
+            isOnline: navigator.onLine, // 網絡狀態
+            selectedItems: [], // 批量選擇的物料
+            searchHistory: [], // 搜索歷史
+            operationHistory: [], // 操作歷史（本地緩存）
+            editingNumber: null // 當前正在編輯的數字（防止重複編輯）
         };
         
         // 操作人員清單
@@ -1231,8 +1340,6 @@
 
         function initDOM() {
             el.statusBadge = $('statusBadge');
-            el.totalItems = $('totalItems');
-            el.lowStock = $('lowStock');
             el.searchInput = $('searchInput');
             el.exportBtn = $('exportBtn');
             el.refreshBtn = $('refreshBtn');
@@ -1250,6 +1357,8 @@
             el.bottomSheet = $('bottomSheet');
             el.bottomSheetOverlay = $('bottomSheetOverlay');
             el.bottomSheetContent = $('bottomSheetContent');
+            el.transferInputSheet = $('transferInputSheet');
+            el.transferInputContent = $('transferInputContent');
             el.header = $('header');
             el.settingsItemCount = $('settingsItemCount');
             el.siteItemCount = $('siteItemCount');
@@ -1265,6 +1374,11 @@
 
         function safeStr(v, d) {
             return (v === undefined || v === null || v === '') ? (d || '') : String(v);
+        }
+
+        function formatNumber(num) {
+            // 如果是小數，保留一位小數，否則顯示整數
+            return num % 1 === 0 ? num : num.toFixed(1);
         }
 
         function escapeHtml(str) {
@@ -1283,6 +1397,34 @@
                     func.apply(context, args);
                 }, delay);
             };
+        }
+        
+        // 優化：統一的物料查找函數
+        function findItemById(id) {
+            if (state.currentItem && state.currentItem.id == id) {
+                return state.currentItem;
+            }
+            for (var i = 0; i < state.stock.length; i++) {
+                if (state.stock[i].id == id) {
+                    return state.stock[i];
+                }
+            }
+            return null;
+        }
+        
+        // 優化：統一的 UI 更新函數
+        function updateNumberDisplay(id, type, value, isBottomSheet) {
+            var elementId = (isBottomSheet ? 'bs-' : '') + (type === 'w' ? 'w-' : 's-') + id;
+            var el = document.getElementById(elementId);
+            if (el && el.tagName !== 'INPUT') {
+                // 如果是小數，保留一位小數，否則顯示整數
+                var displayValue = value % 1 === 0 ? value : value.toFixed(1);
+                el.textContent = displayValue;
+                el.classList.add('number-update');
+                setTimeout(function() { 
+                    if (el) el.classList.remove('number-update'); 
+                }, 400);
+            }
         }
 
         // ===== 分類邏輯 - 優化 =====
@@ -1410,14 +1552,44 @@
             // 顯示/隱藏 Header
             el.header.style.display = (page === 'dashboard') ? 'block' : 'none';
             
-            // 如果切換到設定頁，渲染操作人員選擇器
+            // 如果切換到設定頁，渲染操作人員選擇器和 PWA 安裝選項
             if (page === 'settings') {
                 renderOperatorSelector();
+                renderOperationHistory();
+                // 延遲一下確保 DOM 已渲染
+                setTimeout(function() {
+                    updatePWAInstallSection();
+                    updateAppMode();
+                }, 100);
             }
             
             // 關閉 Bottom Sheet
             closeBottomSheet();
+            
+            // 更新 URL（不刷新頁面）
+            if (history.pushState) {
+                var newUrl = window.location.pathname + (page === 'dashboard' ? '' : '?page=' + page);
+                window.history.pushState({ page: page }, '', newUrl);
+            }
         }
+        
+        // 處理 URL 參數（PWA shortcuts 支持）
+        function handleURLParams() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var page = urlParams.get('page');
+            if (page && (page === 'dashboard' || page === 'list' || page === 'settings')) {
+                switchPage(page);
+            }
+        }
+        
+        // 處理瀏覽器返回按鈕
+        window.addEventListener('popstate', function(event) {
+            if (event.state && event.state.page) {
+                switchPage(event.state.page);
+            } else {
+                switchPage('dashboard');
+            }
+        });
         
         function renderOperatorSelector() {
             var container = document.getElementById('operatorSelector');
@@ -1444,23 +1616,24 @@
         }
         
         function setOperatorGlobal(operator) {
-            state.currentOperator = operator;
-            
-            // 更新 Header 顯示
-            var headerOp = document.getElementById('headerOperator');
-            if (headerOp) {
-                headerOp.textContent = operator;
-                headerOp.classList.add('number-update');
-                setTimeout(function() { headerOp.classList.remove('number-update'); }, 400);
-            }
-            
+            // 使用統一的 setOperator 函數來保持一致性
+            setOperator(operator);
+            // 重新渲染設定頁面的選擇器以確保樣式正確
             renderOperatorSelector();
             toast('已切換操作人員：' + operator, 'success');
         }
 
         function updateDashboard() {
-            el.totalItems.textContent = state.stock.length;
-            el.settingsItemCount.textContent = state.stock.length;
+            var totalItems = state.stock.length;
+            el.settingsItemCount.textContent = totalItems;
+            
+            // 同時更新 Header 中的數字
+            var headerTotal = document.getElementById('headerTotalItems');
+            if (headerTotal) {
+                headerTotal.textContent = totalItems;
+                headerTotal.classList.add('number-update');
+                setTimeout(function() { headerTotal.classList.remove('number-update'); }, 400);
+            }
             
             var lowCount = 0;
             var categoryCounts = {};
@@ -1484,7 +1657,29 @@
                 totalQty += total;
             }
             
-            el.lowStock.textContent = lowCount;
+            // 同時更新 Header 中的低庫存數字
+            var headerLowStock = document.getElementById('headerLowStock');
+            if (headerLowStock) {
+                headerLowStock.textContent = lowCount;
+                headerLowStock.classList.add('number-update');
+                setTimeout(function() { headerLowStock.classList.remove('number-update'); }, 400);
+            }
+            
+            // 計算F22廠區物料數量
+            var siteItemsCount = 0;
+            for (var i = 0; i < state.stock.length; i++) {
+                if (safeNum(state.stock[i].siteQty) > 0) {
+                    siteItemsCount++;
+                }
+            }
+            
+            // 更新 Header 中的F22廠區數字
+            var headerSiteItems = document.getElementById('headerSiteItems');
+            if (headerSiteItems) {
+                headerSiteItems.textContent = siteItemsCount;
+                headerSiteItems.classList.add('number-update');
+                setTimeout(function() { headerSiteItems.classList.remove('number-update'); }, 400);
+            }
             
             // 更新分類條
             if (totalQty === 0) totalQty = 1;
@@ -1507,12 +1702,12 @@
             el.categoryBar.innerHTML = barHtml;
             el.categoryLegend.innerHTML = legendHtml;
             
-            // 更新工地現場物料清單
+            // 更新F22廠區物料清單
             renderSiteItems();
         }
         
         function renderSiteItems() {
-            // 篩選出現場有庫存的物料
+            // 篩選出F22廠區有庫存的物料
             var siteItems = [];
             for (var i = 0; i < state.stock.length; i++) {
                 var item = state.stock[i];
@@ -1521,7 +1716,7 @@
                 }
             }
             
-            // 按現場數量降序排列
+            // 按F22廠區數量降序排列
             siteItems.sort(function(a, b) {
                 return safeNum(b.siteQty) - safeNum(a.siteQty);
             });
@@ -1547,17 +1742,17 @@
                 var cat = getCategory(item);
                 var icon = getCategoryIcon(cat);
                 
-                html += '<div class="site-item flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 cursor-pointer" onclick="openBottomSheet(\'' + escapeHtml(id) + '\')" style="animation-delay: ' + (i * 0.05) + 's">' +
-                    '<div class="flex items-center gap-3.5 flex-1 min-w-0">' +
-                        '<span class="text-2xl flex-shrink-0">' + icon + '</span>' +
+                html += '<div class="site-item flex items-center justify-between p-5 rounded-2xl bg-white/5 border border-white/5 cursor-pointer" onclick="openBottomSheet(\'' + escapeHtml(id) + '\')" style="animation-delay: ' + (i * 0.05) + 's">' +
+                    '<div class="flex items-center gap-4 flex-1 min-w-0">' +
+                        '<span class="text-3xl flex-shrink-0">' + icon + '</span>' +
                         '<div class="flex-1 min-w-0">' +
-                            '<p class="text-sm font-bold text-white truncate mb-0.5">' + escapeHtml(name) + '</p>' +
-                            '<p class="text-xs text-gray-500 truncate font-medium">' + escapeHtml(spec) + '</p>' +
+                            '<p class="text-base font-bold text-white truncate mb-1">' + escapeHtml(name) + '</p>' +
+                            '<p class="text-sm text-gray-300 truncate font-medium">' + escapeHtml(spec) + '</p>' +
                         '</div>' +
                     '</div>' +
                     '<div class="text-right flex-shrink-0 ml-4">' +
-                        '<p class="big-number text-3xl font-extrabold text-cyan-400 leading-none">' + sQty + '</p>' +
-                        '<p class="text-[10px] text-gray-500 font-bold mt-1">件</p>' +
+                        '<p class="big-number text-4xl font-extrabold text-cyan-400 leading-none">' + sQty + '</p>' +
+                        '<p class="text-xs text-gray-400 font-bold mt-1.5">件</p>' +
                     '</div>' +
                 '</div>';
             }
@@ -1613,49 +1808,148 @@
             
             var cat = getCategory(item);
             var icon = getCategoryIcon(cat);
+            var isSelected = state.selectedItems.indexOf(id) >= 0;
+            var selectClass = isSelected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-black' : '';
             
-            return '<div class="card-item glass rounded-3xl p-6 gpu-accelerated list-item-enter" ' +
-                'onclick="openBottomSheet(\'' + escapeHtml(id) + '\')" ' +
-                'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){openBottomSheet(\'' + escapeHtml(id) + '\');event.preventDefault();}" ' +
+            return '<div class="card-item glass rounded-3xl p-6 gpu-accelerated list-item-enter ' + selectClass + '" ' +
+                'onclick="handleItemClick(event, \'' + escapeHtml(id) + '\')" ' +
+                'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){handleItemClick(event, \'' + escapeHtml(id) + '\');event.preventDefault();}" ' +
                 'data-id="' + escapeHtml(id) + '" ' +
                 'role="button" ' +
                 'tabindex="0" ' +
-                'aria-label="' + escapeHtml(name) + '，規格：' + escapeHtml(spec) + '，公司倉：' + wQty + '，現場倉：' + sQty + '，' + statusText + '" ' +
-                'style="animation-delay: ' + (idx * 0.03) + 's">' +
-                '<div class="flex items-start justify-between gap-5">' +
-                    '<div class="flex-1 min-w-0">' +
-                        '<div class="flex items-center gap-3 mb-3">' +
-                            '<span class="text-3xl filter drop-shadow-lg" aria-hidden="true">' + icon + '</span>' +
-                            '<h3 class="font-extrabold text-white text-lg truncate">' + escapeHtml(name) + '</h3>' +
+                'aria-label="' + escapeHtml(name) + '，規格：' + escapeHtml(spec) + '，公司倉：' + wQty + '，F22廠區：' + sQty + '，' + statusText + '" ' +
+                'style="animation-delay: ' + (idx * 0.02) + 's">' +
+                '<div class="flex flex-col gap-4">' +
+                    '<div class="flex items-start justify-between gap-5">' +
+                        '<div class="flex-1 min-w-0">' +
+                            '<div class="flex items-center gap-3 mb-3">' +
+                                '<input type="checkbox" class="item-checkbox w-6 h-6 rounded border-2 border-white/20 bg-white/5 checked:bg-purple-600" ' +
+                                    'onclick="event.stopPropagation();toggleItemSelection(\'' + escapeHtml(id) + '\')" ' +
+                                    (isSelected ? 'checked' : '') + '>' +
+                                '<span class="text-4xl" aria-hidden="true">' + icon + '</span>' +
+                                '<h3 class="font-extrabold text-white text-xl truncate">' + escapeHtml(name) + '</h3>' +
+                            '</div>' +
+                            '<p class="text-sm text-gray-300 mb-4 font-semibold">' + escapeHtml(spec) + ' · ' + escapeHtml(unit) + '</p>' +
+                            '<div class="stock-bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="庫存水平：' + pct.toFixed(0) + '%">' +
+                                '<div class="stock-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div>' +
+                            '</div>' +
                         '</div>' +
-                        '<p class="text-xs text-gray-400 mb-4 font-semibold">' + escapeHtml(spec) + ' · ' + escapeHtml(unit) + '</p>' +
-                        '<div class="stock-bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="庫存水平：' + pct.toFixed(0) + '%">' +
-                            '<div class="stock-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div>' +
+                        '<div class="text-right flex-shrink-0">' +
+                            '<div class="mb-4">' +
+                                '<p class="big-number editable-number text-5xl font-extrabold text-purple-400 leading-none" id="w-' + escapeHtml(id) + '" aria-label="公司倉庫存，雙擊可編輯" ondblclick="editNumber(\'' + escapeHtml(id) + '\', \'w\')" title="雙擊編輯">' + wQty + '</p>' +
+                                '<p class="text-xs text-gray-400 font-bold mt-2 tracking-wide">公司倉</p>' +
+                            '</div>' +
+                            '<div>' +
+                                '<p class="big-number editable-number text-5xl font-extrabold text-cyan-400 leading-none" id="s-' + escapeHtml(id) + '" aria-label="F22廠區庫存，雙擊可編輯" ondblclick="editNumber(\'' + escapeHtml(id) + '\', \'s\')" title="雙擊編輯">' + sQty + '</p>' +
+                                '<p class="text-xs text-gray-400 font-bold mt-2 tracking-wide">F22廠區</p>' +
+                            '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="text-right flex-shrink-0">' +
-                        '<div class="mb-4">' +
-                            '<p class="big-number text-4xl font-extrabold text-purple-400 leading-none" id="w-' + escapeHtml(id) + '" aria-label="公司倉庫存">' + wQty + '</p>' +
-                            '<p class="text-[10px] text-gray-500 font-bold mt-1.5 tracking-wide">公司倉</p>' +
-                        '</div>' +
-                        '<div>' +
-                            '<p class="big-number text-4xl font-extrabold text-cyan-400 leading-none" id="s-' + escapeHtml(id) + '" aria-label="現場倉庫存">' + sQty + '</p>' +
-                            '<p class="text-[10px] text-gray-500 font-bold mt-1.5 tracking-wide">現場倉</p>' +
-                        '</div>' +
+                    '<div class="flex justify-end pt-1">' +
+                        '<button class="btn-interactive px-3 py-1.5 rounded-xl bg-cyan-600/20 text-cyan-300 text-xs font-bold border border-cyan-500/40" ' +
+                            'onclick="event.stopPropagation();window.transferToSite(\'' + escapeHtml(id) + '\');">' +
+                            '<span class="flex items-center gap-1">' +
+                                '<span class="text-base">📦</span>' +
+                                '<span>轉移至F22</span>' +
+                            '</span>' +
+                        '</button>' +
                     '</div>' +
                 '</div>' +
             '</div>';
         }
+        
+        // 處理物料點擊（支持批量選擇）
+        function handleItemClick(event, id) {
+            // 如果按住 Ctrl/Cmd，切換選擇狀態
+            if (event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+                toggleItemSelection(id);
+                return;
+            }
+            // 否則打開盤點視窗
+            openBottomSheet(id);
+        }
+        
+        // 切換物料選擇狀態
+        function toggleItemSelection(id) {
+            var index = state.selectedItems.indexOf(id);
+            if (index >= 0) {
+                state.selectedItems.splice(index, 1);
+            } else {
+                state.selectedItems.push(id);
+            }
+            updateBatchActions();
+            renderList(); // 重新渲染以更新選擇狀態
+        }
+        
+        // 清除選擇
+        function clearSelection() {
+            state.selectedItems = [];
+            updateBatchActions();
+            renderList();
+        }
+        
+        // 更新批量操作欄
+        function updateBatchActions() {
+            var batchBar = document.getElementById('batchActions');
+            var countEl = document.getElementById('selectedCount');
+            if (!batchBar || !countEl) return;
+            
+            if (state.selectedItems.length > 0) {
+                batchBar.classList.remove('hidden');
+                countEl.textContent = state.selectedItems.length;
+            } else {
+                batchBar.classList.add('hidden');
+            }
+        }
+        
+        // 批量調整數量
+        function batchAdjust(type, delta) {
+            if (state.selectedItems.length === 0) {
+                toast('請先選擇物料', 'warning');
+                return;
+            }
+            
+            var count = state.selectedItems.length;
+            if (!confirm('確定要對 ' + count + ' 個物料進行批量調整嗎？')) {
+                return;
+            }
+            
+            var successCount = 0;
+            var failCount = 0;
+            
+            state.selectedItems.forEach(function(id) {
+                var item = findItemById(id);
+                if (!item) {
+                    failCount++;
+                    return;
+                }
+                
+                var isW = type === 'w';
+                var oldQty = isW ? item.warehouseQty : item.siteQty;
+                var newQty = Math.max(0, oldQty + delta);
+                
+                // 驗證範圍
+                if (newQty > 99999) {
+                    failCount++;
+                    return;
+                }
+                
+                // 使用統一的更新函數
+                updateQty(id, type, newQty, oldQty, item);
+                successCount++;
+            });
+            
+            clearSelection();
+            toast('已批量調整 ' + successCount + ' 個物料' + (failCount > 0 ? '，' + failCount + ' 個失敗' : ''), successCount > 0 ? 'success' : 'error');
+        }
 
         function openBottomSheet(id) {
-            var item = null;
-            for (var i = 0; i < state.stock.length; i++) {
-                if (state.stock[i].id == id) { 
-                    item = state.stock[i]; 
-                    break; 
-                }
+            var item = findItemById(id);
+            if (!item) {
+                toast('找不到該物料', 'error');
+                return;
             }
-            if (!item) return;
             
             state.currentItem = item;
             var wQty = safeNum(item.warehouseQty);
@@ -1668,7 +1962,7 @@
                 var isActive = (op === state.currentOperator);
                 var activeClass = isActive ? 'bg-gradient-to-r from-purple-600 to-purple-500 text-white border-purple-400/50 shadow-lg shadow-purple-500/30' : 'bg-white/5 text-gray-300 border-white/10';
                 operatorButtons += '<button onclick="setOperator(\'' + escapeHtml(op) + '\")" ' +
-                    'class="operator-btn btn-interactive px-5 py-3 rounded-2xl text-sm font-bold border-2 transition-all ' + activeClass + '" ' +
+                    'class="operator-btn btn-interactive px-6 py-3.5 rounded-2xl text-base font-bold border-2 transition-all ' + activeClass + '" ' +
                     'data-operator="' + escapeHtml(op) + '" ' +
                     'aria-label="選擇操作人員 ' + escapeHtml(op) + '" ' +
                     'aria-pressed="' + (isActive ? 'true' : 'false') + '">' +
@@ -1678,37 +1972,45 @@
             
             el.bottomSheetContent.innerHTML = 
                 '<div class="mb-8">' +
-                    '<h2 id="bottomSheetTitle" class="text-3xl font-extrabold text-white mb-3 leading-tight">' + escapeHtml(item.name) + '</h2>' +
-                    '<p class="text-sm text-gray-400 font-semibold">' + escapeHtml(item.spec) + ' · ' + escapeHtml(item.unit) + '</p>' +
+                    '<h2 id="bottomSheetTitle" class="text-4xl font-extrabold text-white mb-4 leading-tight">' + escapeHtml(item.name) + '</h2>' +
+                    '<p class="text-base text-gray-300 font-semibold">' + escapeHtml(item.spec) + ' · ' + escapeHtml(item.unit) + '</p>' +
                 '</div>' +
-                '<div class="glass rounded-3xl p-5 mb-6">' +
+                '<div class="glass rounded-3xl p-6 mb-6">' +
                     '<div class="flex items-center gap-2.5 mb-4">' +
-                        '<span class="text-xl" aria-hidden="true">👤</span>' +
-                        '<p class="text-xs text-gray-400 font-bold uppercase tracking-wider">操作人員</p>' +
+                        '<span class="text-2xl" aria-hidden="true">👤</span>' +
+                        '<p class="text-sm text-gray-300 font-bold uppercase tracking-wider">操作人員</p>' +
                     '</div>' +
                     '<div class="flex gap-3" role="group" aria-label="選擇操作人員">' + operatorButtons + '</div>' +
                 '</div>' +
                 '<div class="space-y-6">' +
                     '<div class="glass-strong rounded-3xl p-6 relative overflow-hidden">' +
                         '<div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl" aria-hidden="true"></div>' +
-                        '<p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-5 relative z-10">公司倉庫存</p>' +
+                        '<p class="text-sm text-gray-300 font-bold uppercase tracking-wider mb-5 relative z-10">公司倉庫存</p>' +
                         '<div class="flex items-center justify-between gap-5 relative z-10" role="group" aria-label="調整公司倉庫存">' +
-                            '<button onclick="adjustQty(\'w\', -1)" class="btn-interactive w-16 h-16 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-3xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20" aria-label="減少公司倉庫存">−</button>' +
+                            '<button onclick="adjustQty(\'w\', -1)" class="btn-interactive w-20 h-20 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-4xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20" aria-label="減少公司倉庫存">−</button>' +
                             '<div class="text-center flex-1">' +
-                                '<p class="big-number text-6xl font-extrabold text-purple-400 leading-none" id="bs-w-' + id + '" aria-live="polite" aria-atomic="true">' + wQty + '</p>' +
+                                '<p class="big-number editable-number text-7xl font-extrabold text-purple-400 leading-none" id="bs-w-' + id + '" aria-live="polite" aria-atomic="true" aria-label="公司倉庫存，雙擊可編輯" ondblclick="editNumber(\'' + id + '\', \'w\', true)" title="雙擊編輯">' + wQty + '</p>' +
                             '</div>' +
-                            '<button onclick="adjustQty(\'w\', 1)" class="btn-interactive w-16 h-16 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-3xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20" aria-label="增加公司倉庫存">+</button>' +
+                            '<button onclick="adjustQty(\'w\', 1)" class="btn-interactive w-20 h-20 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-4xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20" aria-label="增加公司倉庫存">+</button>' +
                         '</div>' +
+                    '</div>' +
+                    '<div class="glass rounded-3xl p-5 mb-6">' +
+                        '<button onclick="event.stopPropagation();window.transferToSite(\'' + escapeHtml(String(id)) + '\');" class="btn-interactive w-full py-5 rounded-2xl bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 active:from-cyan-800 active:to-cyan-700 text-white font-extrabold text-xl border-2 border-cyan-400/50 shadow-lg shadow-cyan-500/30 transition-all" aria-label="轉移物料至F22" type="button">' +
+                            '<span class="flex items-center justify-center gap-2">' +
+                                '<span class="text-2xl">📦</span>' +
+                                '<span>轉移物料至F22</span>' +
+                            '</span>' +
+                        '</button>' +
                     '</div>' +
                     '<div class="glass-strong rounded-3xl p-6 relative overflow-hidden">' +
                         '<div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl" aria-hidden="true"></div>' +
-                        '<p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-5 relative z-10">現場倉庫存</p>' +
-                        '<div class="flex items-center justify-between gap-5 relative z-10" role="group" aria-label="調整現場倉庫存">' +
-                            '<button onclick="adjustQty(\'s\', -1)" class="btn-interactive w-16 h-16 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-3xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20" aria-label="減少現場倉庫存">−</button>' +
+                        '<p class="text-sm text-gray-300 font-bold uppercase tracking-wider mb-5 relative z-10">F22廠區庫存</p>' +
+                        '<div class="flex items-center justify-between gap-5 relative z-10" role="group" aria-label="調整F22廠區庫存">' +
+                            '<button onclick="adjustQty(\'s\', -1)" class="btn-interactive w-20 h-20 rounded-3xl bg-red-600/20 text-red-400 flex items-center justify-center text-4xl font-extrabold border-2 border-red-600/40 shadow-lg shadow-red-600/20" aria-label="減少F22廠區庫存">−</button>' +
                             '<div class="text-center flex-1">' +
-                                '<p class="big-number text-6xl font-extrabold text-cyan-400 leading-none" id="bs-s-' + id + '" aria-live="polite" aria-atomic="true">' + sQty + '</p>' +
+                                '<p class="big-number editable-number text-7xl font-extrabold text-cyan-400 leading-none" id="bs-s-' + id + '" aria-live="polite" aria-atomic="true" aria-label="F22廠區庫存，雙擊可編輯" ondblclick="editNumber(\'' + id + '\', \'s\', true)" title="雙擊編輯">' + sQty + '</p>' +
                             '</div>' +
-                            '<button onclick="adjustQty(\'s\', 1)" class="btn-interactive w-16 h-16 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-3xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20" aria-label="增加現場倉庫存">+</button>' +
+                            '<button onclick="adjustQty(\'s\', 1)" class="btn-interactive w-20 h-20 rounded-3xl bg-green-600/20 text-green-400 flex items-center justify-center text-4xl font-extrabold border-2 border-green-600/40 shadow-lg shadow-green-600/20" aria-label="增加F22廠區庫存">+</button>' +
                         '</div>' +
                     '</div>' +
                 '</div>';
@@ -1730,15 +2032,44 @@
             
             // 更新 Header 顯示
             var headerOp = document.getElementById('headerOperator');
-            if (headerOp) headerOp.textContent = operator;
+            if (headerOp) {
+                headerOp.textContent = operator;
+                headerOp.classList.add('number-update');
+                setTimeout(function() { headerOp.classList.remove('number-update'); }, 400);
+            }
             
-            // 更新按鈕樣式
+            // 更新 Bottom Sheet 中的按鈕樣式
             var buttons = document.querySelectorAll('.operator-btn');
             buttons.forEach(function(btn) {
                 if (btn.getAttribute('data-operator') === operator) {
-                    btn.className = 'operator-btn btn-interactive px-5 py-3 rounded-2xl text-sm font-bold border-2 transition-all bg-gradient-to-r from-purple-600 to-purple-500 text-white border-purple-400/50 shadow-lg shadow-purple-500/30';
+                    btn.className = 'operator-btn btn-interactive px-6 py-3.5 rounded-2xl text-base font-bold border-2 transition-all bg-gradient-to-r from-purple-600 to-purple-500 text-white border-purple-400/50 shadow-lg shadow-purple-500/30';
+                    btn.setAttribute('aria-pressed', 'true');
                 } else {
-                    btn.className = 'operator-btn btn-interactive px-5 py-3 rounded-2xl text-sm font-bold border-2 transition-all bg-white/5 text-gray-300 border-white/10';
+                    btn.className = 'operator-btn btn-interactive px-6 py-3.5 rounded-2xl text-base font-bold border-2 transition-all bg-white/5 text-gray-300 border-white/10';
+                    btn.setAttribute('aria-pressed', 'false');
+                }
+            });
+            
+            // 更新設定頁面的按鈕樣式
+            var selectButtons = document.querySelectorAll('.operator-select-btn');
+            selectButtons.forEach(function(btn) {
+                var btnOperator = btn.getAttribute('data-operator');
+                if (btnOperator === operator) {
+                    btn.className = 'btn-interactive operator-select-btn flex items-center justify-between p-5 rounded-2xl border-2 transition-all bg-gradient-to-r from-purple-600 to-purple-500 border-purple-400/50 text-white shadow-lg shadow-purple-500/30';
+                    // 確保有 ✓ 標記
+                    if (!btn.querySelector('span:last-child') || btn.querySelector('span:last-child').textContent !== '✓') {
+                        var checkMark = document.createElement('span');
+                        checkMark.className = 'text-2xl font-bold';
+                        checkMark.textContent = '✓';
+                        btn.appendChild(checkMark);
+                    }
+                } else {
+                    btn.className = 'btn-interactive operator-select-btn flex items-center justify-between p-5 rounded-2xl border-2 transition-all bg-white/5 border-white/10 text-gray-300';
+                    // 移除 ✓ 標記
+                    var checkMark = btn.querySelector('span:last-child');
+                    if (checkMark && checkMark.textContent === '✓') {
+                        checkMark.remove();
+                    }
                 }
             });
             
@@ -1751,42 +2082,48 @@
             el.bottomSheetOverlay.classList.remove('open');
             document.body.style.overflow = '';
             state.currentItem = null;
+            // 同時關閉轉移輸入界面
+            closeTransferInput();
         }
 
-        function adjustQty(type, delta) {
-            if (!state.currentItem) return;
+        // ===== 統一的數量更新函數 =====
+        function updateQty(id, type, newQty, oldQty, item) {
+            // 如果沒有提供 item，從 state.stock 中查找
+            if (!item) {
+                item = findItemById(id);
+            }
+            if (!item) {
+                toast('找不到該物料', 'error');
+                return;
+            }
             
-            var id = state.currentItem.id;
             var isW = type === 'w';
             
             // 更新本地狀態
             if (isW) {
-                state.currentItem.warehouseQty = Math.max(0, state.currentItem.warehouseQty + delta);
+                item.warehouseQty = newQty;
             } else {
-                state.currentItem.siteQty = Math.max(0, state.currentItem.siteQty + delta);
+                item.siteQty = newQty;
             }
             
-            var newQty = isW ? state.currentItem.warehouseQty : state.currentItem.siteQty;
-            
-            // 更新 UI
-            var listEl = document.getElementById((isW ? 'w-' : 's-') + id);
-            var sheetEl = document.getElementById((isW ? 'bs-w-' : 'bs-s-') + id);
-            if (listEl) {
-                listEl.textContent = newQty;
-                listEl.classList.add('number-update');
-                setTimeout(function() { listEl.classList.remove('number-update'); }, 400);
-            }
-            if (sheetEl) {
-                sheetEl.textContent = newQty;
-                sheetEl.classList.add('number-update');
-                setTimeout(function() { sheetEl.classList.remove('number-update'); }, 400);
-            }
+            // 更新 UI（使用工具函數）
+            updateNumberDisplay(id, type, newQty, false); // 列表頁
+            updateNumberDisplay(id, type, newQty, true);  // Bottom Sheet
             
             // 防抖更新後端
             var key = id + '-' + type;
             if (state.updateTimers[key]) {
                 clearTimeout(state.updateTimers[key]);
             }
+            
+            // 保存待同步的操作（用於錯誤恢復）
+            state.pendingUpdates[key] = {
+                id: id,
+                type: type,
+                oldQty: oldQty,
+                newQty: newQty,
+                operator: state.currentOperator
+            };
             
             state.updateTimers[key] = setTimeout(function() {
                 var action = isW ? 'warehouse_audit' : 'audit';
@@ -1797,10 +2134,29 @@
                 })
                     .then(function() { 
                         toast('✅ 已同步 (' + state.currentOperator + ')', 'success');
+                        // 記錄操作歷史
+                        recordOperation(action, item.name, oldQty, newQty, type);
                         updateDashboard();
+                        // 清除待同步記錄
+                        delete state.pendingUpdates[key];
                     })
                     .catch(function(e) { 
-                        toast('同步失敗: ' + e.message, 'error');
+                        // 錯誤恢復：恢復到原始值
+                        if (isW) {
+                            item.warehouseQty = oldQty;
+                        } else {
+                            item.siteQty = oldQty;
+                        }
+                        
+                        // 恢復 UI
+                        if (listEl) listEl.textContent = oldQty;
+                        if (sheetEl) sheetEl.textContent = oldQty;
+                        
+                        // 清除待同步記錄
+                        delete state.pendingUpdates[key];
+                        
+                        toast('❌ 同步失敗，已恢復原值: ' + e.message, 'error');
+                        updateDashboard();
                     });
                 
                 delete state.updateTimers[key];
@@ -1808,6 +2164,360 @@
             
             // 即時回饋
             updateDashboard();
+        }
+        
+        function adjustQty(type, delta) {
+            if (!state.currentItem) return;
+            
+            // 檢查網絡狀態
+            if (!state.isOnline) {
+                toast('⚠️ 目前離線，操作將在連線後同步', 'warning');
+            }
+            
+            var id = state.currentItem.id;
+            var isW = type === 'w';
+            
+            // 保存原始值（用於錯誤恢復）
+            var oldQty = isW ? state.currentItem.warehouseQty : state.currentItem.siteQty;
+            var newQty = Math.max(0, oldQty + delta);
+            
+            // 數據驗證：檢查是否超過合理範圍
+            if (newQty > 99999) {
+                toast('數量不能超過 99999', 'warning');
+                return;
+            }
+            
+            // 重要操作確認：大量減少或減少到 0
+            if (delta < -10 || (delta < 0 && newQty === 0)) {
+                var confirmMsg = delta < -10 
+                    ? '確定要減少 ' + Math.abs(delta) + ' 件嗎？\n\n' + state.currentItem.name
+                    : '確定要將數量調整為 0 嗎？\n\n' + state.currentItem.name;
+                
+                if (!confirm(confirmMsg)) {
+                    return; // 用戶取消
+                }
+            }
+            
+            // 使用統一的更新函數
+            updateQty(id, type, newQty, oldQty, state.currentItem);
+        }
+        
+        // ===== 轉移物料至F22 =====
+        function transferToSite(id) {
+            console.log('transferToSite called with id:', id);
+            
+            // 確保id是字符串
+            id = String(id);
+            
+            var item = findItemById(id);
+            if (!item) {
+                console.error('Item not found for id:', id);
+                toast('找不到該物料', 'error');
+                return;
+            }
+            
+            var warehouseQty = safeNum(item.warehouseQty);
+            
+            if (warehouseQty <= 0) {
+                toast('公司倉庫存為 0，無法轉移', 'warning');
+                return;
+            }
+            
+            // 顯示手機友善的輸入界面
+            showTransferInput(id, item, warehouseQty);
+        }
+        
+        function showTransferInput(id, item, maxQty) {
+            // 保存當前轉移的項目ID
+            state.transferItemId = id;
+            
+            // 生成快速選擇按鈕
+            var quickBtns = '';
+            var quickValues = [0.5, 1, 2, 5, 10, Math.max(1, Math.floor(maxQty / 2)), maxQty];
+            // 過濾超過最大值的選項
+            quickValues = quickValues.filter(function(v) { return v <= maxQty && v > 0; });
+            // 去重並排序
+            quickValues = quickValues.filter(function(v, i, arr) { return arr.indexOf(v) === i; }).sort(function(a, b) { return a - b; });
+            // 只取前6個
+            quickValues = quickValues.slice(0, 6);
+            
+            for (var i = 0; i < quickValues.length; i++) {
+                var val = quickValues[i];
+                var displayVal = val % 1 === 0 ? val : val.toFixed(1);
+                quickBtns += '<button class="transfer-quick-btn" onclick="setTransferQty(' + val + ')">' + displayVal + '</button>';
+            }
+            
+            el.transferInputContent.innerHTML = 
+                '<div class="transfer-input-container">' +
+                    '<h2 id="transferInputTitle" class="text-3xl font-extrabold text-white mb-6 text-center">' + escapeHtml(item.name) + '</h2>' +
+                    '<div class="transfer-info">' +
+                        '<div class="transfer-info-text">當前公司倉庫存</div>' +
+                        '<div class="transfer-info-number">' + formatNumber(maxQty) + '</div>' +
+                    '</div>' +
+                    '<label class="transfer-input-label">輸入轉移數量</label>' +
+                    '<input type="number" id="transferQtyInput" class="transfer-input-number" min="0.1" max="' + maxQty + '" step="0.1" value="" placeholder="0.0" inputmode="decimal">' +
+                    '<div class="transfer-quick-buttons">' + quickBtns + '</div>' +
+                    '<div class="transfer-action-buttons">' +
+                        '<button class="transfer-action-btn cancel" onclick="closeTransferInput()">取消</button>' +
+                        '<button class="transfer-action-btn confirm" onclick="confirmTransfer()">確認轉移</button>' +
+                    '</div>' +
+                '</div>';
+            
+            el.transferInputSheet.classList.add('open');
+            el.transferInputSheet.setAttribute('aria-hidden', 'false');
+            el.bottomSheetOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            
+            // 聚焦到輸入框
+            setTimeout(function() {
+                var input = document.getElementById('transferQtyInput');
+                if (input) {
+                    input.focus();
+                    // 移動設備自動彈出數字鍵盤
+                    input.click();
+                }
+            }, 300);
+        }
+        
+        function setTransferQty(qty) {
+            var input = document.getElementById('transferQtyInput');
+            if (input) {
+                input.value = qty % 1 === 0 ? qty : qty.toFixed(1);
+                // 觸發輸入事件以驗證
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                // 震動反饋（如果支持）
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }
+        }
+        
+        function closeTransferInput() {
+            el.transferInputSheet.classList.remove('open');
+            el.transferInputSheet.setAttribute('aria-hidden', 'true');
+            el.bottomSheetOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+            state.transferItemId = null;
+        }
+        
+        function confirmTransfer() {
+            var id = state.transferItemId;
+            if (!id) {
+                toast('找不到物料資訊', 'error');
+                closeTransferInput();
+                return;
+            }
+            
+            var item = findItemById(id);
+            if (!item) {
+                toast('找不到該物料', 'error');
+                closeTransferInput();
+                return;
+            }
+            
+            var maxQty = safeNum(item.warehouseQty);
+            var input = document.getElementById('transferQtyInput');
+            if (!input) {
+                closeTransferInput();
+                return;
+            }
+            
+            var transferQty = parseFloat(input.value);
+            
+            // 驗證輸入
+            if (isNaN(transferQty) || transferQty <= 0) {
+                toast('請輸入有效的數量', 'error');
+                input.focus();
+                return;
+            }
+            
+            // 保留小數點後一位
+            transferQty = Math.round(transferQty * 10) / 10;
+            
+            if (transferQty > maxQty) {
+                toast('轉移數量不能超過公司倉庫存（' + formatNumber(maxQty) + '）', 'error');
+                input.focus();
+                return;
+            }
+            
+            // 關閉輸入界面
+            closeTransferInput();
+            
+            // 執行轉移
+            var warehouseQty = maxQty;
+            
+            // 調用API
+            postAPI('move_to_site', {
+                id: id,
+                qty: transferQty,
+                person: state.currentOperator
+            })
+                .then(function(data) {
+                    // 更新本地狀態
+                    item.warehouseQty = warehouseQty - transferQty;
+                    item.siteQty = safeNum(item.siteQty) + transferQty;
+                    
+                    // 更新顯示
+                    updateNumberDisplay(id, 'w', item.warehouseQty, true);
+                    updateNumberDisplay(id, 's', item.siteQty, true);
+                    updateNumberDisplay(id, 'w', item.warehouseQty, false);
+                    updateNumberDisplay(id, 's', item.siteQty, false);
+                    
+                    updateDashboard();
+                    toast('✅ 已轉移 ' + formatNumber(transferQty) + ' 件至F22廠區', 'success');
+                    
+                    // 如果Bottom Sheet打開，更新當前項目
+                    if (state.currentItem && state.currentItem.id == id) {
+                        state.currentItem.warehouseQty = item.warehouseQty;
+                        state.currentItem.siteQty = item.siteQty;
+                    }
+                })
+                .catch(function(e) {
+                    toast('❌ 轉移失敗：' + e.message, 'error');
+                });
+        }
+        
+        // ===== 直接編輯數字 =====
+        function editNumber(id, type, isBottomSheet) {
+            // 防止重複編輯
+            var editKey = id + '-' + type + '-' + (isBottomSheet ? 'bs' : 'list');
+            if (state.editingNumber === editKey) return;
+            
+            // 查找物料
+            var item = findItemById(id);
+            if (!item) {
+                toast('找不到該物料', 'error');
+                return;
+            }
+            
+            var isW = type === 'w';
+            var currentQty = isW ? item.warehouseQty : item.siteQty;
+            var elementId = (isBottomSheet ? 'bs-' : '') + (isW ? 'w-' : 's-') + id;
+            var el = document.getElementById(elementId);
+            if (!el || el.tagName === 'INPUT') return;
+            
+            // 標記正在編輯
+            state.editingNumber = editKey;
+            
+            // 保存原始值
+            var oldQty = currentQty;
+            var originalClass = el.className;
+            var originalStyle = el.getAttribute('style') || '';
+            var originalAttrs = {
+                'aria-live': el.getAttribute('aria-live'),
+                'aria-atomic': el.getAttribute('aria-atomic'),
+                'aria-label': el.getAttribute('aria-label'),
+                'title': el.getAttribute('title'),
+                'ondblclick': el.getAttribute('ondblclick')
+            };
+            
+            // 創建輸入框
+            var input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.max = '99999';
+            input.step = '0.1';
+            input.value = currentQty;
+            input.className = 'editable-number-input big-number font-extrabold text-center';
+            input.style.cssText = 'width: 100%; max-width: 300px; margin: 0 auto; display: block;';
+            // 根據類型設置顏色和字體大小
+            if (isBottomSheet) {
+                input.style.fontSize = '4rem';
+                input.style.lineHeight = '1';
+            } else {
+                input.style.fontSize = '2.5rem';
+                input.style.lineHeight = '1';
+            }
+            if (isW) {
+                input.style.color = '#a78bfa';
+            } else {
+                input.style.color = '#67e8f9';
+            }
+            input.setAttribute('aria-label', (isW ? '公司倉' : 'F22廠區') + '庫存輸入');
+            
+            // 替換元素
+            var parent = el.parentNode;
+            parent.replaceChild(input, el);
+            input.focus();
+            input.select();
+            
+            // 處理輸入完成
+            function finishEdit() {
+                if (state.editingNumber !== editKey) return; // 防止重複執行
+                
+                var inputValue = parseFloat(input.value);
+                
+                // 驗證輸入
+                if (isNaN(inputValue) || inputValue < 0) {
+                    inputValue = 0;
+                }
+                if (inputValue > 99999) {
+                    toast('數量不能超過 99999', 'warning');
+                    inputValue = 99999;
+                }
+                // 保留小數點後一位
+                inputValue = Math.round(inputValue * 10) / 10;
+                
+                // 如果值改變了，需要確認
+                if (inputValue !== oldQty) {
+                    var delta = inputValue - oldQty;
+                    if (delta < -10 || (delta < 0 && inputValue === 0)) {
+                        var confirmMsg = delta < -10 
+                            ? '確定要減少 ' + Math.abs(delta) + ' 件嗎？\n\n' + item.name
+                            : '確定要將數量調整為 0 嗎？\n\n' + item.name;
+                        
+                        if (!confirm(confirmMsg)) {
+                            // 取消：恢復原值
+                            restoreElement();
+                            return;
+                        }
+                    }
+                    
+                    // 更新數量
+                    if (isBottomSheet && !state.currentItem) {
+                        state.currentItem = item;
+                    }
+                    updateQty(id, type, inputValue, oldQty, item);
+                }
+                
+                // 恢復顯示
+                restoreElement();
+            }
+            
+            function restoreElement() {
+                state.editingNumber = null;
+                
+                // 恢復原始元素
+                var newEl = document.createElement('p');
+                newEl.id = elementId;
+                newEl.className = originalClass;
+                var displayValue = (isW ? item.warehouseQty : item.siteQty);
+                // 如果是小數，保留一位小數，否則顯示整數
+                newEl.textContent = displayValue % 1 === 0 ? displayValue : displayValue.toFixed(1);
+                
+                // 恢復屬性
+                for (var key in originalAttrs) {
+                    if (originalAttrs[key]) {
+                        newEl.setAttribute(key, originalAttrs[key]);
+                    }
+                }
+                
+                if (originalStyle) newEl.setAttribute('style', originalStyle);
+                
+                parent.replaceChild(newEl, input);
+            }
+            
+            // 綁定事件
+            input.addEventListener('blur', finishEdit);
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    finishEdit();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    restoreElement();
+                }
+            });
         }
 
         // ===== 篩選 =====
@@ -1946,7 +2656,7 @@
                 return;
             }
             
-            var rows = [['ID', '品名', '規格', '單位', '公司倉', '現場', '安全存量']];
+            var rows = [['ID', '品名', '規格', '單位', '公司倉', 'F22廠區', '安全存量']];
             state.filtered.forEach(function(it) {
                 rows.push([it.id, it.name, it.spec, it.unit, it.warehouseQty, it.siteQty, it.safeQty]);
             });
@@ -1966,12 +2676,151 @@
             toast('已匯出 ' + state.filtered.length + ' 筆', 'success');
         }
 
+        // ===== 操作歷史記錄 =====
+        function recordOperation(action, itemName, oldQty, newQty, type) {
+            var record = {
+                time: new Date().toLocaleString('zh-TW'),
+                operator: state.currentOperator,
+                action: action,
+                itemName: itemName,
+                type: type === 'w' ? '公司倉' : 'F22廠區',
+                oldQty: oldQty,
+                newQty: newQty,
+                delta: newQty - oldQty
+            };
+            
+            state.operationHistory.unshift(record);
+            
+            // 只保留最近 50 條記錄
+            if (state.operationHistory.length > 50) {
+                state.operationHistory = state.operationHistory.slice(0, 50);
+            }
+            
+            // 保存到 localStorage
+            try {
+                localStorage.setItem('operationHistory', JSON.stringify(state.operationHistory));
+            } catch (e) {
+                console.warn('無法保存操作歷史到 localStorage:', e);
+            }
+        }
+        
+        function renderOperationHistory() {
+            // 從 localStorage 載入歷史記錄
+            try {
+                var saved = localStorage.getItem('operationHistory');
+                if (saved) {
+                    state.operationHistory = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.warn('無法載入操作歷史:', e);
+            }
+            
+            // 查找或創建操作歷史容器
+            var container = document.getElementById('operationHistoryContainer');
+            if (!container) {
+                // 在設定頁面中查找合適的位置插入
+                var settingsPage = document.getElementById('page-settings');
+                if (settingsPage) {
+                    var aboutSection = settingsPage.querySelector('.glass.rounded-3xl:last-of-type');
+                    if (aboutSection) {
+                        var historySection = document.createElement('div');
+                        historySection.className = 'glass rounded-3xl p-6';
+                        historySection.innerHTML = 
+                            '<h3 class="text-lg font-extrabold text-white mb-5 flex items-center gap-2">' +
+                            '<span>📋</span>' +
+                            '<span>操作歷史</span>' +
+                            '</h3>' +
+                            '<div id="operationHistoryContainer" class="space-y-2 max-h-96 overflow-y-auto"></div>';
+                        aboutSection.parentNode.insertBefore(historySection, aboutSection);
+                        container = document.getElementById('operationHistoryContainer');
+                    }
+                }
+            }
+            
+            if (!container) return;
+            
+            if (state.operationHistory.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">暫無操作記錄</p>';
+                return;
+            }
+            
+            var html = '';
+            var displayCount = Math.min(state.operationHistory.length, 20); // 只顯示最近 20 條
+            for (var i = 0; i < displayCount; i++) {
+                var record = state.operationHistory[i];
+                var deltaText = record.delta > 0 ? '+' + record.delta : record.delta;
+                var deltaClass = record.delta > 0 ? 'text-green-400' : (record.delta < 0 ? 'text-red-400' : 'text-gray-400');
+                
+                html += '<div class="p-3 rounded-xl bg-white/5 border border-white/5 text-sm">' +
+                    '<div class="flex justify-between items-start mb-1">' +
+                        '<span class="text-white font-bold truncate flex-1">' + escapeHtml(record.itemName) + '</span>' +
+                        '<span class="' + deltaClass + ' font-extrabold ml-2">' + deltaText + '</span>' +
+                    '</div>' +
+                    '<div class="flex justify-between items-center text-xs text-gray-400">' +
+                        '<span>' + escapeHtml(record.type) + ' ' + record.oldQty + ' → ' + record.newQty + '</span>' +
+                        '<span>' + escapeHtml(record.time) + '</span>' +
+                    '</div>' +
+                    '<div class="text-xs text-gray-500 mt-1">操作人員：' + escapeHtml(record.operator) + '</div>' +
+                '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // ===== 搜索歷史 =====
+        function saveSearchHistory(searchText) {
+            if (!searchText || !searchText.trim()) return;
+            
+            var text = searchText.trim();
+            var index = state.searchHistory.indexOf(text);
+            if (index >= 0) {
+                state.searchHistory.splice(index, 1);
+            }
+            state.searchHistory.unshift(text);
+            
+            // 只保留最近 5 次搜索
+            if (state.searchHistory.length > 5) {
+                state.searchHistory = state.searchHistory.slice(0, 5);
+            }
+            
+            // 更新 datalist
+            var datalist = document.getElementById('searchHistory');
+            if (datalist) {
+                datalist.innerHTML = state.searchHistory.map(function(s) {
+                    return '<option value="' + escapeHtml(s) + '">';
+                }).join('');
+            }
+        }
+
         // ===== 事件綁定 =====
         function bindEvents() {
+            // 網絡狀態監聽
+            window.addEventListener('online', function() {
+                state.isOnline = true;
+                setStatus('online', '線上');
+                toast('網絡已連接', 'success');
+            });
+            
+            window.addEventListener('offline', function() {
+                state.isOnline = false;
+                setStatus('error', '離線');
+                toast('網絡已斷開，操作將在連線後同步', 'warning');
+            });
+            
             // 搜尋
             el.searchInput.addEventListener('input', function(e) {
                 state.searchText = e.target.value;
+                if (state.searchText.trim()) {
+                    saveSearchHistory(state.searchText);
+                }
                 applyFiltersDebounced();
+            });
+            
+            // 搜索框 Enter 鍵
+            el.searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && state.searchText.trim()) {
+                    saveSearchHistory(state.searchText);
+                }
             });
             
             // 分類
@@ -2026,11 +2875,22 @@
             
             // 鍵盤快捷鍵
             document.addEventListener('keydown', function(e) {
-                // ESC 關閉 Bottom Sheet
-                if (e.key === 'Escape' && el.bottomSheet.classList.contains('open')) {
-                    closeBottomSheet();
+                // ESC 關閉 Bottom Sheet 或轉移輸入界面
+                if (e.key === 'Escape') {
+                    if (el.transferInputSheet.classList.contains('open')) {
+                        closeTransferInput();
+                    } else if (el.bottomSheet.classList.contains('open')) {
+                        closeBottomSheet();
+                    }
                 }
-                // Enter/Space 觸發按鈕（已在 HTML 中處理）
+                // Enter 在轉移輸入界面確認
+                if (e.key === 'Enter' && el.transferInputSheet.classList.contains('open')) {
+                    var input = document.getElementById('transferQtyInput');
+                    if (input && document.activeElement === input) {
+                        e.preventDefault();
+                        confirmTransfer();
+                    }
+                }
             });
         }
 
@@ -2039,13 +2899,258 @@
         window.openBottomSheet = openBottomSheet;
         window.closeBottomSheet = closeBottomSheet;
         window.adjustQty = adjustQty;
+        window.transferToSite = transferToSite;
+        window.setTransferQty = setTransferQty;
+        window.closeTransferInput = closeTransferInput;
+        window.confirmTransfer = confirmTransfer;
         window.setOperator = setOperator;
         window.setOperatorGlobal = setOperatorGlobal;
+        window.editNumber = editNumber;
+        window.installPWA = installPWA;
+        window.handleItemClick = handleItemClick;
+        window.toggleItemSelection = toggleItemSelection;
+        window.clearSelection = clearSelection;
+        window.batchAdjust = batchAdjust;
 
+        // ===== PWA Service Worker 註冊 =====
+        if ('serviceWorker' in navigator) {
+            // 先清除所有舊的 Service Worker
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (var i = 0; i < registrations.length; i++) {
+                    registrations[i].unregister();
+                }
+                // 清除所有緩存
+                if ('caches' in window) {
+                    caches.keys().then(function(cacheNames) {
+                        cacheNames.forEach(function(cacheName) {
+                            if (cacheName.indexOf('inventory-system') >= 0) {
+                                caches.delete(cacheName);
+                            }
+                        });
+                    });
+                }
+            });
+            
+            window.addEventListener('load', function() {
+                // 使用時間戳確保每次都載入新版本
+                var timestamp = Date.now();
+                navigator.serviceWorker.register('./service-worker.js?v=' + timestamp)
+                    .then(function(registration) {
+                        console.log('Service Worker 註冊成功:', registration.scope);
+                        
+                        // 強制更新：立即檢查並更新
+                        setInterval(function() {
+                            registration.update();
+                        }, 1000);
+                        
+                        // 檢查更新
+                        registration.addEventListener('updatefound', function() {
+                            var newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        // 有新版本可用，自動更新
+                                        newWorker.postMessage({ action: 'skipWaiting' });
+                                        setTimeout(function() {
+                                            window.location.reload(true);
+                                        }, 100);
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker 註冊失敗:', error);
+                    });
+            });
+        }
+        
+        // ===== PWA 安裝提示（可選功能，不強制） =====
+        var deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', function(e) {
+            // 阻止默認的彈出式安裝提示（避免打擾用戶）
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 更新設定頁的安裝選項顯示
+            updatePWAInstallSection();
+        });
+        
+        // 更新 PWA 安裝區域顯示
+        function updatePWAInstallSection() {
+            var section = document.getElementById('pwaInstallSection');
+            if (!section) return;
+            
+            // 如果已經安裝，不顯示安裝按鈕
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            // 檢查是否為移動設備
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            var isAndroid = /Android/i.test(navigator.userAgent);
+            
+            // 移動設備都顯示安裝選項
+            if (isMobile) {
+                section.classList.remove('hidden');
+            } else if (deferredPrompt) {
+                // 桌面端如果有安裝提示，也顯示
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+        
+        // 更新應用模式顯示
+        function updateAppMode() {
+            var modeEl = document.getElementById('appMode');
+            if (!modeEl) return;
+            
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                modeEl.textContent = '已安裝版';
+                modeEl.classList.add('text-green-400');
+            } else {
+                modeEl.textContent = '網頁版';
+                modeEl.classList.remove('text-green-400');
+            }
+        }
+        
+        // 安裝功能（可選，在設定頁提供）
+        function installPWA() {
+            // 檢查是否已經安裝
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                toast('✅ 應用已安裝', 'success');
+                return;
+            }
+            
+            var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            var isAndroid = /Android/i.test(navigator.userAgent);
+            var isChrome = /Chrome/i.test(navigator.userAgent);
+            
+            // iOS 特殊處理
+            if (isIOS) {
+                var instructions = '📱 iOS 安裝步驟：\n\n' +
+                    '1. 點擊瀏覽器底部的「分享」按鈕（方框+箭頭圖標）\n' +
+                    '2. 向下滾動，找到「加入主畫面」\n' +
+                    '3. 點擊「加入主畫面」\n' +
+                    '4. 點擊右上角「加入」\n\n' +
+                    '完成後，應用圖標會出現在主屏幕上！';
+                toast(instructions, 'info');
+                return;
+            }
+            
+            // Android Chrome 使用標準 PWA 安裝
+            if (isAndroid && isChrome && deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        toast('✅ 安裝成功！現在可以從主屏幕啟動', 'success');
+                        updatePWAInstallSection();
+                        updateAppMode();
+                    } else {
+                        toast('已取消安裝，您仍可正常使用網頁版', 'info');
+                    }
+                    deferredPrompt = null;
+                });
+                return;
+            }
+            
+            // Android 其他瀏覽器
+            if (isAndroid) {
+                toast('📱 Android 安裝：\n\n請使用 Chrome 瀏覽器，或點擊瀏覽器菜單中的「添加到主屏幕」選項', 'info');
+                return;
+            }
+            
+            // 桌面端
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        toast('✅ 安裝成功！', 'success');
+                        updatePWAInstallSection();
+                        updateAppMode();
+                    } else {
+                        toast('已取消安裝', 'info');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                toast('您的瀏覽器可能不支持 PWA 安裝，或需要手動添加', 'info');
+            }
+        }
+        
+        // 監聽安裝完成事件
+        window.addEventListener('appinstalled', function() {
+            toast('✅ 應用已成功安裝到主屏幕！', 'success');
+            deferredPrompt = null;
+            updatePWAInstallSection();
+            updateAppMode();
+        });
+        
+        // ===== 網絡狀態監聽 =====
+        function updateOnlineStatus() {
+            state.isOnline = navigator.onLine;
+            var statusEl = el.statusBadge;
+            if (statusEl) {
+                if (state.isOnline) {
+                    if (!statusEl.textContent.includes('離線')) {
+                        setStatus('online', '線上');
+                    }
+                } else {
+                    setStatus('error', '離線模式');
+                    toast('⚠️ 目前離線，部分功能可能無法使用', 'warning');
+                }
+            }
+        }
+        
+        window.addEventListener('online', function() {
+            updateOnlineStatus();
+            toast('✅ 網絡已恢復', 'success');
+            // 重試失敗的操作
+            retryFailedUpdates();
+        });
+        
+        window.addEventListener('offline', function() {
+            updateOnlineStatus();
+        });
+        
+        // 重試失敗的操作
+        function retryFailedUpdates() {
+            var keys = Object.keys(state.pendingUpdates);
+            if (keys.length === 0) return;
+            
+            toast('正在重試同步 ' + keys.length + ' 個操作...', 'info');
+            
+            keys.forEach(function(key) {
+                var update = state.pendingUpdates[key];
+                var action = update.type === 'w' ? 'warehouse_audit' : 'audit';
+                
+                postAPI(action, {
+                    id: update.id,
+                    qty: update.newQty,
+                    person: update.operator
+                })
+                    .then(function() {
+                        delete state.pendingUpdates[key];
+                        if (Object.keys(state.pendingUpdates).length === 0) {
+                            toast('✅ 所有操作已同步', 'success');
+                        }
+                    })
+                    .catch(function(e) {
+                        console.error('重試失敗:', e);
+                    });
+            });
+        }
+        
         // ===== 初始化 =====
         function init() {
             initDOM();
             bindEvents();
+            handleURLParams(); // 處理 URL 參數（PWA shortcuts）
+            updateOnlineStatus(); // 初始化網絡狀態
             loadData(false);
         }
 
