@@ -1042,12 +1042,12 @@
                 </div>
                 
                 <!-- 標題和狀態 -->
-                <div class="flex justify-between items-center mb-3">
+                <div class="flex justify-between items-center mb-4">
                     <div>
-                        <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 via-purple-500 to-purple-600 animate-gradient">
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-purple-400 to-cyan-400 animate-gradient">
                             物料戰情室
                         </h1>
-                        <p class="text-xs text-gray-500 mt-1 font-semibold tracking-wide" aria-label="版本號">v19.1 Pro Edition</p>
+                        <p class="text-sm text-gray-400 mt-1 font-semibold tracking-wide" aria-label="版本號">v19.1 Pro Edition</p>
                     </div>
                     <div id="statusBadge" class="status-badge text-sm px-4 py-2.5 rounded-full bg-white/5 text-gray-400 border border-white/10 font-semibold backdrop-blur-sm" role="status" aria-live="polite" aria-atomic="true" title="網絡連接狀態">
                         連線中...
@@ -1823,13 +1823,12 @@
                     '<div class="flex items-start justify-between gap-5">' +
                         '<div class="flex-1 min-w-0">' +
                             '<div class="flex items-center gap-3 mb-3">' +
-                                '<input type="checkbox" class="item-checkbox w-6 h-6 rounded border-2 border-white/20 bg-white/5 checked:bg-purple-600" ' +
-                                    'onclick="event.stopPropagation();toggleItemSelection(\'' + escapeHtml(id) + '\')" ' +
-                                    (isSelected ? 'checked' : '') + '>' +
                                 '<span class="text-4xl" aria-hidden="true">' + icon + '</span>' +
-                                '<h3 class="font-extrabold text-white text-xl truncate">' + escapeHtml(name) + '</h3>' +
+                                '<div class="min-w-0">' +
+                                    '<p class="text-lg font-extrabold text-cyan-300 leading-tight truncate">' + escapeHtml(spec) + '</p>' +
+                                    '<h3 class="font-extrabold text-white text-sm mt-0.5 truncate">' + escapeHtml(name) + ' · ' + escapeHtml(unit) + '</h3>' +
+                                '</div>' +
                             '</div>' +
-                            '<p class="text-sm text-gray-300 mb-4 font-semibold">' + escapeHtml(spec) + ' · ' + escapeHtml(unit) + '</p>' +
                             '<div class="stock-bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="庫存水平：' + pct.toFixed(0) + '%">' +
                                 '<div class="stock-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div>' +
                             '</div>' +
@@ -2107,8 +2106,8 @@
             }
             
             // 更新 UI（使用工具函數）
-            updateNumberDisplay(id, type, newQty, false); // 列表頁
-            updateNumberDisplay(id, type, newQty, true);  // Bottom Sheet
+            updateNumberDisplay(id, type, newQty, false);
+            updateNumberDisplay(id, type, newQty, true);
             
             // 防抖更新後端
             var key = id + '-' + type;
@@ -2134,25 +2133,21 @@
                 })
                     .then(function() { 
                         toast('✅ 已同步 (' + state.currentOperator + ')', 'success');
-                        // 記錄操作歷史
                         recordOperation(action, item.name, oldQty, newQty, type);
                         updateDashboard();
-                        // 清除待同步記錄
                         delete state.pendingUpdates[key];
                     })
                     .catch(function(e) { 
-                        // 錯誤恢復：恢復到原始值
+                        // 錯誤恢復：恢復到原始值與畫面
                         if (isW) {
                             item.warehouseQty = oldQty;
                         } else {
                             item.siteQty = oldQty;
                         }
                         
-                        // 恢復 UI
-                        if (listEl) listEl.textContent = oldQty;
-                        if (sheetEl) sheetEl.textContent = oldQty;
+                        updateNumberDisplay(id, type, oldQty, false);
+                        updateNumberDisplay(id, type, oldQty, true);
                         
-                        // 清除待同步記錄
                         delete state.pendingUpdates[key];
                         
                         toast('❌ 同步失敗，已恢復原值: ' + e.message, 'error');
@@ -2553,17 +2548,29 @@
                 if (el.loadingTimer) el.loadingTimer.textContent = '已等待 ' + sec + ' 秒';
             }, 1000);
             
-            var ctrl = new AbortController();
-            var timeoutId = setTimeout(function() {
-                ctrl.abort();
-            }, TIMEOUT);
+            if (typeof fetch !== 'function') {
+                clearInterval(timer);
+                showError('瀏覽器不支援網路請求，請更新或更換瀏覽器');
+                return;
+            }
             
-            fetch(url + '?t=' + Date.now(), { 
-                signal: ctrl.signal,
-                cache: 'no-cache'
-            })
+            var ctrl = null;
+            var timeoutId = null;
+            if (typeof AbortController !== 'undefined') {
+                ctrl = new AbortController();
+                timeoutId = setTimeout(function() {
+                    ctrl.abort();
+                }, TIMEOUT);
+            }
+            
+            var fetchOptions = { cache: 'no-cache' };
+            if (ctrl && ctrl.signal) {
+                fetchOptions.signal = ctrl.signal;
+            }
+            
+            fetch(url + '?t=' + Date.now(), fetchOptions)
                 .then(function(res) {
-                    clearTimeout(timeoutId);
+                    if (timeoutId !== null) clearTimeout(timeoutId);
                     clearInterval(timer);
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     return res.text();
@@ -2603,7 +2610,7 @@
                     toast('已載入 ' + state.stock.length + ' 筆資料', 'success');
                 })
                 .catch(function(err) {
-                    clearTimeout(timeoutId);
+                    if (timeoutId !== null) clearTimeout(timeoutId);
                     clearInterval(timer);
                     
                     if (err.name === 'AbortError') {
