@@ -80,9 +80,9 @@
         }
 
         body {
-            /* ENTERPRISE DARK MODE: Neutral deep slate for professional aesthetics */
-            background: #0B0C10;
-            color: #f1f5f9;
+            /* MONOCHROME ENTERPRISE: Ultra-dark neutral zinc */
+            background: #09090b;
+            color: #fafafa;
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -154,23 +154,21 @@
             display: none;
         }
 
-        /* ENTERPRISE GLASS EFFECT - Neutral & Refined */
+        /* MONOCHROME GLASS - Pure Neutral Grayscale */
         .glass {
-            background: rgba(21, 22, 28, 0.6);
-            backdrop-filter: blur(24px) saturate(120%);
-            -webkit-backdrop-filter: blur(24px) saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(20px) saturate(110%);
+            -webkit-backdrop-filter: blur(20px) saturate(110%);
+            border: 1px solid rgba(63, 63, 70, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         }
 
         .glass-strong {
-            background: rgba(15, 16, 20, 0.8);
-            backdrop-filter: blur(32px) saturate(130%);
-            -webkit-backdrop-filter: blur(32px) saturate(130%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            background: rgba(18, 18, 21, 0.9);
+            backdrop-filter: blur(24px) saturate(120%);
+            -webkit-backdrop-filter: blur(24px) saturate(120%);
+            border: 1px solid rgba(63, 63, 70, 0.6);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
         }
 
         /* 卡片光暈效果 */
@@ -625,28 +623,24 @@
             border-color: rgba(139, 92, 246, 0.6);
         }
 
-        /* ENTERPRISE CARD SURFACE - Neutral with Refined Shadows */
+        /* MONOCHROME CARD SURFACE - Pure Neutral */
         .card-item {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             position: relative;
-            /* Neutral surface, slightly lighter than background */
-            background: rgba(21, 22, 28, 0.9);
-            backdrop-filter: blur(20px) saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            /* Subtle depth shadow */
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+            /* Pure neutral zinc surface */
+            background: #18181b;
+            backdrop-filter: blur(16px);
+            border: 1px solid #27272a;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
             padding: 2.5rem !important;
         }
 
         @media (hover: hover) {
             .card-item:hover {
                 transform: translateY(-2px);
-                /* Strategic color accent on hover */
-                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6),
-                    0 0 0 1px rgba(139, 92, 246, 0.2) inset;
-                border-color: rgba(139, 92, 246, 0.3);
+                border-color: #3f3f46;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
             }
         }
 
@@ -1114,55 +1108,55 @@
     <!-- 主容器 -->
     <div class="relative min-h-screen pb-24 safe-bottom">
 
-        <!-- ENTERPRISE HERO HEADER - Neutral & Professional -->
+        <!-- MONOCHROME ENTERPRISE HEADER -->
         <header id="header"
-            class="sticky top-0 z-50 safe-top min-h-[40vh] bg-[#0F1014] backdrop-blur-2xl border-b border-white/10"
+            class="sticky top-0 z-50 safe-top min-h-[40vh] bg-[#0A0A0B] backdrop-blur-2xl border-b border-zinc-800"
             role="banner">
             <div class="px-8 py-16 relative">
 
-                <!-- JUMBO Statistics - High Contrast White for Maximum Readability -->
+                <!-- JUMBO Statistics - Monochrome with Functional Color for Status Only -->
                 <div class="grid grid-cols-3 gap-8 mb-12">
                     <div class="text-center">
-                        <p class="text-xs text-slate-400 font-bold mb-6 tracking-widest uppercase">總品項</p>
+                        <p class="text-xs text-gray-500 font-semibold mb-6 tracking-widest uppercase">總品項</p>
                         <p id="headerTotalItems"
                             class="text-8xl md:text-9xl font-black text-white leading-none tabular-nums">-</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-xs text-slate-400 font-bold mb-6 tracking-widest uppercase">F22廠區</p>
+                        <p class="text-xs text-gray-500 font-semibold mb-6 tracking-widest uppercase">F22廠區</p>
                         <p id="headerSiteItems"
                             class="text-8xl md:text-9xl font-black text-cyan-400 leading-none tabular-nums">-</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-xs text-slate-400 font-bold mb-6 tracking-widest uppercase">低庫存</p>
+                        <p class="text-xs text-gray-500 font-semibold mb-6 tracking-widest uppercase">低庫存</p>
                         <p id="headerLowStock"
                             class="text-8xl md:text-9xl font-black text-yellow-400 leading-none tabular-nums">-</p>
                     </div>
                 </div>
 
-                <!-- Title Row - Subdued -->
+                <!-- Title Row - Pure Monochrome -->
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight text-slate-100">
+                        <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight text-gray-100">
                             物料戰情室
                         </h1>
-                        <p class="text-sm text-slate-500 font-semibold tracking-wide mt-2">v19.1 Pro Edition</p>
+                        <p class="text-sm text-gray-600 font-medium tracking-wide mt-2">v19.1 Pro Edition</p>
                     </div>
                     <div id="statusBadge"
-                        class="status-badge text-xs px-4 py-2.5 rounded-full bg-slate-800/60 text-slate-300 border border-slate-700/50 font-semibold backdrop-blur-xl"
+                        class="status-badge text-xs px-4 py-2.5 rounded-full bg-zinc-900 text-gray-400 border border-zinc-800 font-medium backdrop-blur-xl"
                         role="status" aria-live="polite" aria-atomic="true" title="網絡連接狀態">
                         連線中...
                     </div>
                 </div>
 
-                <!-- Operator Badge - Functional Color Accent -->
+                <!-- Operator Badge - Only Functional Color Element -->
                 <div class="flex items-center gap-4">
-                    <span class="text-xs text-slate-500 font-semibold tracking-wide uppercase">操作人員</span>
+                    <span class="text-xs text-gray-600 font-medium tracking-wide uppercase">操作人員</span>
                     <span id="headerOperator"
-                        class="px-6 py-3 rounded-xl bg-purple-600 text-white font-black border border-purple-500 text-base shadow-lg shadow-purple-500/20"
+                        class="px-6 py-3 rounded-xl bg-purple-600 text-white font-bold border border-purple-500 text-base shadow-lg"
                         aria-label="當前操作人員" role="status">黃俊瑋</span>
                 </div>
             </div>
-        </header>
+        </header>>
 
         <!-- Dashboard 頁面 -->
         <div id="page-dashboard" class="page active">
@@ -1198,30 +1192,30 @@
             </div>
         </div>
 
-        <!-- List Page - Enterprise Clean -->
+        <!-- List Page - Pure Monochrome -->
         <div id="page-list" class="page">
             <div class="px-8 py-10 space-y-10">
-                <!-- Professional Search Bar -->
-                <div class="search-container rounded-2xl p-7 min-h-[72px] bg-[#15161C] backdrop-blur-xl border border-white/10 shadow-lg"
+                <!-- Monochrome Search Bar -->
+                <div class="search-container rounded-2xl p-7 min-h-[72px] bg-zinc-900 backdrop-blur-xl border border-zinc-800 shadow-lg"
                     role="search">
                     <label for="searchInput" class="sr-only">搜尋物料</label>
                     <div class="flex items-center gap-5">
-                        <svg class="w-7 h-7 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor"
+                        <svg class="w-7 h-7 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input type="search" id="searchInput" placeholder="搜尋品名、規格、速記碼..."
-                            class="search-input flex-1 bg-transparent text-slate-100 placeholder-slate-500 text-xl font-bold focus:outline-none"
+                            class="search-input flex-1 bg-transparent text-gray-100 placeholder-gray-600 text-xl font-bold focus:outline-none"
                             autocomplete="off" aria-label="搜尋物料品名或規格" aria-describedby="searchHint"
                             list="searchHistory">
                         <datalist id="searchHistory"></datalist>
                     </div>
                     <div id="searchHint" class="sr-only">輸入關鍵字以搜尋物料</div>
-                    <div id="searchResultsCount" class="text-sm text-slate-500 mt-3 hidden"></div>
+                    <div id="searchResultsCount" class="text-sm text-gray-600 mt-3 hidden"></div>
                 </div>
 
-                <!-- Refined Filter Chips - Functional Color on Active Only -->
+                <!-- Monochrome Filter Chips - Functional Color on Active Only -->
                 <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style="-webkit-overflow-scrolling: touch;"
                     id="categoryChips" role="tablist" aria-label="物料分類篩選">
                     <button
@@ -1230,34 +1224,34 @@
                         <span>全部</span>
                     </button>
                     <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-semibold bg-slate-800/40 text-slate-300 border border-slate-700/50 min-h-[52px] whitespace-nowrap hover:bg-slate-700/50 hover:border-slate-600 transition-all"
+                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
                         data-cat="wire" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔌 電線</span>
                     </button>
                     <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-semibold bg-slate-800/40 text-slate-300 border border-slate-700/50 min-h-[52px] whitespace-nowrap hover:bg-slate-700/50 hover:border-slate-600 transition-all"
+                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
                         data-cat="terminal" role="tab" aria-selected="false" aria-controls="inventoryList"
                         tabindex="-1">
                         <span>🔗 端子</span>
                     </button>
                     <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-semibold bg-slate-800/40 text-slate-300 border border-slate-700/50 min-h-[52px] whitespace-nowrap hover:bg-slate-700/50 hover:border-slate-600 transition-all"
+                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
                         data-cat="consumable" role="tab" aria-selected="false" aria-controls="inventoryList"
                         tabindex="-1">
                         <span>📦 耗材</span>
                     </button>
                     <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-semibold bg-slate-800/40 text-slate-300 border border-slate-700/50 min-h-[52px] whitespace-nowrap hover:bg-slate-700/50 hover:border-slate-600 transition-all"
+                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
                         data-cat="pipe" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
                         <span>🔩 管材</span>
                     </button>
                     <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-semibold bg-slate-800/40 text-slate-300 border border-slate-700/50 min-h-[52px] whitespace-nowrap hover:bg-slate-700/50 hover:border-slate-600 transition-all"
+                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
                         data-cat="hardware" role="tab" aria-selected="false" aria-controls="inventoryList"
                         tabindex="-1">
                         <span>🔧 五金</span>
                     </button>
-                </div>>
+                </div>
 
                 <!-- 批量操作欄 -->
                 <div id="batchActions" class="hidden glass rounded-2xl p-5 mb-4">
