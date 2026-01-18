@@ -1087,11 +1087,9 @@
     <!-- 主容器 -->
     <div class="relative min-h-screen pb-24 safe-bottom">
 
-        <!-- MONOCHROME ENTERPRISE HEADER -->
-        <header id="header"
-            class="sticky top-0 z-50 safe-top min-h-[40vh] bg-[#0A0A0B] backdrop-blur-2xl border-b border-zinc-800"
-            role="banner">
-            <div class="px-8 py-16 relative">
+        <!-- SCROLLABLE HEADER - Scrolls with page to maximize list visibility -->
+        <header id="header" class="relative z-40 safe-top bg-[#0A0A0B] border-b border-zinc-800" role="banner">
+            <div class="px-6 py-6 relative">
 
                 <!-- JUMBO Statistics - Monochrome with Functional Color for Status Only -->
                 <div class="grid grid-cols-3 gap-8 mb-12">
@@ -1184,71 +1182,80 @@
 
         <!-- List Page - Pure Monochrome -->
         <div id="page-list" class="page">
-            <div class="px-8 py-10 space-y-10">
-                <!-- Monochrome Search Bar -->
-                <div class="search-container rounded-2xl p-7 min-h-[72px] bg-zinc-900 backdrop-blur-xl border border-zinc-800 shadow-lg"
-                    role="search">
-                    <label for="searchInput" class="sr-only">搜尋物料</label>
-                    <div class="flex items-center gap-5">
-                        <svg class="w-7 h-7 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <input type="search" id="searchInput" placeholder="搜尋品名、規格、速記碼..."
-                            class="search-input flex-1 bg-transparent text-gray-100 placeholder-gray-600 text-xl font-bold focus:outline-none"
-                            autocomplete="off" aria-label="搜尋物料品名或規格" aria-describedby="searchHint"
-                            list="searchHistory">
-                        <datalist id="searchHistory"></datalist>
+            <div class="px-6 py-6 space-y-8">
+                <!-- FLOATING STICKY SEARCH BAR - Stays at top while scrolling -->
+                <div
+                    class="sticky top-0 z-50 -mx-6 px-6 py-4 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/50 safe-top">
+                    <!-- Monochrome Search Bar -->
+                    <div class="search-container rounded-2xl p-5 min-h-[60px] bg-zinc-900 backdrop-blur-xl border border-zinc-800 shadow-lg mb-4"
+                        role="search">
+                        <label for="searchInput" class="sr-only">搜尋物料</label>
+                        <div class="flex items-center gap-4">
+                            <svg class="w-6 h-6 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="search" id="searchInput" placeholder="搜尋品名、規格、速記碼..."
+                                class="search-input flex-1 bg-transparent text-gray-100 placeholder-gray-600 text-lg font-bold focus:outline-none"
+                                autocomplete="off" aria-label="搜尋物料品名或規格" aria-describedby="searchHint"
+                                list="searchHistory">
+                            <datalist id="searchHistory"></datalist>
+                        </div>
+                        <div id="searchHint" class="sr-only">輸入關鍵字以搜尋物料</div>
+                        <div id="searchResultsCount" class="text-sm text-gray-600 mt-2 hidden"></div>
                     </div>
-                    <div id="searchHint" class="sr-only">輸入關鍵字以搜尋物料</div>
-                    <div id="searchResultsCount" class="text-sm text-gray-600 mt-3 hidden"></div>
-                </div>
 
-                <!-- Monochrome Filter Chips - Functional Color on Active Only -->
-                <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style="-webkit-overflow-scrolling: touch;"
-                    id="categoryChips" role="tablist" aria-label="物料分類篩選">
-                    <button
-                        class="cat-chip active px-7 py-4 rounded-full text-base font-bold bg-purple-600 text-white border border-purple-500 min-h-[52px] whitespace-nowrap shadow-md"
-                        data-cat="all" role="tab" aria-selected="true" aria-controls="inventoryList" tabindex="0">
-                        <span>全部</span>
-                    </button>
-                    <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
-                        data-cat="wire" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
-                        <span>🔌 電線</span>
-                    </button>
-                    <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
-                        data-cat="terminal" role="tab" aria-selected="false" aria-controls="inventoryList"
-                        tabindex="-1">
-                        <span>🔗 端子</span>
-                    </button>
-                    <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
-                        data-cat="consumable" role="tab" aria-selected="false" aria-controls="inventoryList"
-                        tabindex="-1">
-                        <span>📦 耗材</span>
-                    </button>
-                    <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
-                        data-cat="pipe" role="tab" aria-selected="false" aria-controls="inventoryList" tabindex="-1">
-                        <span>🔩 管材</span>
-                    </button>
-                    <button
-                        class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
-                        data-cat="hardware" role="tab" aria-selected="false" aria-controls="inventoryList"
-                        tabindex="-1">
-                        <span>🔧 五金</span>
-                    </button>
+                    <!-- Compact Filter Chips -->
+                    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
+                        style="-webkit-overflow-scrolling: touch;" id="categoryChips" role="tablist"
+                        aria-label="物料分類篩選">
+                        <button
+                            class="cat-chip active px-7 py-4 rounded-full text-base font-bold bg-purple-600 text-white border border-purple-500 min-h-[52px] whitespace-nowrap shadow-md"
+                            data-cat="all" role="tab" aria-selected="true" aria-controls="inventoryList" tabindex="0">
+                            <span>全部</span>
+                        </button>
+                        <button
+                            class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
+                            data-cat="wire" role="tab" aria-selected="false" aria-controls="inventoryList"
+                            tabindex="-1">
+                            <span>🔌 電線</span>
+                        </button>
+                        <button
+                            class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
+                            data-cat="terminal" role="tab" aria-selected="false" aria-controls="inventoryList"
+                            tabindex="-1">
+                            <span>🔗 端子</span>
+                        </button>
+                        <button
+                            class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
+                            data-cat="consumable" role="tab" aria-selected="false" aria-controls="inventoryList"
+                            tabindex="-1">
+                            <span>📦 耗材</span>
+                        </button>
+                        <button
+                            class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
+                            data-cat="pipe" role="tab" aria-selected="false" aria-controls="inventoryList"
+                            tabindex="-1">
+                            <span>🔩 管材</span>
+                        </button>
+                        <button
+                            class="cat-chip px-7 py-4 rounded-full text-base font-medium bg-zinc-900 text-gray-400 border border-zinc-800 min-h-[52px] whitespace-nowrap hover:bg-zinc-800 hover:text-gray-300 transition-all"
+                            data-cat="hardware" role="tab" aria-selected="false" aria-controls="inventoryList"
+                            tabindex="-1">
+                            <span>🔧 五金</span>
+                        </button>
+                    </div>
                 </div>
+                <!-- End of Floating Sticky Search Container -->
 
-                <!-- 批量操作欄 -->
+                <!-- 批量操作欄 - Outside of sticky container -->
                 <div id="batchActions"
                     class="hidden bg-zinc-900/70 backdrop-blur-xl border border-zinc-700/50 shadow-2xl rounded-2xl p-5 mb-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <span class="text-base font-bold text-white">已選擇 <span id="selectedCount">0</span> 項</span>
+                            <span class="text-base font-bold text-white">已選擇 <span id="selectedCount">0</span>
+                                項</span>
                             <button onclick="clearSelection()"
                                 class="text-sm text-gray-300 hover:text-white font-semibold">清除</button>
                         </div>
@@ -1263,8 +1270,8 @@
                     </div>
                 </div>
 
-                <!-- FLOATING Inventory Cards with Dramatic Spacing -->
-                <div id="inventoryList" class="space-y-10" role="list" aria-label="物料列表"></div>
+                <!-- COMPACT Inventory Cards with Dense Spacing -->
+                <div id="inventoryList" class="space-y-3" role="list" aria-label="物料列表"></div>
 
                 <!-- 空狀態 -->
                 <div id="emptyState" class="hidden empty-state text-center py-24" role="status" aria-live="polite">
@@ -2006,46 +2013,24 @@
                     var isSelected = state.selectedItems.indexOf(id) >= 0;
                     var selectClass = isSelected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-black' : '';
 
-                    return '<div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 cursor-pointer transition-all duration-200 active:scale-95 hover:border-zinc-700 hover:shadow-xl ' + selectClass + '" ' +
+                    // COMPACT CARD: High-density flex-row layout for scannability
+                    return '<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 cursor-pointer transition-all duration-150 active:scale-[0.98] hover:bg-zinc-800/50 ' + selectClass + '" ' +
                         'onclick="handleItemClick(event, \'' + escapeHtml(id) + '\')" ' +
                         'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){handleItemClick(event, \'' + escapeHtml(id) + '\');event.preventDefault();}" ' +
-                        'data-id="' + escapeHtml(id) + '" ' +
-                        'role="button" ' +
-                        'tabindex="0" ' +
-                        'aria-label="' + escapeHtml(name) + '，規格：' + escapeHtml(spec) + '，公司倉：' + wQty + '，F22廠區：' + sQty + '，' + statusText + '">' +
-                        '<div class="flex flex-col lg:flex-row gap-6">' +
+                        'data-id="' + escapeHtml(id) + '" role="button" tabindex="0" ' +
+                        'aria-label="' + escapeHtml(name) + '，規格：' + escapeHtml(spec) + '，總量：' + total + '件">' +
+                        '<div class="flex items-center gap-4">' +
+                        '<span class="text-3xl flex-shrink-0">' + icon + '</span>' +
                         '<div class="flex-1 min-w-0">' +
-                        '<div class="flex items-center gap-5 mb-6">' +
-                        '<span class="text-6xl" aria-hidden="true">' + icon + '</span>' +
-                        '<div class="min-w-0">' +
-                        '<p class="text-3xl font-bold text-white leading-tight">' + escapeHtml(spec) + '</p>' +
-                        '<h3 class="font-semibold text-gray-400 text-xl mt-2">' + escapeHtml(name) + ' · ' + escapeHtml(unit) + '</h3>' +
+                        '<p class="text-xl font-black text-white leading-tight truncate">' + escapeHtml(spec) + '</p>' +
+                        '<p class="text-sm text-gray-500 truncate mt-0.5">' + escapeHtml(name) + ' · ' + escapeHtml(unit) + '</p>' +
                         '</div>' +
+                        '<div class="flex items-center gap-3 flex-shrink-0">' +
+                        '<div class="text-right">' +
+                        '<p class="text-3xl font-black text-white leading-none tabular-nums">' + total + '</p>' +
+                        '<p class="text-xs ' + (total === 0 ? 'text-red-400' : (total < safeQty ? 'text-yellow-400' : 'text-green-400')) + ' font-bold mt-1">' + statusText + '</p>' +
                         '</div>' +
-                        '</div>' +
-                        '<div class="stock-bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="庫存水平：' + pct.toFixed(0) + '%">' +
-                        '<div class="stock-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="flex lg:flex-col gap-10 lg:gap-8 justify-around lg:justify-end lg:text-right flex-shrink-0">' +
-                        '<div>' +
-                        '<p class="editable-number text-7xl md:text-9xl font-black text-purple-400 leading-none mb-4 tabular-nums" id="w-' + escapeHtml(id) + '" aria-label="公司倉庫存，雙擊可編輯" ondblclick="editNumber(\'' + escapeHtml(id) + '\', \'w\')" title="雙擊編輯">' + wQty + '</p>' +
-                        '<p class="text-base text-gray-500 font-bold tracking-widest uppercase">公司倉</p>' +
-                        '</div>' +
-                        '<div>' +
-                        '<p class="editable-number text-7xl md:text-9xl font-black text-cyan-400 leading-none mb-4 tabular-nums" id="s-' + escapeHtml(id) + '" aria-label="F22廠區庫存，雙擊可編輯" ondblclick="editNumber(\'' + escapeHtml(id) + '\', \'s\')" title="雙擊編輯">' + sQty + '</p>' +
-                        '<p class="text-base text-gray-500 font-bold tracking-widest uppercase">F22廠區</p>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="flex justify-end pt-6">' +
-                        '<button class="h-16 px-8 rounded-2xl bg-cyan-600/30 text-cyan-300 text-lg font-bold border-2 border-cyan-500/50 transition-all duration-200 active:scale-95 hover:bg-cyan-600/40" ' +
-                        'onclick="event.stopPropagation();window.transferToSite(\'' + escapeHtml(id) + '\');">' +
-                        '<span class="flex items-center gap-2">' +
-                        '<span class="text-xl">📦</span>' +
-                        '<span>轉移至F22</span>' +
-                        '</span>' +
-                        '</button>' +
+                        '<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>' +
                         '</div>' +
                         '</div>' +
                         '</div>';
