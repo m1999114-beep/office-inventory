@@ -13,7 +13,7 @@
     <meta name="apple-mobile-web-app-title" content="物料戰情室">
     <meta name="description" content="工程物料庫存管理系統 - 即時盤點、追蹤、統計">
     <meta name="keywords" content="物料管理,庫存系統,盤點,工程管理">
-    <title>物料戰情室 v19.1 - 工程物料庫存管理系統</title>
+    <title>物料戰情室 v20.0 - 工程物料庫存管理系統</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="icon-192.png">
@@ -38,7 +38,26 @@
         window.autoAnimate = autoAnimate;
     </script>
 
-    <!-- Chart.js for Dashboard Visualization -->
+    <!-- ===== 專業 UI 插件升級 ===== -->
+
+    <!-- Lucide Icons - 專業 SVG 圖標庫 -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- CountUp.js - 數字動畫效果 -->
+    <script src="https://cdn.jsdelivr.net/npm/countup.js@2.8.0/dist/countUp.umd.min.js"></script>
+
+    <!-- Day.js - 輕量級日期處理 -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/zh-tw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
+
+    <!-- ApexCharts - 現代化互動圖表 -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Floating UI - 專業 Tooltip/Popover -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.3/dist/floating-ui.dom.umd.min.js"></script>
+
+    <!-- Chart.js for Dashboard Visualization (保留備用) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Fuse.js for Fuzzy Search -->
@@ -83,11 +102,44 @@
         }
     </script>
     <style>
+        /* ===== shadcn/ui Design System - Dark Theme ===== */
+        :root {
+            /* shadcn/ui official dark theme colors */
+            --background: 0 0% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 0 0% 3.9%;
+            --card-foreground: 0 0% 98%;
+            --popover: 0 0% 3.9%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 0 0% 98%;
+            --primary-foreground: 0 0% 9%;
+            --secondary: 0 0% 14.9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 0 0% 14.9%;
+            --muted-foreground: 0 0% 63.9%;
+            --accent: 0 0% 14.9%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 0 0% 14.9%;
+            --input: 0 0% 14.9%;
+            --ring: 0 0% 83.1%;
+            --radius: 0.5rem;
+
+            /* 品牌色彩 */
+            --purple: 262.1 83.3% 57.8%;
+            --cyan: 187.9 85.7% 53.3%;
+            --green: 142.1 76.2% 36.3%;
+            --yellow: 40.6 96.1% 40.4%;
+            --red: 0 84.2% 60.2%;
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             margin: 0;
             padding: 0;
+            border-color: hsl(var(--border));
         }
 
         html,
@@ -97,19 +149,20 @@
         }
 
         body {
-            /* MONOCHROME ENTERPRISE: Ultra-dark neutral zinc */
-            background: #09090b;
-            color: #fafafa;
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            /* shadcn/ui dark background */
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            line-height: 1.6;
-            font-size: 16px;
+            line-height: 1.5;
+            font-size: 14px;
+            letter-spacing: -0.01em;
         }
 
         @media (min-width: 640px) {
             body {
-                font-size: 17px;
+                font-size: 15px;
             }
         }
 
@@ -193,15 +246,149 @@
         /* 移除 shimmer 動畫，簡化特效 */
 
         .stock-green {
-            background: linear-gradient(90deg, #10b981, #34d399);
+            background: hsl(var(--green));
         }
 
         .stock-yellow {
-            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            background: hsl(var(--yellow));
         }
 
         .stock-red {
-            background: linear-gradient(90deg, #ef4444, #f87171);
+            background: hsl(var(--red));
+        }
+
+        /* ===== 低庫存警示（參考 Grocy）===== */
+        .low-stock-alert {
+            position: relative;
+            border-color: hsl(var(--yellow)) !important;
+            animation: lowStockPulse 2s ease-in-out infinite;
+        }
+
+        .low-stock-alert::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            border: 2px solid hsl(var(--yellow));
+            opacity: 0;
+            animation: lowStockRing 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes lowStockPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 hsla(var(--yellow), 0);
+            }
+
+            50% {
+                box-shadow: 0 0 12px 2px hsla(var(--yellow), 0.3);
+            }
+        }
+
+        @keyframes lowStockRing {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.02);
+            }
+        }
+
+        /* 無庫存 - 更醒目警示 */
+        .out-of-stock {
+            position: relative;
+            border-color: hsl(var(--red)) !important;
+            background: hsla(var(--red), 0.05) !important;
+        }
+
+        .out-of-stock::after {
+            content: '⚠️ 無庫存';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: hsl(var(--red));
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* 同步狀態指示器 */
+        .sync-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+        }
+
+        .sync-indicator.syncing {
+            background: hsla(var(--yellow), 0.15);
+            color: hsl(var(--yellow));
+        }
+
+        .sync-indicator.syncing .sync-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        .sync-indicator.synced {
+            background: hsla(var(--green), 0.15);
+            color: hsl(var(--green));
+        }
+
+        .sync-indicator.pending {
+            background: hsla(var(--yellow), 0.15);
+            color: hsl(var(--yellow));
+        }
+
+        .sync-indicator.offline {
+            background: hsla(var(--red), 0.15);
+            color: hsl(var(--red));
+        }
+
+        /* 下拉刷新指示器 */
+        .pull-to-refresh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: hsl(var(--background));
+            border-bottom: 1px solid hsl(var(--border));
+            transform: translateY(-100%);
+            transition: transform 0.2s ease;
+            z-index: 50;
+        }
+
+        .pull-to-refresh.active {
+            transform: translateY(0);
+        }
+
+        .pull-to-refresh .refresh-icon {
+            width: 24px;
+            height: 24px;
+            color: hsl(var(--muted-foreground));
+            transition: transform 0.2s ease;
+        }
+
+        .pull-to-refresh.refreshing .refresh-icon {
+            animation: spin 0.8s linear infinite;
         }
 
         /* 載入動畫 - 優化 */
@@ -220,20 +407,22 @@
             }
         }
 
-        /* 按鈕微交互 - 實用為主，簡化特效 */
+        /* shadcn/ui 按鈕樣式 */
         .btn-interactive {
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             position: relative;
             cursor: pointer;
-            /* 確保觸摸目標 */
             min-width: 44px;
             min-height: 44px;
-            /* 提升對比度 */
-            border: 2px solid transparent;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            font-weight: 500;
         }
 
-        .btn-interactive:focus {
-            outline: 3px solid #8b5cf6;
+        .btn-interactive:focus-visible {
+            outline: 2px solid hsl(var(--ring));
             outline-offset: 2px;
         }
 
@@ -244,53 +433,61 @@
         }
 
         .btn-interactive:hover {
-            opacity: 0.9;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: hsl(var(--accent));
         }
 
         .btn-interactive:active {
-            transform: scale(0.97);
-            transition: all 0.1s;
+            transform: scale(0.98);
         }
 
-        /* 分類按鈕 - 實用為主，簡化特效 */
+        /* shadcn/ui 分類標籤 */
         .cat-chip {
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             white-space: nowrap;
             position: relative;
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--border));
+            background: transparent;
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
         .cat-chip.active {
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa) !important;
-            color: white !important;
-            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
-            border-color: rgba(255, 255, 255, 0.2) !important;
+            background: hsl(var(--foreground)) !important;
+            color: hsl(var(--background)) !important;
+            border-color: hsl(var(--foreground)) !important;
+        }
+
+        .cat-chip:hover:not(.active) {
+            background: hsl(var(--secondary));
+            color: hsl(var(--foreground));
         }
 
         .cat-chip:active {
             transform: scale(0.98);
         }
 
-        /* 底部導航 - 簡化特效 */
+        /* shadcn/ui 底部導航 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             z-index: 100;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.9));
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            background: hsl(var(--background));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid hsl(var(--border));
             padding-bottom: env(safe-area-inset-bottom);
-            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
         }
 
         .nav-item {
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             cursor: pointer;
             user-select: none;
             position: relative;
+            color: hsl(var(--muted-foreground));
         }
 
         .nav-item::before {
@@ -301,13 +498,13 @@
             transform: translateX(-50%) scaleX(0);
             width: 32px;
             height: 2px;
-            background: #8b5cf6;
+            background: hsl(var(--foreground));
             border-radius: 0 0 999px 999px;
-            transition: transform 0.2s ease;
+            transition: transform 0.15s ease;
         }
 
         .nav-item.active {
-            color: #8b5cf6;
+            color: hsl(var(--foreground));
         }
 
         .nav-item.active::before {
@@ -315,31 +512,28 @@
         }
 
         .nav-item.active .nav-icon {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .nav-item:active {
             transform: scale(0.96);
         }
 
-        /* Bottom Sheet - 簡化特效 */
+        /* shadcn/ui Bottom Sheet */
         .bottom-sheet {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.98), rgba(5, 5, 5, 0.97));
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: hsl(var(--card));
+            border-top-left-radius: calc(var(--radius) * 2);
+            border-top-right-radius: calc(var(--radius) * 2);
+            border-top: 1px solid hsl(var(--border));
             transform: translateY(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
             z-index: 200;
             max-height: 85vh;
             padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
-            box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.8);
         }
 
         .bottom-sheet.open {
@@ -349,12 +543,11 @@
         .bottom-sheet-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 199;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
-            backdrop-filter: blur(4px);
         }
 
         .bottom-sheet-overlay.open {
@@ -363,11 +556,11 @@
         }
 
         .bottom-sheet-handle {
-            width: 40px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
+            width: 48px;
+            height: 4px;
+            background: hsl(var(--muted));
             border-radius: 999px;
-            margin: 16px auto;
+            margin: 12px auto;
         }
 
         /* 轉移輸入框 - 手機友善 */
@@ -497,7 +690,7 @@
             margin-top: 4px;
         }
 
-        /* Toast - 簡化特效 */
+        /* shadcn/ui Toast */
         .toast-container {
             position: fixed;
             bottom: 90px;
@@ -506,25 +699,23 @@
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             width: 90%;
-            max-width: 420px;
+            max-width: 400px;
             pointer-events: none;
         }
 
         .toast {
-            background: rgba(20, 20, 20, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 14px 20px;
-            border-radius: 16px;
-            animation: toastIn 0.3s ease;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            animation: toastIn 0.2s ease;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             pointer-events: auto;
+            font-size: 0.875rem;
         }
 
         @keyframes toastIn {
@@ -1075,6 +1266,17 @@
 </head>
 
 <body>
+    <!-- 下拉刷新指示器 -->
+    <div id="pullToRefresh" class="pull-to-refresh" aria-hidden="true">
+        <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+            <path d="M16 21h5v-5" />
+        </svg>
+        <span class="ml-2 text-sm font-medium">下拉刷新</span>
+    </div>
+
     <!-- Toast 容器 -->
     <div id="toastBox" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
 
@@ -1123,6 +1325,9 @@
                         role="status" aria-live="polite" aria-atomic="true" title="網絡連接狀態">
                         連線中...
                     </div>
+                    <div id="syncIndicator" class="sync-indicator synced" style="opacity: 0;" aria-live="polite">
+                        <span class="sync-icon">✓</span> 已同步
+                    </div>
                 </div>
 
                 <!-- Operator Badge - Only Functional Color Element -->
@@ -1138,25 +1343,50 @@
         <!-- Dashboard 頁面 -->
         <div id="page-dashboard" class="page active">
             <div class="px-5 py-6 space-y-6">
-                <!-- Stock Distribution Chart -->
-                <div class="bg-zinc-900/70 backdrop-blur-xl border border-zinc-700/50 shadow-2xl rounded-3xl p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="text-2xl">📊</span>
-                        <h3 class="text-lg font-bold text-white">庫存分佈</h3>
+                <!-- 智慧補貨建議卡片 -->
+                <div id="replenishCard"
+                    class="bg-gradient-to-br from-yellow-900/30 to-orange-900/20 backdrop-blur-xl border border-yellow-600/30 shadow-2xl rounded-3xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">🚨</span>
+                            <h3 class="text-lg font-bold text-yellow-300">智慧補貨建議</h3>
+                        </div>
+                        <button id="copyPurchaseListBtn" onclick="copyPurchaseList()"
+                            class="btn-interactive px-4 py-2 rounded-xl bg-yellow-600/30 text-yellow-300 text-sm font-bold border border-yellow-500/40 hover:bg-yellow-600/50 transition-all">
+                            📋 複製採購清單
+                        </button>
                     </div>
-                    <div class="h-64 flex items-center justify-center">
-                        <canvas id="stockChart"></canvas>
+                    <div id="replenishList" class="space-y-3">
+                        <!-- 緊急補貨清單將在這裡動態生成 -->
+                        <p class="text-gray-500 text-sm">載入中...</p>
                     </div>
                 </div>
+
+
+
+
 
                 <!-- 分類統計條 -->
                 <div class="bg-zinc-900/70 backdrop-blur-xl border border-zinc-700/50 shadow-2xl rounded-3xl p-6">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="text-2xl">📈</span>
                         <h3 class="text-lg font-bold text-white">分類統計</h3>
+                        <span class="text-xs text-gray-500 ml-2">（點擊類別可篩選）</span>
                     </div>
                     <div id="categoryBar" class="h-4 rounded-full bg-white/5 flex overflow-hidden mb-4"></div>
                     <div id="categoryLegend" class="flex flex-wrap gap-4 text-sm text-gray-300"></div>
+                </div>
+
+                <!-- 呆滯物料警示 -->
+                <div id="staleItemsCard"
+                    class="hidden bg-gradient-to-br from-red-900/30 to-pink-900/20 backdrop-blur-xl border border-red-600/30 shadow-2xl rounded-3xl p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-2xl">⏰</span>
+                        <h3 class="text-lg font-bold text-red-300">呆滯物料警示</h3>
+                        <span class="text-xs text-gray-500">（超過 30 天未變動）</span>
+                    </div>
+                    <div id="staleItemsList" class="space-y-2 max-h-48 overflow-y-auto">
+                    </div>
                 </div>
 
                 <!-- F22廠區物料清單 -->
@@ -1166,8 +1396,11 @@
                             <span class="text-3xl">🏗️</span>
                             <h3 class="text-xl font-bold text-white">F22廠區物料</h3>
                         </div>
-                        <span id="siteItemCount"
-                            class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/30 to-cyan-400/20 text-cyan-300 font-bold border border-cyan-400/40 shadow-lg shadow-cyan-500/20">-</span>
+                        <div class="flex items-center gap-2">
+                            <span id="siteFilterLabel" class="text-xs text-gray-500 hidden">篩選：</span>
+                            <span id="siteItemCount"
+                                class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/30 to-cyan-400/20 text-cyan-300 font-bold border border-cyan-400/40 shadow-lg shadow-cyan-500/20">-</span>
+                        </div>
                     </div>
                     <div id="siteItemsList" class="space-y-2.5 max-h-96 overflow-y-auto">
                         <!-- 物料項目將在這裡動態生成 -->
@@ -1201,6 +1434,16 @@
                                 autocomplete="off" aria-label="搜尋物料品名或規格" aria-describedby="searchHint"
                                 list="searchHistory">
                             <datalist id="searchHistory"></datalist>
+                            <!-- Voice Search Button -->
+                            <button id="voiceSearchBtn" onclick="startVoiceSearch()" type="button"
+                                class="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white transition-all active:scale-95"
+                                aria-label="語音搜尋" title="語音搜尋">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z">
+                                    </path>
+                                </svg>
+                            </button>
                         </div>
                         <div id="searchHint" class="sr-only">輸入關鍵字以搜尋物料</div>
                         <div id="searchResultsCount" class="text-sm text-gray-600 mt-2 hidden"></div>
@@ -1366,17 +1609,78 @@
             </div>
         </div>
 
-        <!-- Loading 狀態 -->
-        <div id="loadingState"
-            class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-zinc-950/90 backdrop-blur-2xl border border-zinc-700/60 shadow-[0_16px_48px_rgba(0,0,0,0.8)]"
-            role="status" aria-live="polite" aria-busy="true" aria-label="載入資料中">
-            <div class="relative" aria-hidden="true">
-                <div class="loader"></div>
-                <div class="absolute inset-0 loader"
-                    style="border-top-color: #a78bfa; animation-delay: 0.2s; animation-duration: 1.2s;"></div>
+        <!-- Loading 狀態 - Skeleton Loader -->
+        <div id="loadingState" class="fixed inset-0 z-50 bg-zinc-950 overflow-auto p-6 safe-top" role="status"
+            aria-live="polite" aria-busy="true" aria-label="載入資料中">
+
+            <!-- Skeleton Header -->
+            <div class="mb-6 animate-pulse">
+                <div class="h-8 w-32 bg-zinc-800 rounded-lg mb-2"></div>
+                <div class="h-4 w-24 bg-zinc-800/50 rounded"></div>
             </div>
-            <p class="text-gray-300 mt-10 text-lg font-bold">載入資料中...</p>
-            <p id="loadingTimer" class="text-gray-600 text-sm mt-3 font-semibold" aria-live="polite"></p>
+
+            <!-- Skeleton Search Bar -->
+            <div class="h-14 w-full bg-zinc-800 rounded-2xl mb-4 animate-pulse"></div>
+
+            <!-- Skeleton Category Chips -->
+            <div class="flex gap-3 mb-6 animate-pulse">
+                <div class="h-10 w-16 bg-zinc-800 rounded-full"></div>
+                <div class="h-10 w-20 bg-zinc-800/70 rounded-full"></div>
+                <div class="h-10 w-20 bg-zinc-800/50 rounded-full"></div>
+            </div>
+
+            <!-- Skeleton Cards (mimics compact list layout) -->
+            <div class="space-y-3">
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 animate-pulse">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-zinc-700 rounded-lg"></div>
+                        <div class="flex-1">
+                            <div class="h-5 w-24 bg-zinc-700 rounded mb-2"></div>
+                            <div class="h-3 w-32 bg-zinc-800 rounded"></div>
+                        </div>
+                        <div class="h-8 w-12 bg-zinc-700 rounded"></div>
+                    </div>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 animate-pulse"
+                    style="animation-delay: 0.1s">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-zinc-700 rounded-lg"></div>
+                        <div class="flex-1">
+                            <div class="h-5 w-28 bg-zinc-700 rounded mb-2"></div>
+                            <div class="h-3 w-36 bg-zinc-800 rounded"></div>
+                        </div>
+                        <div class="h-8 w-10 bg-zinc-700 rounded"></div>
+                    </div>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 animate-pulse"
+                    style="animation-delay: 0.2s">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-zinc-700 rounded-lg"></div>
+                        <div class="flex-1">
+                            <div class="h-5 w-20 bg-zinc-700 rounded mb-2"></div>
+                            <div class="h-3 w-28 bg-zinc-800 rounded"></div>
+                        </div>
+                        <div class="h-8 w-14 bg-zinc-700 rounded"></div>
+                    </div>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 animate-pulse"
+                    style="animation-delay: 0.3s">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-zinc-700 rounded-lg"></div>
+                        <div class="flex-1">
+                            <div class="h-5 w-32 bg-zinc-700 rounded mb-2"></div>
+                            <div class="h-3 w-40 bg-zinc-800 rounded"></div>
+                        </div>
+                        <div class="h-8 w-12 bg-zinc-700 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Text -->
+            <p class="text-center text-gray-500 mt-8 text-sm font-medium">
+                <span class="inline-block animate-pulse">載入資料中...</span>
+            </p>
+            <p id="loadingTimer" class="text-center text-gray-600 text-xs mt-2" aria-live="polite"></p>
         </div>
 
         <!-- Error 狀態 -->
@@ -1474,11 +1778,169 @@
                 // 操作人員清單
                 var OPERATORS = ['黃俊瑋', '戴庭宇', '徐伊恩'];
 
-                // Chart.js instance for stock distribution chart
-                var stockChartInstance = null;
+
 
                 // Fuse.js instance for fuzzy search
                 var fuseInstance = null;
+
+                // ApexCharts instance for modern charts
+                var apexChartInstance = null;
+
+                // ===== Day.js 初始化（中文支援）=====
+                if (typeof dayjs !== 'undefined') {
+                    dayjs.locale('zh-tw');
+                    if (typeof dayjs_plugin_relativeTime !== 'undefined') {
+                        dayjs.extend(dayjs_plugin_relativeTime);
+                    }
+                }
+
+                // 格式化相對時間
+                function formatRelativeTime(date) {
+                    if (typeof dayjs !== 'undefined' && date) {
+                        return dayjs(date).fromNow();
+                    }
+                    return '';
+                }
+
+                // 格式化日期時間
+                function formatDateTime(date, format) {
+                    if (typeof dayjs !== 'undefined' && date) {
+                        return dayjs(date).format(format || 'YYYY/MM/DD HH:mm');
+                    }
+                    return '';
+                }
+
+                // ===== 觸覺回饋 (Haptic Feedback) =====
+                function hapticFeedback(type) {
+                    if (!navigator.vibrate) return;
+
+                    switch (type) {
+                        case 'light':
+                            navigator.vibrate(10);
+                            break;
+                        case 'medium':
+                            navigator.vibrate(20);
+                            break;
+                        case 'heavy':
+                            navigator.vibrate(30);
+                            break;
+                        case 'success':
+                            navigator.vibrate([10, 50, 10]);
+                            break;
+                        case 'error':
+                            navigator.vibrate([30, 50, 30, 50, 30]);
+                            break;
+                        case 'warning':
+                            navigator.vibrate([20, 30, 20]);
+                            break;
+                        default:
+                            navigator.vibrate(15);
+                    }
+                }
+
+                // ===== 同步狀態管理 =====
+                var syncState = {
+                    isSyncing: false,
+                    pendingCount: 0,
+                    lastSyncTime: null
+                };
+
+                function updateSyncIndicator() {
+                    var indicator = document.getElementById('syncIndicator');
+                    if (!indicator) return;
+
+                    syncState.pendingCount = Object.keys(state.pendingUpdates).length;
+
+                    if (!state.isOnline) {
+                        indicator.className = 'sync-indicator offline';
+                        indicator.innerHTML = '<span class="sync-icon">⚡</span> 離線';
+                    } else if (syncState.isSyncing) {
+                        indicator.className = 'sync-indicator syncing';
+                        indicator.innerHTML = '<span class="sync-icon">⟳</span> 同步中';
+                    } else if (syncState.pendingCount > 0) {
+                        indicator.className = 'sync-indicator pending';
+                        indicator.innerHTML = '<span class="sync-icon">⏳</span> 待同步 (' + syncState.pendingCount + ')';
+                    } else {
+                        indicator.className = 'sync-indicator synced';
+                        indicator.innerHTML = '<span class="sync-icon">✓</span> 已同步';
+                        // 3秒後隱藏
+                        setTimeout(function () {
+                            if (syncState.pendingCount === 0 && !syncState.isSyncing) {
+                                indicator.style.opacity = '0';
+                            }
+                        }, 3000);
+                    }
+                    indicator.style.opacity = '1';
+                }
+
+                // ===== 下拉刷新 (Pull-to-Refresh) =====
+                var pullState = {
+                    startY: 0,
+                    currentY: 0,
+                    pulling: false,
+                    threshold: 80
+                };
+
+                function initPullToRefresh() {
+                    var container = document.getElementById('inventoryPage');
+                    if (!container) return;
+
+                    container.addEventListener('touchstart', function (e) {
+                        if (window.scrollY === 0) {
+                            pullState.startY = e.touches[0].clientY;
+                            pullState.pulling = true;
+                        }
+                    }, { passive: true });
+
+                    container.addEventListener('touchmove', function (e) {
+                        if (!pullState.pulling) return;
+
+                        pullState.currentY = e.touches[0].clientY;
+                        var pullDistance = pullState.currentY - pullState.startY;
+
+                        if (pullDistance > 0 && window.scrollY === 0) {
+                            var pullIndicator = document.getElementById('pullToRefresh');
+                            if (pullIndicator) {
+                                var progress = Math.min(pullDistance / pullState.threshold, 1);
+                                pullIndicator.style.transform = 'translateY(' + (progress * 60 - 60) + 'px)';
+
+                                if (pullDistance > pullState.threshold) {
+                                    pullIndicator.classList.add('active');
+                                }
+                            }
+                        }
+                    }, { passive: true });
+
+                    container.addEventListener('touchend', function () {
+                        if (!pullState.pulling) return;
+
+                        var pullDistance = pullState.currentY - pullState.startY;
+                        var pullIndicator = document.getElementById('pullToRefresh');
+
+                        if (pullDistance > pullState.threshold) {
+                            // 觸發刷新
+                            hapticFeedback('medium');
+                            if (pullIndicator) {
+                                pullIndicator.classList.add('refreshing');
+                            }
+                            loadData(true).finally(function () {
+                                if (pullIndicator) {
+                                    pullIndicator.classList.remove('active', 'refreshing');
+                                    pullIndicator.style.transform = '';
+                                }
+                            });
+                        } else {
+                            if (pullIndicator) {
+                                pullIndicator.classList.remove('active');
+                                pullIndicator.style.transform = '';
+                            }
+                        }
+
+                        pullState.pulling = false;
+                        pullState.startY = 0;
+                        pullState.currentY = 0;
+                    }, { passive: true });
+                }
 
                 // ===== DOM 緩存 =====
                 var el = {};
@@ -1574,25 +2036,41 @@
                     }
                 }
 
-                // ===== 分類邏輯 - 優化 =====
+                // ===== 分類邏輯 - 優化（使用 Lucide Icons）=====
+                // Lucide SVG 圖標模板
+                function lucideIcon(name, color, size) {
+                    size = size || 24;
+                    color = color || 'currentColor';
+                    var icons = {
+                        'cable': '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1"/><path d="M19 15V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V9"/><path d="M21 21v-2h-4"/><path d="M3 5h4V3"/><path d="M7 5a1 1 0 0 1 1 1v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1Z"/></svg>',
+                        'link': '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+                        'package': '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+                        'cylinder': '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/></svg>',
+                        'wrench': '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'
+                    };
+                    return icons[name] || icons['package'];
+                }
+
                 var categoryConfig = {
                     wire: {
                         keywords: ['電線', '電纜', 'cable', 'wire', 'XIPE', 'CSA', '細纜', '細芯',
                             '控制電纜', 'PVC電線', '導線', '線材'],
+                        iconName: 'cable',
                         icon: '🔌',
                         label: '電線',
                         color: '#8b5cf6'
                     },
-                    terminal: { keywords: ['端子', 'terminal'], icon: '🔗', label: '端子', color: '#06b6d4' },
+                    terminal: { keywords: ['端子', 'terminal'], iconName: 'link', icon: '🔗', label: '端子', color: '#06b6d4' },
                     consumable: {
                         keywords: ['扎線帶', '紮線帶', '束線帶', '膠帶', '膠布', '絕緣膠帶', '電火布',
                             '耗材', 'consumable', 'tape', '標籤', '標示', '貼紙'],
+                        iconName: 'package',
                         icon: '📦',
                         label: '耗材',
                         color: '#ec4899'
                     },
-                    pipe: { keywords: ['管', 'pipe', '配管'], icon: '🔩', label: '管材', color: '#10b981' },
-                    hardware: { keywords: [], icon: '🔧', label: '五金', color: '#6366f1' }
+                    pipe: { keywords: ['管', 'pipe', '配管'], iconName: 'cylinder', icon: '🔩', label: '管材', color: '#10b981' },
+                    hardware: { keywords: [], iconName: 'wrench', icon: '🔧', label: '五金', color: '#6366f1' }
                 };
 
                 function getCategory(item) {
@@ -1606,8 +2084,13 @@
                     return 'hardware';
                 }
 
-                function getCategoryIcon(cat) {
-                    return categoryConfig[cat] ? categoryConfig[cat].icon : '📦';
+                function getCategoryIcon(cat, useSvg) {
+                    var config = categoryConfig[cat] || categoryConfig.hardware;
+                    if (useSvg) {
+                        return '<span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10">' +
+                            lucideIcon(config.iconName, config.color, 20) + '</span>';
+                    }
+                    return config.icon;
                 }
 
                 // ===== UI 狀態管理 =====
@@ -1672,6 +2155,64 @@
                             toast.addEventListener('mouseleave', Swal.resumeTimer);
                         }
                     });
+                }
+
+                // ===== Voice Search (webkitSpeechRecognition) =====
+                function startVoiceSearch() {
+                    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+                    if (!SpeechRecognition) {
+                        toast('您的瀏覽器不支援語音搜尋', 'warning');
+                        return;
+                    }
+
+                    var recognition = new SpeechRecognition();
+                    recognition.lang = 'zh-TW';
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+
+                    var voiceBtn = document.getElementById('voiceSearchBtn');
+
+                    recognition.onstart = function () {
+                        if (voiceBtn) {
+                            voiceBtn.classList.add('bg-red-600', 'text-white', 'animate-pulse');
+                            voiceBtn.classList.remove('bg-zinc-800', 'text-gray-400');
+                        }
+                        toast('🎤 正在聆聽...', 'info');
+                    };
+
+                    recognition.onresult = function (event) {
+                        var transcript = event.results[0][0].transcript;
+                        if (el.searchInput) {
+                            el.searchInput.value = transcript;
+                            state.searchText = transcript;
+                            applyFiltersDebounced();
+                            toast('🎤 搜尋：' + transcript, 'success');
+                        }
+                    };
+
+                    recognition.onerror = function (event) {
+                        toast('語音識別失敗：' + event.error, 'error');
+                    };
+
+                    recognition.onend = function () {
+                        if (voiceBtn) {
+                            voiceBtn.classList.remove('bg-red-600', 'text-white', 'animate-pulse');
+                            voiceBtn.classList.add('bg-zinc-800', 'text-gray-400');
+                        }
+                    };
+
+                    recognition.start();
+                }
+
+                // ===== Optimistic UI: Green Flash Animation =====
+                function flashGreen(element) {
+                    if (!element) return;
+                    element.classList.add('bg-green-500/30');
+                    element.style.transition = 'background-color 0.3s ease';
+                    setTimeout(function () {
+                        element.classList.remove('bg-green-500/30');
+                    }, 500);
                 }
 
                 function switchPage(page) {
@@ -1838,8 +2379,9 @@
                         if (categoryCounts[cat] > 0) {
                             var pct = (categoryCounts[cat] / totalQty * 100).toFixed(1);
                             var config = categoryConfig[cat];
-                            barHtml += '<div class="category-bar-item" style="width:' + pct + '%; background: linear-gradient(90deg, ' + config.color + ', ' + config.color + 'dd);"></div>';
-                            legendHtml += '<span class="flex items-center gap-2 px-2 py-1 rounded-lg bg-white/5 border border-white/5">' +
+                            var isActive = dashboardFilter.category === cat;
+                            barHtml += '<div class="category-bar-item cursor-pointer hover:opacity-80 transition-opacity" style="width:' + pct + '%; background: linear-gradient(90deg, ' + config.color + ', ' + config.color + 'dd);" onclick="filterSiteByCategory(\'' + cat + '\')"></div>';
+                            legendHtml += '<span class="flex items-center gap-2 px-2 py-1 rounded-lg cursor-pointer transition-all hover:scale-105 ' + (isActive ? 'bg-white/20 ring-2 ring-white/30' : 'bg-white/5 border border-white/5') + '" onclick="filterSiteByCategory(\'' + cat + '\')">' +
                                 '<span style="color:' + config.color + '; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">' + config.icon + '</span>' +
                                 '<span class="font-semibold">' + config.label + '</span>' +
                                 '<span class="text-gray-500 font-bold">' + pct + '%</span>' +
@@ -1850,70 +2392,28 @@
                     el.categoryBar.innerHTML = barHtml;
                     el.categoryLegend.innerHTML = legendHtml;
 
-                    // ===== Chart.js - Stock Distribution Doughnut =====
-                    var totalWarehouse = 0;
-                    var totalSite = 0;
-                    for (var i = 0; i < state.stock.length; i++) {
-                        totalWarehouse += safeNum(state.stock[i].warehouseQty);
-                        totalSite += safeNum(state.stock[i].siteQty);
-                    }
 
-                    var chartCanvas = document.getElementById('stockChart');
-                    if (chartCanvas && typeof Chart !== 'undefined') {
-                        // Destroy previous instance if exists
-                        if (stockChartInstance) {
-                            stockChartInstance.destroy();
-                        }
 
-                        stockChartInstance = new Chart(chartCanvas, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['公司倉', 'F22廠區'],
-                                datasets: [{
-                                    data: [totalWarehouse, totalSite],
-                                    backgroundColor: ['rgba(168, 85, 247, 0.8)', 'rgba(34, 211, 238, 0.8)'],
-                                    borderColor: ['#a855f7', '#22d3ee'],
-                                    borderWidth: 2,
-                                    hoverBorderWidth: 4
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                cutout: '60%',
-                                plugins: {
-                                    legend: {
-                                        position: 'bottom',
-                                        labels: {
-                                            color: '#ffffff',
-                                            font: { size: 14, weight: 'bold' },
-                                            padding: 20
-                                        }
-                                    },
-                                    tooltip: {
-                                        backgroundColor: 'rgba(24, 24, 27, 0.95)',
-                                        titleColor: '#ffffff',
-                                        bodyColor: '#d4d4d8',
-                                        borderColor: 'rgba(63, 63, 70, 0.5)',
-                                        borderWidth: 1,
-                                        padding: 12,
-                                        bodyFont: { size: 14 }
-                                    }
-                                }
-                            }
-                        });
-                    }
+                    // 更新智慧決策模組
+                    updateReplenishSuggestions();
+                    updateStaleItems();
 
                     // 更新F22廠區物料清單
                     renderSiteItems();
                 }
 
                 function renderSiteItems() {
-                    // 篩選出F22廠區有庫存的物料
+                    // 篩選出F22廠區有庫存的物料，並應用分類過濾
                     var siteItems = [];
                     for (var i = 0; i < state.stock.length; i++) {
                         var item = state.stock[i];
+                        // 基礎條件：F22 有庫存
                         if (safeNum(item.siteQty) > 0) {
+                            // 過濾條件：若有選定分類，則需確認分類相符
+                            if (dashboardFilter.category) {
+                                var itemCat = getCategory(item);
+                                if (itemCat !== dashboardFilter.category) continue;
+                            }
                             siteItems.push(item);
                         }
                     }
@@ -1962,6 +2462,193 @@
                     el.siteItemsList.innerHTML = html;
                 }
 
+                // ===== 智慧決策模組 =====
+                var dashboardFilter = {
+                    category: null // 當前選中的分類，null 表示全部
+                };
+
+                // 更新智慧補貨建議
+                function updateReplenishSuggestions() {
+                    var replenishList = document.getElementById('replenishList');
+                    if (!replenishList) return;
+
+                    // 篩選低庫存物料並計算缺口
+                    var lowStockItems = [];
+                    for (var i = 0; i < state.stock.length; i++) {
+                        var item = state.stock[i];
+                        var total = safeNum(item.warehouseQty) + safeNum(item.siteQty);
+                        var safe = safeNum(item.safeQty, 1);
+                        if (total < safe) {
+                            lowStockItems.push({
+                                item: item,
+                                shortage: safe - total,
+                                urgency: (safe - total) / safe // 緊急度：缺口比例
+                            });
+                        }
+                    }
+
+                    // 按緊急度排序
+                    lowStockItems.sort(function (a, b) {
+                        return b.urgency - a.urgency;
+                    });
+
+                    if (lowStockItems.length === 0) {
+                        replenishList.innerHTML = '<p class="text-green-400 text-sm font-medium">✅ 所有物料庫存充足！</p>';
+                        return;
+                    }
+
+                    // 顯示前 3 名最緊急的
+                    var html = '<div class="text-sm text-gray-400 mb-3">共 <span class="text-yellow-300 font-bold">' + lowStockItems.length + '</span> 項需要補貨</div>';
+                    var top3 = lowStockItems.slice(0, 3);
+
+                    for (var i = 0; i < top3.length; i++) {
+                        var data = top3[i];
+                        var item = data.item;
+                        var urgencyColor = data.urgency > 0.8 ? 'text-red-400' : data.urgency > 0.5 ? 'text-yellow-400' : 'text-orange-400';
+
+                        html += '<div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">' +
+                            '<div class="flex-1 min-w-0">' +
+                            '<p class="text-white font-bold truncate">' + escapeHtml(safeStr(item.spec, '-')) + '</p>' +
+                            '<p class="text-xs text-gray-500 truncate">' + escapeHtml(safeStr(item.name, '')) + '</p>' +
+                            '</div>' +
+                            '<div class="text-right ml-3">' +
+                            '<p class="' + urgencyColor + ' font-black text-lg">缺 ' + Math.ceil(data.shortage) + '</p>' +
+                            '<p class="text-xs text-gray-600">安全量 ' + safeNum(item.safeQty) + '</p>' +
+                            '</div>' +
+                            '</div>';
+                    }
+
+                    replenishList.innerHTML = html;
+                }
+
+
+
+                // 一鍵複製採購清單
+                function copyPurchaseList() {
+                    var lowStockItems = [];
+                    for (var i = 0; i < state.stock.length; i++) {
+                        var item = state.stock[i];
+                        var total = safeNum(item.warehouseQty) + safeNum(item.siteQty);
+                        var safe = safeNum(item.safeQty, 1);
+                        if (total < safe) {
+                            lowStockItems.push({
+                                name: safeStr(item.name, ''),
+                                spec: safeStr(item.spec, '-'),
+                                unit: safeStr(item.unit, '個'),
+                                shortage: Math.ceil(safe - total)
+                            });
+                        }
+                    }
+
+                    if (lowStockItems.length === 0) {
+                        toast('沒有需要補貨的物料！', 'info');
+                        return;
+                    }
+
+                    // 生成採購清單文字
+                    var text = '📋 採購清單 (' + formatDateTime(new Date()) + ')\n';
+                    text += '═══════════════════════════\n';
+                    for (var i = 0; i < lowStockItems.length; i++) {
+                        var item = lowStockItems[i];
+                        text += (i + 1) + '. ' + item.name + ' (' + item.spec + ')\n';
+                        text += '   建議採購：' + item.shortage + ' ' + item.unit + '\n';
+                    }
+                    text += '═══════════════════════════\n';
+                    text += '共 ' + lowStockItems.length + ' 項\n';
+
+                    // 複製到剪貼簿
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(function () {
+                            hapticFeedback('success');
+                            toast('✅ 採購清單已複製！', 'success');
+                        }).catch(function () {
+                            toast('複製失敗，請手動複製', 'error');
+                        });
+                    } else {
+                        toast('瀏覽器不支援複製功能', 'warning');
+                    }
+                }
+
+                // 呆滯物料分析 (30天未變動)
+                function updateStaleItems() {
+                    var card = document.getElementById('staleItemsCard');
+                    var list = document.getElementById('staleItemsList');
+                    if (!card || !list) return;
+
+                    var now = new Date();
+                    var staleCount = 0;
+                    var html = '';
+
+                    // 模擬數據：如果有 last_updated 欄位則使用，否則隨機模擬幾個（僅供演示，實際應接後端）
+                    // 在此版本中，我們檢查 item.lastUpdated (假設格式為 ISO 字串或 Date 物件)
+                    // 如果沒有 lastUpdated，我們暫時不顯示，避免誤判
+
+                    var staleItems = [];
+                    for (var i = 0; i < state.stock.length; i++) {
+                        var item = state.stock[i];
+                        if (item.lastUpdated) {
+                            var lastUpdate = new Date(item.lastUpdated);
+                            var diffTime = Math.abs(now - lastUpdate);
+                            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                            if (diffDays > 30) {
+                                staleItems.push({
+                                    item: item,
+                                    days: diffDays
+                                });
+                            }
+                        }
+                    }
+
+                    // 按呆滯天數排序
+                    staleItems.sort(function (a, b) {
+                        return b.days - a.days;
+                    });
+
+                    if (staleItems.length === 0) {
+                        card.classList.add('hidden');
+                        return;
+                    }
+
+                    card.classList.remove('hidden');
+
+                    var displayItems = staleItems.slice(0, 3); // 顯示前3名
+                    for (var i = 0; i < displayItems.length; i++) {
+                        var data = displayItems[i];
+                        html += '<div class="flex items-center justify-between p-2 rounded-lg bg-black/20 border border-white/5">' +
+                            '<span class="text-white text-sm font-medium truncate flex-1">' + escapeHtml(safeStr(data.item.name)) + '</span>' +
+                            '<span class="text-red-300 text-xs font-bold whitespace-nowrap ml-2">' + data.days + ' 天未動</span>' +
+                            '</div>';
+                    }
+
+                    if (staleItems.length > 3) {
+                        html += '<p class="text-center text-xs text-red-300/70 mt-2">還有 ' + (staleItems.length - 3) + ' 項...</p>';
+                    }
+
+                    list.innerHTML = html;
+                }
+
+                // 分類聯動過濾（點擊分類統計中的類別）
+                function filterSiteByCategory(category) {
+                    if (dashboardFilter.category === category) {
+                        dashboardFilter.category = null; // 再次點擊則取消篩選
+                    } else {
+                        dashboardFilter.category = category;
+                    }
+                    renderSiteItems();
+
+                    // 更新篩選標籤顯示
+                    var label = document.getElementById('siteFilterLabel');
+                    if (label) {
+                        if (dashboardFilter.category) {
+                            label.classList.remove('hidden');
+                            label.textContent = '篩選：' + (categoryConfig[category] ? categoryConfig[category].label : '全部');
+                        } else {
+                            label.classList.add('hidden');
+                        }
+                    }
+                }
+
                 // ===== 列表渲染 =====
                 function renderList() {
                     if (state.filtered.length === 0) {
@@ -2000,35 +2687,43 @@
                     var pct = Math.min((total / Math.max(safeQty * 2, 1)) * 100, 100);
                     var colorClass = 'stock-green';
                     var statusText = '庫存充足';
+                    var alertClass = ''; // 警示類別
+
                     if (total === 0) {
                         colorClass = 'stock-red';
                         statusText = '無庫存';
+                        alertClass = 'out-of-stock';
                     } else if (total < safeQty) {
                         colorClass = 'stock-yellow';
                         statusText = '庫存不足';
+                        alertClass = 'low-stock-alert';
                     }
 
                     var cat = getCategory(item);
-                    var icon = getCategoryIcon(cat);
+                    var icon = getCategoryIcon(cat, true); // 使用 SVG 圖標
                     var isSelected = state.selectedItems.indexOf(id) >= 0;
                     var selectClass = isSelected ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-black' : '';
 
-                    // COMPACT CARD: High-density flex-row layout for scannability
-                    return '<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 cursor-pointer transition-all duration-150 active:scale-[0.98] hover:bg-zinc-800/50 ' + selectClass + '" ' +
+                    // COMPACT CARD: High-density flex-row layout with stock alerts
+                    return '<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 cursor-pointer transition-all duration-150 active:scale-[0.98] hover:bg-zinc-800/50 ' + selectClass + ' ' + alertClass + '" ' +
                         'onclick="handleItemClick(event, \'' + escapeHtml(id) + '\')" ' +
                         'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){handleItemClick(event, \'' + escapeHtml(id) + '\');event.preventDefault();}" ' +
                         'data-id="' + escapeHtml(id) + '" role="button" tabindex="0" ' +
-                        'aria-label="' + escapeHtml(name) + '，規格：' + escapeHtml(spec) + '，總量：' + total + '件">' +
+                        'aria-label="' + escapeHtml(name) + '，規格：' + escapeHtml(spec) + '，公司倉：' + wQty + '件，F22：' + sQty + '件">' +
                         '<div class="flex items-center gap-4">' +
-                        '<span class="text-3xl flex-shrink-0">' + icon + '</span>' +
+                        icon +
                         '<div class="flex-1 min-w-0">' +
                         '<p class="text-xl font-black text-white leading-tight truncate">' + escapeHtml(spec) + '</p>' +
                         '<p class="text-sm text-gray-500 truncate mt-0.5">' + escapeHtml(name) + ' · ' + escapeHtml(unit) + '</p>' +
                         '</div>' +
-                        '<div class="flex items-center gap-3 flex-shrink-0">' +
-                        '<div class="text-right">' +
-                        '<p class="text-3xl font-black text-white leading-none tabular-nums">' + total + '</p>' +
-                        '<p class="text-xs ' + (total === 0 ? 'text-red-400' : (total < safeQty ? 'text-yellow-400' : 'text-green-400')) + ' font-bold mt-1">' + statusText + '</p>' +
+                        '<div class="flex items-center gap-4 flex-shrink-0">' +
+                        '<div class="text-center">' +
+                        '<p class="text-2xl font-black text-purple-400 tabular-nums leading-none">' + wQty + '</p>' +
+                        '<p class="text-xs text-purple-400/70 font-bold mt-1">公司</p>' +
+                        '</div>' +
+                        '<div class="text-center">' +
+                        '<p class="text-2xl font-black text-cyan-400 tabular-nums leading-none">' + sQty + '</p>' +
+                        '<p class="text-xs text-cyan-400/70 font-bold mt-1">F22</p>' +
                         '</div>' +
                         '<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>' +
                         '</div>' +
@@ -2303,6 +2998,10 @@
                         operator: state.currentOperator
                     };
 
+                    // 更新同步指示器
+                    syncState.isSyncing = true;
+                    updateSyncIndicator();
+
                     state.updateTimers[key] = setTimeout(function () {
                         var action = isW ? 'warehouse_audit' : 'audit';
                         postAPI(action, {
@@ -2312,9 +3011,13 @@
                         })
                             .then(function () {
                                 toast('✅ 已同步 (' + state.currentOperator + ')', 'success');
+                                hapticFeedback('success');
                                 recordOperation(action, item.name, oldQty, newQty, type);
                                 updateDashboard();
                                 delete state.pendingUpdates[key];
+                                syncState.isSyncing = false;
+                                syncState.lastSyncTime = new Date();
+                                updateSyncIndicator();
                             })
                             .catch(function (e) {
                                 // 錯誤恢復：恢復到原始值與畫面
@@ -2328,8 +3031,11 @@
                                 updateNumberDisplay(id, type, oldQty, true);
 
                                 delete state.pendingUpdates[key];
+                                syncState.isSyncing = false;
+                                updateSyncIndicator();
 
                                 toast('❌ 同步失敗，已恢復原值: ' + e.message, 'error');
+                                hapticFeedback('error');
                                 updateDashboard();
                             });
 
@@ -2343,9 +3049,13 @@
                 function adjustQty(type, delta) {
                     if (!state.currentItem) return;
 
+                    // 觸覺回饋
+                    hapticFeedback(delta > 0 ? 'light' : 'medium');
+
                     // 檢查網絡狀態
                     if (!state.isOnline) {
                         toast('⚠️ 目前離線，操作將在連線後同步', 'warning');
+                        hapticFeedback('warning');
                     }
 
                     var id = state.currentItem.id;
@@ -3385,6 +4095,176 @@
 
             })();
     </script>
+
+</body>
+
+</html> // 更新應用模式顯示
+function updateAppMode() {
+var modeEl = document.getElementById('appMode');
+if (!modeEl) return;
+
+if (window.matchMedia('(display-mode: standalone)').matches) {
+modeEl.textContent = '已安裝版';
+modeEl.classList.add('text-green-400');
+} else {
+modeEl.textContent = '網頁版';
+modeEl.classList.remove('text-green-400');
+}
+}
+
+// 安裝功能（可選，在設定頁提供）
+function installPWA() {
+// 檢查是否已經安裝
+if (window.matchMedia('(display-mode: standalone)').matches) {
+toast('✅ 應用已安裝', 'success');
+return;
+}
+
+var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+var isAndroid = /Android/i.test(navigator.userAgent);
+var isChrome = /Chrome/i.test(navigator.userAgent);
+
+// iOS 特殊處理
+if (isIOS) {
+var instructions = '📱 iOS 安裝步驟：\n\n' +
+'1. 點擊瀏覽器底部的「分享」按鈕（方框+箭頭圖標）\n' +
+'2. 向下滾動，找到「加入主畫面」\n' +
+'3. 點擊「加入主畫面」\n' +
+'4. 點擊右上角「加入」\n\n' +
+'完成後，應用圖標會出現在主屏幕上！';
+toast(instructions, 'info');
+return;
+}
+
+// Android Chrome 使用標準 PWA 安裝
+if (isAndroid && isChrome && deferredPrompt) {
+deferredPrompt.prompt();
+deferredPrompt.userChoice.then(function (choiceResult) {
+if (choiceResult.outcome === 'accepted') {
+toast('✅ 安裝成功！現在可以從主屏幕啟動', 'success');
+updatePWAInstallSection();
+updateAppMode();
+} else {
+toast('已取消安裝，您仍可正常使用網頁版', 'info');
+}
+deferredPrompt = null;
+});
+return;
+}
+
+// Android 其他瀏覽器
+if (isAndroid) {
+toast('📱 Android 安裝：\n\n請使用 Chrome 瀏覽器，或點擊瀏覽器菜單中的「添加到主屏幕」選項', 'info');
+return;
+}
+
+// 桌面端
+if (deferredPrompt) {
+deferredPrompt.prompt();
+deferredPrompt.userChoice.then(function (choiceResult) {
+if (choiceResult.outcome === 'accepted') {
+toast('✅ 安裝成功！', 'success');
+updatePWAInstallSection();
+updateAppMode();
+} else {
+toast('已取消安裝', 'info');
+}
+deferredPrompt = null;
+});
+} else {
+toast('您的瀏覽器可能不支持 PWA 安裝，或需要手動添加', 'info');
+}
+}
+
+// 監聽安裝完成事件
+window.addEventListener('appinstalled', function () {
+toast('✅ 應用已成功安裝到主屏幕！', 'success');
+deferredPrompt = null;
+updatePWAInstallSection();
+updateAppMode();
+});
+
+// ===== 網絡狀態監聽 =====
+function updateOnlineStatus() {
+state.isOnline = navigator.onLine;
+var statusEl = el.statusBadge;
+if (statusEl) {
+if (state.isOnline) {
+if (!statusEl.textContent.includes('離線')) {
+setStatus('online', '線上');
+}
+} else {
+setStatus('error', '離線模式');
+toast('⚠️ 目前離線，部分功能可能無法使用', 'warning');
+}
+}
+}
+
+window.addEventListener('online', function () {
+updateOnlineStatus();
+toast('✅ 網絡已恢復', 'success');
+// 重試失敗的操作
+retryFailedUpdates();
+});
+
+window.addEventListener('offline', function () {
+updateOnlineStatus();
+});
+
+// 重試失敗的操作
+function retryFailedUpdates() {
+var keys = Object.keys(state.pendingUpdates);
+if (keys.length === 0) return;
+
+toast('正在重試同步 ' + keys.length + ' 個操作...', 'info');
+
+keys.forEach(function (key) {
+var update = state.pendingUpdates[key];
+var action = update.type === 'w' ? 'warehouse_audit' : 'audit';
+
+postAPI(action, {
+id: update.id,
+qty: update.newQty,
+person: update.operator
+})
+.then(function () {
+delete state.pendingUpdates[key];
+if (Object.keys(state.pendingUpdates).length === 0) {
+toast('✅ 所有操作已同步', 'success');
+}
+})
+.catch(function (e) {
+console.error('重試失敗:', e);
+});
+});
+}
+
+// ===== 初始化 =====
+function init() {
+initDOM();
+bindEvents();
+handleURLParams(); // 處理 URL 參數（PWA shortcuts）
+updateOnlineStatus(); // 初始化網絡狀態
+
+// Initialize AutoAnimate for smooth list transitions
+if (window.autoAnimate) {
+var inventoryList = document.getElementById('inventoryList');
+if (inventoryList) {
+window.autoAnimate(inventoryList, { duration: 250 });
+}
+}
+
+loadData(false);
+}
+
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', init);
+} else {
+init();
+}
+
+})();
+</script>
 
 </body>
 
