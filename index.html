@@ -1362,8 +1362,20 @@
                     </div>
                 </div>
 
-
-
+                <!-- 常用物料推薦 -->
+                <div id="frequentlyUsedCard"
+                    class="bg-gradient-to-br from-purple-900/30 to-indigo-900/20 backdrop-blur-xl border border-purple-600/30 shadow-2xl rounded-3xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">⭐</span>
+                            <h3 class="text-lg font-bold text-purple-300">常用物料</h3>
+                        </div>
+                        <span class="text-xs text-gray-500">根據最近修改記錄</span>
+                    </div>
+                    <div id="frequentlyUsedList" class="space-y-3">
+                        <p class="text-gray-500 text-sm">載入中...</p>
+                    </div>
+                </div>
 
 
                 <!-- 分類統計條 -->
@@ -2070,7 +2082,7 @@
                         color: '#ec4899'
                     },
                     pipe: { keywords: ['管', 'pipe', '配管'], iconName: 'cylinder', icon: '🔩', label: '管材', color: '#10b981' },
-                    hardware: { keywords: [], iconName: 'wrench', icon: '🔧', label: '五金', color: '#6366f1' }
+                    hardware: { keywords: ['耐龍合接頭'], iconName: 'wrench', icon: '🔧', label: '五金', color: '#6366f1' }
                 };
 
                 function getCategory(item) {
@@ -2397,6 +2409,7 @@
                     // 更新智慧決策模組
                     updateReplenishSuggestions();
                     updateStaleItems();
+                    updateFrequentlyUsed();
 
                     // 更新F22廠區物料清單
                     renderSiteItems();
@@ -2521,6 +2534,69 @@
                     replenishList.innerHTML = html;
                 }
 
+                // ===== 常用物料推薦 =====
+                function updateFrequentlyUsed() {
+                    var container = document.getElementById('frequentlyUsedList');
+                    if (!container) return;
+
+                    // Load operation history from localStorage
+                    var history = [];
+                    try {
+                        var saved = localStorage.getItem('operationHistory');
+                        if (saved) history = JSON.parse(saved);
+                    } catch (e) { console.warn('無法載入操作歷史:', e); }
+
+                    if (history.length === 0) {
+                        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">暫無操作記錄，開始盤點後將顯示常用物料</p>';
+                        return;
+                    }
+
+                    // Count item frequency
+                    var freqMap = {};
+                    for (var i = 0; i < history.length; i++) {
+                        var name = history[i].itemName;
+                        if (!freqMap[name]) freqMap[name] = { count: 0, lastTime: history[i].time };
+                        freqMap[name].count++;
+                    }
+
+                    // Sort by frequency
+                    var sorted = Object.keys(freqMap).map(function (name) {
+                        return { name: name, count: freqMap[name].count, lastTime: freqMap[name].lastTime };
+                    }).sort(function (a, b) { return b.count - a.count; }).slice(0, 5);
+
+                    // Render
+                    var html = '';
+                    for (var j = 0; j < sorted.length; j++) {
+                        var freq = sorted[j];
+                        var item = null;
+                        for (var k = 0; k < state.stock.length; k++) {
+                            if (state.stock[k].name === freq.name) {
+                                item = state.stock[k];
+                                break;
+                            }
+                        }
+                        if (!item) continue;
+
+                        html += '<div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-all" onclick="openBottomSheet(\'' + escapeHtml(item.id) + '\')">' +
+                            '<div class="flex items-center gap-3 flex-1 min-w-0">' +
+                            '<span class="text-purple-400 font-black text-xl">' + (j + 1) + '</span>' +
+                            '<div class="min-w-0">' +
+                            '<p class="text-white font-bold truncate">' + escapeHtml(safeStr(item.spec, '-')) + '</p>' +
+                            '<p class="text-xs text-gray-500 truncate">' + escapeHtml(safeStr(item.name, '')) + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="text-right flex-shrink-0">' +
+                            '<p class="text-purple-400 font-extrabold text-lg">' + freq.count + '次</p>' +
+                            '</div>' +
+                            '</div>';
+                    }
+
+                    if (html === '') {
+                        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">暫無符合的物料</p>';
+                    } else {
+                        container.innerHTML = html;
+                    }
+                }
 
 
                 // 一鍵複製採購清單
