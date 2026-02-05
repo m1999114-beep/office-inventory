@@ -1343,51 +1343,133 @@
         <!-- Dashboard 頁面 -->
         <div id="page-dashboard" class="page active">
             <div class="px-5 py-6 space-y-6">
-                <!-- 智慧補貨建議卡片 -->
-                <div id="replenishCard"
-                    class="bg-gradient-to-br from-yellow-900/30 to-orange-900/20 backdrop-blur-xl border border-yellow-600/30 shadow-2xl rounded-3xl p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">🚨</span>
-                            <h3 class="text-lg font-bold text-yellow-300">智慧補貨建議</h3>
+
+                <!-- 🚨 缺料戰情中心 - AI 智慧分類 -->
+                <div id="shortageCommandCenter"
+                    class="bg-gradient-to-br from-red-950/50 via-orange-950/40 to-yellow-950/30 backdrop-blur-xl border border-red-600/40 shadow-2xl rounded-3xl p-6">
+
+                    <!-- 標題列 -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl animate-pulse">🚨</span>
+                            <div>
+                                <h3 class="text-xl font-black text-white">缺料戰情中心</h3>
+                                <p class="text-xs text-gray-400 font-medium">AI 智慧分類 · 優先處理建議</p>
+                            </div>
                         </div>
                         <button id="copyPurchaseListBtn" onclick="copyPurchaseList()"
-                            class="btn-interactive px-4 py-2 rounded-xl bg-yellow-600/30 text-yellow-300 text-sm font-bold border border-yellow-500/40 hover:bg-yellow-600/50 transition-all">
-                            📋 複製採購清單
+                            class="btn-interactive px-4 py-2 rounded-xl bg-white/10 text-white text-sm font-bold border border-white/20 hover:bg-white/20 transition-all">
+                            📋 複製清單
                         </button>
                     </div>
-                    <div id="replenishList" class="space-y-3">
-                        <!-- 緊急補貨清單將在這裡動態生成 -->
-                        <p class="text-gray-500 text-sm">載入中...</p>
+
+                    <!-- 緊急程度統計卡片 -->
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div id="urgentCard" onclick="filterShortageByUrgency('critical')"
+                            class="shortage-urgency-card cursor-pointer p-4 rounded-2xl bg-red-600/20 border-2 border-red-500/40 text-center transition-all hover:scale-105 hover:bg-red-600/30 active:scale-95">
+                            <p class="text-3xl font-black text-red-400 leading-none" id="criticalCount">0</p>
+                            <p class="text-xs text-red-300 font-bold mt-2">🔴 緊急</p>
+                            <p class="text-xs text-red-400/60 mt-1">無庫存</p>
+                        </div>
+                        <div id="severeCard" onclick="filterShortageByUrgency('severe')"
+                            class="shortage-urgency-card cursor-pointer p-4 rounded-2xl bg-orange-600/20 border-2 border-orange-500/40 text-center transition-all hover:scale-105 hover:bg-orange-600/30 active:scale-95">
+                            <p class="text-3xl font-black text-orange-400 leading-none" id="severeCount">0</p>
+                            <p class="text-xs text-orange-300 font-bold mt-2">🟠 嚴重</p>
+                            <p class="text-xs text-orange-400/60 mt-1">&lt;50% 安全量</p>
+                        </div>
+                        <div id="lowCard" onclick="filterShortageByUrgency('low')"
+                            class="shortage-urgency-card cursor-pointer p-4 rounded-2xl bg-yellow-600/20 border-2 border-yellow-500/40 text-center transition-all hover:scale-105 hover:bg-yellow-600/30 active:scale-95">
+                            <p class="text-3xl font-black text-yellow-400 leading-none" id="lowCount">0</p>
+                            <p class="text-xs text-yellow-300 font-bold mt-2">🟡 低庫存</p>
+                            <p class="text-xs text-yellow-400/60 mt-1">&lt;安全量</p>
+                        </div>
+                    </div>
+
+                    <!-- AI 類別篩選 -->
+                    <div class="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide" id="shortageCategoryFilter">
+                        <button onclick="filterShortageByCategory('all')" data-cat="all"
+                            class="shortage-cat-chip active px-4 py-2 rounded-full text-sm font-bold bg-white text-black border border-white whitespace-nowrap transition-all">
+                            全部
+                        </button>
+                        <button onclick="filterShortageByCategory('wire')" data-cat="wire"
+                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap hover:bg-white/10 transition-all">
+                            🔌 電線
+                        </button>
+                        <button onclick="filterShortageByCategory('terminal')" data-cat="terminal"
+                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap hover:bg-white/10 transition-all">
+                            🔗 端子
+                        </button>
+                        <button onclick="filterShortageByCategory('consumable')" data-cat="consumable"
+                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap hover:bg-white/10 transition-all">
+                            📦 耗材
+                        </button>
+                        <button onclick="filterShortageByCategory('pipe')" data-cat="pipe"
+                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap hover:bg-white/10 transition-all">
+                            🔩 管材
+                        </button>
+                        <button onclick="filterShortageByCategory('hardware')" data-cat="hardware"
+                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm font-medium bg-white/5 text-gray-300 border border-white/10 whitespace-nowrap hover:bg-white/10 transition-all">
+                            🔧 五金
+                        </button>
+                    </div>
+
+                    <!-- 缺料清單 -->
+                    <div id="shortageList" class="space-y-3 max-h-[400px] overflow-y-auto">
+                        <p class="text-gray-500 text-sm text-center py-4">載入中...</p>
+                    </div>
+
+                    <!-- 全部充足提示 -->
+                    <div id="allStockOk" class="hidden text-center py-8">
+                        <div class="text-6xl mb-4">✅</div>
+                        <p class="text-green-400 text-lg font-bold">所有物料庫存充足！</p>
+                        <p class="text-gray-500 text-sm mt-2">目前沒有需要補貨的物料</p>
                     </div>
                 </div>
 
-                <!-- 常用物料推薦 -->
-                <div id="frequentlyUsedCard"
-                    class="bg-gradient-to-br from-purple-900/30 to-indigo-900/20 backdrop-blur-xl border border-purple-600/30 shadow-2xl rounded-3xl p-6">
-                    <div class="flex items-center justify-between mb-4">
+                <!-- 常用物料推薦 (摺疊設計) -->
+                <details id="frequentlyUsedCard"
+                    class="bg-gradient-to-br from-purple-900/30 to-indigo-900/20 backdrop-blur-xl border border-purple-600/30 shadow-2xl rounded-3xl overflow-hidden">
+                    <summary
+                        class="p-6 cursor-pointer flex items-center justify-between hover:bg-white/5 transition-all">
                         <div class="flex items-center gap-2">
                             <span class="text-2xl">⭐</span>
                             <h3 class="text-lg font-bold text-purple-300">常用物料</h3>
+                            <span class="text-xs text-gray-500 ml-2">根據最近修改記錄</span>
                         </div>
-                        <span class="text-xs text-gray-500">根據最近修改記錄</span>
+                        <svg class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6">
+                        <div id="frequentlyUsedList" class="space-y-3">
+                            <p class="text-gray-500 text-sm">載入中...</p>
+                        </div>
                     </div>
-                    <div id="frequentlyUsedList" class="space-y-3">
-                        <p class="text-gray-500 text-sm">載入中...</p>
-                    </div>
-                </div>
+                </details>
 
-
-                <!-- 分類統計條 -->
-                <div class="bg-zinc-900/70 backdrop-blur-xl border border-zinc-700/50 shadow-2xl rounded-3xl p-6">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="text-2xl">📈</span>
-                        <h3 class="text-lg font-bold text-white">分類統計</h3>
-                        <span class="text-xs text-gray-500 ml-2">（點擊類別可篩選）</span>
+                <!-- 分類統計條 (摺疊設計) -->
+                <details
+                    class="bg-zinc-900/70 backdrop-blur-xl border border-zinc-700/50 shadow-2xl rounded-3xl overflow-hidden">
+                    <summary
+                        class="p-6 cursor-pointer flex items-center justify-between hover:bg-white/5 transition-all">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">📈</span>
+                            <h3 class="text-lg font-bold text-white">分類統計</h3>
+                            <span class="text-xs text-gray-500 ml-2">（點擊類別可篩選）</span>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6">
+                        <div id="categoryBar" class="h-4 rounded-full bg-white/5 flex overflow-hidden mb-4"></div>
+                        <div id="categoryLegend" class="flex flex-wrap gap-4 text-sm text-gray-300"></div>
                     </div>
-                    <div id="categoryBar" class="h-4 rounded-full bg-white/5 flex overflow-hidden mb-4"></div>
-                    <div id="categoryLegend" class="flex flex-wrap gap-4 text-sm text-gray-300"></div>
-                </div>
+                </details>
 
                 <!-- 呆滯物料警示 -->
                 <div id="staleItemsCard"
@@ -2475,63 +2557,230 @@
                     el.siteItemsList.innerHTML = html;
                 }
 
-                // ===== 智慧決策模組 =====
+                // ===== AI 缺料戰情中心 =====
+                var shortageFilter = {
+                    urgency: null, // 'critical', 'severe', 'low', null=全部
+                    category: null // 類別篩選，null=全部
+                };
+
                 var dashboardFilter = {
                     category: null // 當前選中的分類，null 表示全部
                 };
 
-                // 更新智慧補貨建議
-                function updateReplenishSuggestions() {
-                    var replenishList = document.getElementById('replenishList');
-                    if (!replenishList) return;
+                // AI 智慧分類缺料
+                function classifyShortages() {
+                    var classified = {
+                        critical: [], // 無庫存
+                        severe: [],   // <50% 安全量
+                        low: []       // <安全量
+                    };
 
-                    // 篩選低庫存物料並計算缺口
-                    var lowStockItems = [];
+                    // 載入操作歷史計算使用頻率
+                    var freqMap = {};
+                    try {
+                        var history = JSON.parse(localStorage.getItem('operationHistory') || '[]');
+                        for (var h = 0; h < history.length; h++) {
+                            var name = history[h].itemName;
+                            freqMap[name] = (freqMap[name] || 0) + 1;
+                        }
+                    } catch (e) { }
+
                     for (var i = 0; i < state.stock.length; i++) {
                         var item = state.stock[i];
                         var total = safeNum(item.warehouseQty) + safeNum(item.siteQty);
                         var safe = safeNum(item.safeQty, 1);
-                        if (total < safe) {
-                            lowStockItems.push({
-                                item: item,
-                                shortage: safe - total,
-                                urgency: (safe - total) / safe // 緊急度：缺口比例
-                            });
+
+                        if (total >= safe) continue; // 庫存充足，跳過
+
+                        var shortage = safe - total;
+                        var ratio = total / safe;
+                        var frequency = freqMap[item.name] || 0;
+                        var cat = getCategory(item);
+
+                        // 計算 AI 優先級分數 (0-100)
+                        // 權重：緊急程度 40% + 使用頻率 30% + 缺口大小 30%
+                        var urgencyScore = (1 - ratio) * 40;
+                        var frequencyScore = Math.min(frequency / 10, 1) * 30;
+                        var shortageScore = Math.min(shortage / 20, 1) * 30;
+                        var priority = urgencyScore + frequencyScore + shortageScore;
+
+                        var data = {
+                            item: item,
+                            total: total,
+                            safe: safe,
+                            shortage: shortage,
+                            ratio: ratio,
+                            category: cat,
+                            frequency: frequency,
+                            priority: priority
+                        };
+
+                        // 分類
+                        if (total === 0) {
+                            data.urgencyLevel = 'critical';
+                            classified.critical.push(data);
+                        } else if (ratio < 0.5) {
+                            data.urgencyLevel = 'severe';
+                            classified.severe.push(data);
+                        } else {
+                            data.urgencyLevel = 'low';
+                            classified.low.push(data);
                         }
                     }
 
-                    // 按緊急度排序
-                    lowStockItems.sort(function (a, b) {
-                        return b.urgency - a.urgency;
+                    // 每個分類內部按優先級排序
+                    classified.critical.sort(function (a, b) { return b.priority - a.priority; });
+                    classified.severe.sort(function (a, b) { return b.priority - a.priority; });
+                    classified.low.sort(function (a, b) { return b.priority - a.priority; });
+
+                    return classified;
+                }
+
+                // 更新缺料戰情中心
+                function updateShortageCenter() {
+                    var classified = classifyShortages();
+
+                    // 更新統計卡片
+                    var criticalEl = document.getElementById('criticalCount');
+                    var severeEl = document.getElementById('severeCount');
+                    var lowEl = document.getElementById('lowCount');
+
+                    if (criticalEl) criticalEl.textContent = classified.critical.length;
+                    if (severeEl) severeEl.textContent = classified.severe.length;
+                    if (lowEl) lowEl.textContent = classified.low.length;
+
+                    // 合併並篩選
+                    var allShortages = classified.critical.concat(classified.severe, classified.low);
+
+                    // 應用篩選條件
+                    var filtered = allShortages.filter(function (data) {
+                        if (shortageFilter.urgency && data.urgencyLevel !== shortageFilter.urgency) {
+                            return false;
+                        }
+                        if (shortageFilter.category && shortageFilter.category !== 'all' && data.category !== shortageFilter.category) {
+                            return false;
+                        }
+                        return true;
                     });
 
-                    if (lowStockItems.length === 0) {
-                        replenishList.innerHTML = '<p class="text-green-400 text-sm font-medium">✅ 所有物料庫存充足！</p>';
+                    // 渲染缺料清單
+                    var listEl = document.getElementById('shortageList');
+                    var okEl = document.getElementById('allStockOk');
+
+                    if (!listEl) return;
+
+                    if (allShortages.length === 0) {
+                        listEl.classList.add('hidden');
+                        if (okEl) okEl.classList.remove('hidden');
                         return;
                     }
 
-                    // 顯示前 3 名最緊急的
-                    var html = '<div class="text-sm text-gray-400 mb-3">共 <span class="text-yellow-300 font-bold">' + lowStockItems.length + '</span> 項需要補貨</div>';
-                    var top3 = lowStockItems.slice(0, 3);
+                    listEl.classList.remove('hidden');
+                    if (okEl) okEl.classList.add('hidden');
 
-                    for (var i = 0; i < top3.length; i++) {
-                        var data = top3[i];
-                        var item = data.item;
-                        var urgencyColor = data.urgency > 0.8 ? 'text-red-400' : data.urgency > 0.5 ? 'text-yellow-400' : 'text-orange-400';
+                    var html = '';
 
-                        html += '<div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">' +
-                            '<div class="flex-1 min-w-0">' +
-                            '<p class="text-white font-bold truncate">' + escapeHtml(safeStr(item.spec, '-')) + '</p>' +
-                            '<p class="text-xs text-gray-500 truncate">' + escapeHtml(safeStr(item.name, '')) + '</p>' +
-                            '</div>' +
-                            '<div class="text-right ml-3">' +
-                            '<p class="' + urgencyColor + ' font-black text-lg">缺 ' + Math.ceil(data.shortage) + '</p>' +
-                            '<p class="text-xs text-gray-600">安全量 ' + safeNum(item.safeQty) + '</p>' +
-                            '</div>' +
-                            '</div>';
+                    // 按緊急程度分組顯示
+                    var groups = [
+                        { level: 'critical', label: '🔴 緊急 - 無庫存', color: 'red', items: [] },
+                        { level: 'severe', label: '🟠 嚴重 - 庫存不足50%', color: 'orange', items: [] },
+                        { level: 'low', label: '🟡 低庫存 - 低於安全量', color: 'yellow', items: [] }
+                    ];
+
+                    // 分配到各組
+                    for (var f = 0; f < filtered.length; f++) {
+                        var d = filtered[f];
+                        for (var g = 0; g < groups.length; g++) {
+                            if (groups[g].level === d.urgencyLevel) {
+                                groups[g].items.push(d);
+                                break;
+                            }
+                        }
                     }
 
-                    replenishList.innerHTML = html;
+                    // 渲染各組
+                    for (var g = 0; g < groups.length; g++) {
+                        var group = groups[g];
+                        if (group.items.length === 0) continue;
+
+                        html += '<div class="mb-4">';
+                        html += '<p class="text-xs font-bold text-' + group.color + '-400 mb-2 uppercase tracking-wider">' + group.label + ' (' + group.items.length + ')</p>';
+
+                        for (var j = 0; j < group.items.length; j++) {
+                            var data = group.items[j];
+                            var item = data.item;
+                            var icon = getCategoryIcon(data.category);
+                            var freqTag = data.frequency > 3 ? '<span class="ml-2 px-2 py-0.5 text-xs bg-purple-500/30 text-purple-300 rounded-full">高頻</span>' : '';
+
+                            html += '<div class="flex items-center justify-between p-4 rounded-2xl bg-' + group.color + '-900/20 border border-' + group.color + '-500/30 cursor-pointer hover:bg-' + group.color + '-900/30 transition-all active:scale-[0.98]" onclick="openBottomSheet(\'' + escapeHtml(String(item.id)) + '\')">';
+                            html += '<div class="flex items-center gap-3 flex-1 min-w-0">';
+                            html += '<span class="text-2xl flex-shrink-0">' + icon + '</span>';
+                            html += '<div class="flex-1 min-w-0">';
+                            html += '<p class="text-white font-bold truncate">' + escapeHtml(safeStr(item.spec, '-')) + freqTag + '</p>';
+                            html += '<p class="text-xs text-gray-400 truncate">' + escapeHtml(safeStr(item.name, '')) + '</p>';
+                            html += '</div>';
+                            html += '</div>';
+                            html += '<div class="text-right flex-shrink-0 ml-3">';
+                            html += '<p class="text-' + group.color + '-400 font-black text-xl">缺 ' + Math.ceil(data.shortage) + '</p>';
+                            html += '<p class="text-xs text-gray-500">現有 ' + data.total + ' / 安全 ' + data.safe + '</p>';
+                            html += '</div>';
+                            html += '</div>';
+                        }
+
+                        html += '</div>';
+                    }
+
+                    listEl.innerHTML = html;
+                }
+
+                // 按緊急程度篩選
+                function filterShortageByUrgency(urgency) {
+                    // 切換篩選
+                    if (shortageFilter.urgency === urgency) {
+                        shortageFilter.urgency = null;
+                    } else {
+                        shortageFilter.urgency = urgency;
+                    }
+
+                    // 更新卡片樣式
+                    var cards = document.querySelectorAll('.shortage-urgency-card');
+                    cards.forEach(function (card) {
+                        card.classList.remove('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-black');
+                    });
+
+                    if (shortageFilter.urgency) {
+                        var activeCard = document.getElementById(urgency === 'critical' ? 'urgentCard' : urgency === 'severe' ? 'severeCard' : 'lowCard');
+                        if (activeCard) {
+                            activeCard.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-black');
+                        }
+                    }
+
+                    updateShortageCenter();
+                }
+
+                // 按類別篩選
+                function filterShortageByCategory(category) {
+                    shortageFilter.category = category === 'all' ? null : category;
+
+                    // 更新按鈕樣式
+                    var chips = document.querySelectorAll('.shortage-cat-chip');
+                    chips.forEach(function (chip) {
+                        var chipCat = chip.getAttribute('data-cat');
+                        if ((category === 'all' && chipCat === 'all') || chipCat === category) {
+                            chip.classList.remove('bg-white/5', 'text-gray-300', 'border-white/10');
+                            chip.classList.add('bg-white', 'text-black', 'border-white', 'active');
+                        } else {
+                            chip.classList.remove('bg-white', 'text-black', 'border-white', 'active');
+                            chip.classList.add('bg-white/5', 'text-gray-300', 'border-white/10');
+                        }
+                    });
+
+                    updateShortageCenter();
+                }
+
+                // 更新智慧補貨建議 (兼容舊版)
+                function updateReplenishSuggestions() {
+                    updateShortageCenter();
                 }
 
                 // ===== 常用物料推薦 =====
