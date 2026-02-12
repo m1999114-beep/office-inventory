@@ -1583,24 +1583,69 @@
                     $('bottomSheetContent').innerHTML =
                         '<div class="mb-6"><h2 class="text-3xl font-bold text-white mb-2">' + escapeHtml(item.name) + '</h2><p class="text-gray-400">' + escapeHtml(item.spec) + ' · ' + item.unit + '</p></div>' +
                         '<div class="bg-zinc-900 rounded-2xl p-4 mb-4"><p class="text-sm text-gray-400 mb-3">操作人員</p><div class="flex gap-2 flex-wrap">' + opButtons + '</div></div>' +
+                        // 公司倉
                         '<div class="bg-zinc-900 rounded-2xl p-4 mb-4"><p class="text-sm text-gray-400 mb-3">公司倉庫存</p>' +
-                        '<div class="flex items-center justify-between gap-4">' +
-                        '<button onclick="adjustQty(\'w\', -1)" class="w-16 h-16 rounded-2xl bg-red-600/20 text-red-400 text-3xl font-bold">−</button>' +
-                        '<p class="text-6xl font-bold text-purple-400" id="bs-w-' + id + '">' + item.warehouseQty + '</p>' +
-                        '<button onclick="adjustQty(\'w\', 1)" class="w-16 h-16 rounded-2xl bg-green-600/20 text-green-400 text-3xl font-bold">+</button>' +
+                        '<div class="flex items-center justify-between gap-3">' +
+                        '<button onclick="adjustQty(\'w\', -1)" class="w-14 h-14 rounded-2xl bg-red-600/20 text-red-400 text-2xl font-bold">−</button>' +
+                        '<p class="text-5xl font-bold text-purple-400 cursor-pointer" style="border-bottom:2px dashed rgba(168,85,247,0.3);padding-bottom:2px;" id="bs-w-' + id + '" onclick="directEditQty(\'w\')" title="點擊直接輸入數量">' + item.warehouseQty + '</p>' +
+                        '<button onclick="adjustQty(\'w\', 1)" class="w-14 h-14 rounded-2xl bg-green-600/20 text-green-400 text-2xl font-bold">+</button>' +
+                        '</div>' +
+                        '<div class="flex gap-2 mt-3 justify-center flex-wrap">' +
+                        '<button onclick="adjustQty(\'w\', -10)" class="px-3 py-1.5 rounded-lg bg-red-600/10 text-red-400 text-xs font-bold border border-red-600/20">-10</button>' +
+                        '<button onclick="adjustQty(\'w\', -5)" class="px-3 py-1.5 rounded-lg bg-red-600/10 text-red-400 text-xs font-bold border border-red-600/20">-5</button>' +
+                        '<button onclick="directEditQty(\'w\')" class="px-3 py-1.5 rounded-lg bg-purple-600/10 text-purple-400 text-xs font-bold border border-purple-600/20">✏️ 直接輸入</button>' +
+                        '<button onclick="adjustQty(\'w\', 5)" class="px-3 py-1.5 rounded-lg bg-green-600/10 text-green-400 text-xs font-bold border border-green-600/20">+5</button>' +
+                        '<button onclick="adjustQty(\'w\', 10)" class="px-3 py-1.5 rounded-lg bg-green-600/10 text-green-400 text-xs font-bold border border-green-600/20">+10</button>' +
                         '</div></div>' +
                         '<button onclick="transferToSite(\'' + id + '\')" class="w-full py-4 rounded-2xl bg-cyan-600 text-white font-bold mb-4">📦 轉移至 F22</button>' +
+                        // F22 廠區
                         '<div class="bg-zinc-900 rounded-2xl p-4"><p class="text-sm text-gray-400 mb-3">F22廠區庫存</p>' +
-                        '<div class="flex items-center justify-between gap-4">' +
-                        '<button onclick="adjustQty(\'s\', -1)" class="w-16 h-16 rounded-2xl bg-red-600/20 text-red-400 text-3xl font-bold">−</button>' +
-                        '<p class="text-6xl font-bold text-cyan-400" id="bs-s-' + id + '">' + item.siteQty + '</p>' +
-                        '<button onclick="adjustQty(\'s\', 1)" class="w-16 h-16 rounded-2xl bg-green-600/20 text-green-400 text-3xl font-bold">+</button>' +
+                        '<div class="flex items-center justify-between gap-3">' +
+                        '<button onclick="adjustQty(\'s\', -1)" class="w-14 h-14 rounded-2xl bg-red-600/20 text-red-400 text-2xl font-bold">−</button>' +
+                        '<p class="text-5xl font-bold text-cyan-400 cursor-pointer" style="border-bottom:2px dashed rgba(6,182,212,0.3);padding-bottom:2px;" id="bs-s-' + id + '" onclick="directEditQty(\'s\')" title="點擊直接輸入數量">' + item.siteQty + '</p>' +
+                        '<button onclick="adjustQty(\'s\', 1)" class="w-14 h-14 rounded-2xl bg-green-600/20 text-green-400 text-2xl font-bold">+</button>' +
+                        '</div>' +
+                        '<div class="flex gap-2 mt-3 justify-center flex-wrap">' +
+                        '<button onclick="adjustQty(\'s\', -10)" class="px-3 py-1.5 rounded-lg bg-red-600/10 text-red-400 text-xs font-bold border border-red-600/20">-10</button>' +
+                        '<button onclick="adjustQty(\'s\', -5)" class="px-3 py-1.5 rounded-lg bg-red-600/10 text-red-400 text-xs font-bold border border-red-600/20">-5</button>' +
+                        '<button onclick="directEditQty(\'s\')" class="px-3 py-1.5 rounded-lg bg-cyan-600/10 text-cyan-400 text-xs font-bold border border-cyan-600/20">✏️ 直接輸入</button>' +
+                        '<button onclick="adjustQty(\'s\', 5)" class="px-3 py-1.5 rounded-lg bg-green-600/10 text-green-400 text-xs font-bold border border-green-600/20">+5</button>' +
+                        '<button onclick="adjustQty(\'s\', 10)" class="px-3 py-1.5 rounded-lg bg-green-600/10 text-green-400 text-xs font-bold border border-green-600/20">+10</button>' +
                         '</div></div>';
 
                     $('bottomSheet').classList.add('open');
                     $('bottomSheet').setAttribute('aria-hidden', 'false');
                     $('bottomSheetOverlay').classList.add('open');
                     document.body.style.overflow = 'hidden';
+                }
+
+                function directEditQty(type) {
+                    if (!state.currentItem) return;
+                    var item = state.currentItem;
+                    var isW = type === 'w';
+                    var oldQty = isW ? item.warehouseQty : item.siteQty;
+                    var label = isW ? '公司倉庫存' : 'F22廠區庫存';
+
+                    Swal.fire({
+                        title: label,
+                        text: escapeHtml(item.name) + ' (' + escapeHtml(item.spec) + ')',
+                        input: 'number',
+                        inputValue: oldQty,
+                        inputAttributes: { min: 0, step: 1, style: 'font-size:28px;text-align:center;font-weight:bold;' },
+                        showCancelButton: true,
+                        confirmButtonText: '確認修改',
+                        cancelButtonText: '取消',
+                        confirmButtonColor: '#8b5cf6',
+                        inputValidator: function (value) {
+                            if (value === '' || value === null) return '請輸入數量';
+                            if (Number(value) < 0) return '數量不能為負數';
+                        }
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            var newQty = parseInt(result.value) || 0;
+                            updateQty(item.id, type, newQty, oldQty, item);
+                        }
+                    });
                 }
 
                 function setOperator(op) {
@@ -1952,6 +1997,7 @@
                 window.confirmTextRemove = confirmTextRemove;
                 window.filterByStatus = filterByStatus;
                 window.toggleSort = toggleSort;
+                window.directEditQty = directEditQty;
                 window.updateOCRQty = function () { };
                 window.toggleOCR = function () { };
 
