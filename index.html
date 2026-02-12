@@ -11,6 +11,17 @@
     <link rel="icon" type="image/png"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📦%3C/text%3E%3C/svg%3E">
 
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Tippy.js Tooltips -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css">
+
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
@@ -64,7 +75,7 @@
         body {
             background: #0a0a0a;
             color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 14px;
             line-height: 1.5;
         }
@@ -83,6 +94,19 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== Nav dot indicator ===== */
+        .nav-item.active .nav-dot {
+            opacity: 1;
+        }
+
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: #c084fc;
         }
 
         /* ===== 4. Buttons & Interactive ===== */
@@ -617,154 +641,145 @@
     <!-- 主容器 -->
     <div class="relative min-h-screen pb-24">
         <!-- Header -->
-        <header id="header" class="relative z-40 bg-[#0A0A0B] border-b border-zinc-800">
-            <div class="px-6 py-6">
-                <!-- 統計數字 -->
-                <div class="grid grid-cols-3 gap-8 mb-8">
-                    <div class="text-center">
-                        <p class="text-base text-gray-500 font-bold mb-2 tracking-widest uppercase">總品項</p>
-                        <p id="headerTotalItems" class="text-6xl md:text-7xl font-black text-white leading-none">-</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-base text-gray-500 font-bold mb-2 tracking-widest uppercase">F22廠區</p>
-                        <p id="headerSiteItems" class="text-6xl md:text-7xl font-black text-cyan-400 leading-none">-</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-base text-gray-500 font-bold mb-2 tracking-widest uppercase">低庫存</p>
-                        <p id="headerLowStock" class="text-6xl md:text-7xl font-black text-yellow-400 leading-none">-
-                        </p>
-                    </div>
-                </div>
-                <!-- Title -->
-                <div class="flex justify-between items-center mb-4">
+        <header id="header" class="sticky top-0 z-40 bg-[#0A0A0B]/80 backdrop-blur-xl border-b border-zinc-800/60">
+            <div class="px-5 py-4">
+                <!-- Title Row -->
+                <div class="flex justify-between items-center mb-3">
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-black text-gray-100">物料戰情室</h1>
-                        <p class="text-sm text-gray-600 font-medium mt-1">v21.0 Pro Edition</p>
+                        <h1 class="text-2xl font-black text-gray-100 tracking-tight">物料戰情室</h1>
+                        <p class="text-[11px] text-gray-500 font-medium mt-0.5">v21.0 Pro · <span id="headerOperator"
+                                class="text-purple-400 font-bold cursor-pointer"
+                                onclick="switchPage('settings')">黃俊瑋</span></p>
                     </div>
                     <div id="statusBadge"
-                        class="text-xs px-4 py-2 rounded-full bg-zinc-900 text-gray-400 border border-zinc-800">連線中...
+                        class="text-[11px] px-3 py-1.5 rounded-full bg-zinc-900 text-gray-400 border border-zinc-800 font-medium">
+                        連線中...
                     </div>
                 </div>
-                <!-- Operator -->
-                <div class="flex items-center gap-4">
-                    <span class="text-xs text-gray-600 font-medium uppercase">操作人員</span>
-                    <span id="headerOperator"
-                        class="px-4 py-2 rounded-xl bg-purple-600 text-white font-bold text-sm">黃俊瑋</span>
+                <!-- Stats Pills -->
+                <div class="flex gap-2">
+                    <div class="flex-1 bg-zinc-900/80 border border-zinc-800/60 rounded-2xl px-4 py-2.5 text-center">
+                        <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">總品項</p>
+                        <p id="headerTotalItems" class="text-2xl font-black text-white leading-tight">-</p>
+                    </div>
+                    <div class="flex-1 bg-zinc-900/80 border border-zinc-800/60 rounded-2xl px-4 py-2.5 text-center">
+                        <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">F22廠區</p>
+                        <p id="headerSiteItems" class="text-2xl font-black text-cyan-400 leading-tight">-</p>
+                    </div>
+                    <div class="flex-1 bg-zinc-900/80 border border-zinc-800/60 rounded-2xl px-4 py-2.5 text-center">
+                        <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">低庫存</p>
+                        <p id="headerLowStock" class="text-2xl font-black text-yellow-400 leading-tight">-</p>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- Dashboard 頁面 -->
         <div id="page-dashboard" class="page active">
-            <div class="px-5 py-6 space-y-6">
+            <div class="px-5 py-5 space-y-4">
                 <!-- 快速操作 -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="quick-action-card" onclick="openTextRemove()">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-2xl">🤖</span>
-                            <span class="text-lg font-bold text-white">AI 智能移出</span>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="relative overflow-hidden bg-gradient-to-br from-purple-900/40 to-purple-950/20 border border-purple-700/30 rounded-2xl p-4 cursor-pointer active:scale-[0.97] transition-transform"
+                        onclick="openTextRemove()">
+                        <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-purple-500/10 blur-xl"></div>
+                        <div class="relative">
+                            <div class="w-10 h-10 rounded-xl bg-purple-600/30 flex items-center justify-center mb-3">
+                                <span class="text-xl">🤖</span>
+                            </div>
+                            <p class="text-sm font-bold text-white">AI 智能移出</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">模糊輸入自動匹配</p>
                         </div>
-                        <p class="text-sm text-gray-400">模糊輸入自動匹配</p>
                     </div>
-                    <div class="quick-action-card" onclick="copyPurchaseList()">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-2xl">📋</span>
-                            <span class="text-lg font-bold text-white">採購清單</span>
+                    <div class="relative overflow-hidden bg-gradient-to-br from-cyan-900/40 to-cyan-950/20 border border-cyan-700/30 rounded-2xl p-4 cursor-pointer active:scale-[0.97] transition-transform"
+                        onclick="copyPurchaseList()">
+                        <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-cyan-500/10 blur-xl"></div>
+                        <div class="relative">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-600/30 flex items-center justify-center mb-3"><span
+                                    class="text-xl">📋</span></div>
+                            <p class="text-sm font-bold text-white">採購清單</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">一鍵複製缺料清單</p>
                         </div>
-                        <p class="text-sm text-gray-400">一鍵複製缺料清單</p>
                     </div>
                 </div>
 
                 <!-- 缺料戰情中心 -->
-                <div
-                    class="bg-gradient-to-br from-red-950/50 via-orange-950/40 to-yellow-950/30 border border-red-600/40 rounded-3xl p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">🚨</span>
+                <div class="bg-zinc-900/60 backdrop-blur-sm border border-zinc-800/60 rounded-2xl overflow-hidden">
+                    <div class="flex items-center justify-between p-4 border-b border-zinc-800/40">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center"><span
+                                    class="text-base">🚨</span></div>
                             <div>
-                                <h3 class="text-xl font-black text-white">缺料戰情中心</h3>
-                                <p class="text-xs text-gray-400">AI 智慧分類</p>
+                                <h3 class="text-sm font-bold text-white">缺料戰情中心</h3>
+                                <p class="text-[10px] text-gray-500">AI 智慧分類</p>
                             </div>
                         </div>
-                        <button onclick="copyPurchaseList()" class="btn-interactive px-4 py-2 text-sm">📋 複製清單</button>
+                        <button onclick="copyPurchaseList()"
+                            class="text-[11px] px-3 py-1.5 rounded-lg bg-zinc-800 text-gray-400 border border-zinc-700/50 font-medium">📋
+                            複製</button>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="grid grid-cols-3 gap-0 border-b border-zinc-800/40">
                         <div onclick="filterShortageByUrgency('critical')"
-                            class="shortage-urgency-card cursor-pointer p-4 rounded-2xl bg-red-600/20 border-2 border-red-500/40 text-center">
-                            <p class="text-3xl font-black text-red-400" id="criticalCount">0</p>
-                            <p class="text-xs text-red-300 font-bold mt-1">🔴 緊急</p>
+                            class="cursor-pointer p-3 text-center border-r border-zinc-800/40 active:bg-red-900/20 transition-colors">
+                            <p class="text-2xl font-black text-red-400" id="criticalCount">0</p>
+                            <p class="text-[10px] text-red-300/70 font-semibold mt-0.5">🔴 緊急</p>
                         </div>
                         <div onclick="filterShortageByUrgency('severe')"
-                            class="shortage-urgency-card cursor-pointer p-4 rounded-2xl bg-orange-600/20 border-2 border-orange-500/40 text-center">
-                            <p class="text-3xl font-black text-orange-400" id="severeCount">0</p>
-                            <p class="text-xs text-orange-300 font-bold mt-1">🟠 嚴重</p>
+                            class="cursor-pointer p-3 text-center border-r border-zinc-800/40 active:bg-orange-900/20 transition-colors">
+                            <p class="text-2xl font-black text-orange-400" id="severeCount">0</p>
+                            <p class="text-[10px] text-orange-300/70 font-semibold mt-0.5">🟠 嚴重</p>
                         </div>
                         <div onclick="filterShortageByUrgency('low')"
-                            class="shortage-urgency-card cursor-pointer p-4 rounded-2xl bg-yellow-600/20 border-2 border-yellow-500/40 text-center">
-                            <p class="text-3xl font-black text-yellow-400" id="lowCount">0</p>
-                            <p class="text-xs text-yellow-300 font-bold mt-1">🟡 低庫存</p>
+                            class="cursor-pointer p-3 text-center active:bg-yellow-900/20 transition-colors">
+                            <p class="text-2xl font-black text-yellow-400" id="lowCount">0</p>
+                            <p class="text-[10px] text-yellow-300/70 font-semibold mt-0.5">� 低庫存</p>
                         </div>
                     </div>
-                    <div class="flex gap-2 overflow-x-auto pb-3 mb-4" id="shortageCategoryFilter">
+                    <div class="flex gap-1.5 overflow-x-auto p-3 border-b border-zinc-800/40"
+                        id="shortageCategoryFilter">
                         <button onclick="filterShortageByCategory('all')"
-                            class="shortage-cat-chip active px-4 py-2 rounded-full text-sm font-bold bg-white text-black">全部</button>
+                            class="shortage-cat-chip active px-3 py-1.5 rounded-full text-[11px] font-bold bg-white text-black whitespace-nowrap">全部</button>
                         <button onclick="filterShortageByCategory('wire')"
-                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm bg-white/5 text-gray-300">🔌
+                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔌
                             電線</button>
                         <button onclick="filterShortageByCategory('terminal')"
-                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm bg-white/5 text-gray-300">🔗
+                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔗
                             端子</button>
                         <button onclick="filterShortageByCategory('consumable')"
-                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm bg-white/5 text-gray-300">📦
+                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">📦
                             耗材</button>
                         <button onclick="filterShortageByCategory('pipe')"
-                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm bg-white/5 text-gray-300">🔩
+                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔩
                             管材</button>
                         <button onclick="filterShortageByCategory('hardware')"
-                            class="shortage-cat-chip px-4 py-2 rounded-full text-sm bg-white/5 text-gray-300">🔧
+                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔧
                             五金</button>
                     </div>
-                    <div id="shortageList" class="space-y-3 max-h-[400px] overflow-y-auto">
-                        <p class="text-gray-500 text-sm text-center py-4">載入中...</p>
+                    <div id="shortageList" class="p-3 space-y-2 max-h-[350px] overflow-y-auto">
+                        <p class="text-gray-500 text-xs text-center py-4">載入中...</p>
                     </div>
                     <div id="allStockOk" class="hidden text-center py-8">
-                        <div class="text-6xl mb-4">✅</div>
-                        <p class="text-green-400 text-lg font-bold">所有物料庫存充足！</p>
+                        <div class="text-5xl mb-3">✅</div>
+                        <p class="text-green-400 text-sm font-bold">所有物料庫存充足！</p>
                     </div>
                 </div>
 
                 <!-- 分類統計 -->
-                <details class="bg-zinc-900/70 border border-zinc-700/50 rounded-3xl overflow-hidden">
-                    <summary class="p-6 cursor-pointer flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">📈</span>
-                            <h3 class="text-lg font-bold text-white">分類統計</h3>
+                <details class="bg-zinc-900/60 backdrop-blur-sm border border-zinc-800/60 rounded-2xl overflow-hidden">
+                    <summary class="p-4 cursor-pointer flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center"><span
+                                    class="text-base">📈</span></div>
+                            <h3 class="text-sm font-bold text-white">分類統計</h3>
                         </div>
                     </summary>
-                    <div class="px-6 pb-6">
-                        <div id="categoryBar" class="h-4 rounded-full bg-white/5 flex overflow-hidden mb-4"></div>
-                        <div id="categoryLegend" class="flex flex-wrap gap-4 text-sm text-gray-300"></div>
+                    <div class="px-4 pb-4">
+                        <div id="categoryBar" class="h-3 rounded-full bg-white/5 flex overflow-hidden mb-3"></div>
+                        <div id="categoryLegend" class="flex flex-wrap gap-3 text-xs text-gray-400"></div>
                     </div>
                 </details>
-
-                <!-- F22廠區物料 -->
-                <div class="bg-zinc-900/70 border border-zinc-700/50 rounded-3xl p-6">
-                    <div class="flex items-center justify-between mb-5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">🏗️</span>
-                            <h3 class="text-xl font-bold text-white">F22廠區物料</h3>
-                        </div>
-                        <span id="siteItemCount"
-                            class="text-sm px-4 py-2 rounded-full bg-cyan-500/20 text-cyan-300 font-bold">-</span>
-                    </div>
-                    <div id="siteItemsList" class="space-y-2 max-h-96 overflow-y-auto"></div>
-                    <div id="siteItemsEmpty" class="hidden text-center py-12">
-                        <div class="text-5xl mb-3 opacity-40">📭</div>
-                        <p class="text-gray-500 text-sm">F22廠區暫無物料</p>
-                    </div>
-                </div>
             </div>
         </div>
+
 
         <!-- List 頁面 -->
         <div id="page-list" class="page">
@@ -830,6 +845,12 @@
                     <p class="text-gray-400 text-lg font-bold">找不到符合的品項</p>
                 </div>
             </div>
+        </div>
+
+        <!-- Hidden placeholders for JS compatibility -->
+        <div class="hidden"><span id="siteItemCount"></span>
+            <div id="siteItemsList"></div>
+            <div id="siteItemsEmpty"></div>
         </div>
 
         <!-- Settings 頁面 -->
@@ -925,22 +946,29 @@
     </div>
 
     <!-- 底部導航 -->
-    <nav class="bottom-nav">
-        <div class="flex justify-around items-center py-3 px-3">
+    <nav class="bottom-nav"
+        style="background: rgba(10,10,11,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06);">
+        <div class="flex justify-around items-center py-2 px-3">
             <button onclick="switchPage('dashboard')"
-                class="nav-item active relative flex flex-col items-center gap-1 px-5 py-2" data-page="dashboard">
-                <span class="text-xl">🏠</span>
-                <span class="text-[10px] font-bold">總覽</span>
+                class="nav-item active relative flex flex-col items-center gap-0.5 px-6 py-2" data-page="dashboard">
+                <span class="text-[22px]">🏠</span>
+                <span class="text-[10px] font-semibold">總覽</span>
+                <span
+                    class="nav-dot absolute -bottom-0.5 w-1 h-1 rounded-full bg-purple-400 opacity-0 transition-opacity"></span>
             </button>
-            <button onclick="switchPage('list')" class="nav-item relative flex flex-col items-center gap-1 px-5 py-2"
+            <button onclick="switchPage('list')" class="nav-item relative flex flex-col items-center gap-0.5 px-6 py-2"
                 data-page="list">
-                <span class="text-xl">📦</span>
-                <span class="text-[10px] font-bold">列表</span>
+                <span class="text-[22px]">📦</span>
+                <span class="text-[10px] font-semibold">列表</span>
+                <span
+                    class="nav-dot absolute -bottom-0.5 w-1 h-1 rounded-full bg-purple-400 opacity-0 transition-opacity"></span>
             </button>
             <button onclick="switchPage('settings')"
-                class="nav-item relative flex flex-col items-center gap-1 px-5 py-2" data-page="settings">
-                <span class="text-xl">⚙️</span>
-                <span class="text-[10px] font-bold">設定</span>
+                class="nav-item relative flex flex-col items-center gap-0.5 px-6 py-2" data-page="settings">
+                <span class="text-[22px]">⚙️</span>
+                <span class="text-[10px] font-semibold">設定</span>
+                <span
+                    class="nav-dot absolute -bottom-0.5 w-1 h-1 rounded-full bg-purple-400 opacity-0 transition-opacity"></span>
             </button>
         </div>
     </nav>
@@ -1089,7 +1117,14 @@
                     state.currentPage = page;
                     document.querySelectorAll('.nav-item').forEach(function (item) { item.classList.remove('active'); });
                     var activeNav = document.querySelector('[data-page="' + page + '"]');
-                    if (activeNav) activeNav.classList.add('active');
+                    if (activeNav) {
+                        activeNav.classList.add('active');
+                        // GSAP spring bounce on nav icon
+                        if (typeof gsap !== 'undefined') {
+                            var icon = activeNav.querySelector('span:first-child');
+                            if (icon) gsap.fromTo(icon, { scale: 0.7 }, { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.4)' });
+                        }
+                    }
                     $('header').style.display = (page === 'dashboard') ? 'block' : 'none';
                     if (page === 'settings') renderOperatorSelector();
                     closeAllSheets();
