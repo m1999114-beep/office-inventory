@@ -55,6 +55,31 @@
     </script>
 
     <style>
+        /* ===== Design Tokens ===== */
+        :root {
+            --bg-base: #09090b;
+            --bg-card: #111113;
+            --bg-elevated: #18181b;
+            --bg-hover: #1f1f23;
+            --border: #27272a;
+            --border-subtle: #1e1e21;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --text-faint: #52525b;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --accent-muted: rgba(139, 92, 246, 0.15);
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --cyan: #06b6d4;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
         /* ===== 1. Reset & Base ===== */
         * {
             box-sizing: border-box;
@@ -71,45 +96,66 @@
             overscroll-behavior-y: contain;
         }
 
-        /* ===== 2. Typography & Colors ===== */
         body {
-            background: #0a0a0a;
-            color: #ffffff;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 14px;
             line-height: 1.5;
         }
 
-        /* ===== 3. Scrollbar ===== */
-
+        /* ===== 2. Scrollbar ===== */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
             background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 999px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
         }
 
-        /* ===== Nav dot indicator ===== */
-        .nav-item.active .nav-dot {
-            opacity: 1;
+        /* ===== 3. Skeleton Loading ===== */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-md);
         }
 
-        .nav-item {
-            transition: all 0.2s ease;
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
         }
 
-        .nav-item.active {
-            color: #c084fc;
+        /* ===== 4. Cards & Surfaces ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            transition: border-color 0.2s;
         }
 
-        /* ===== 4. Buttons & Interactive ===== */
+        .card:hover {
+            border-color: var(--border);
+        }
+
+        .card-elevated {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        /* ===== 5. Buttons ===== */
         .btn-interactive {
             transition: all 0.15s ease;
             cursor: pointer;
@@ -118,93 +164,112 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #27272a;
-            border-radius: 0.5rem;
-            background: #18181b;
-            color: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
             font-weight: 500;
         }
 
         .btn-interactive:hover {
-            background: #27272a;
+            background: var(--bg-hover);
         }
 
         .btn-interactive:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
 
-        /* ===== 5. Category Chips ===== */
+        /* ===== 6. Category Chips ===== */
         .cat-chip {
             transition: all 0.15s ease;
             white-space: nowrap;
             border-radius: 9999px;
-            border: 1px solid #27272a;
+            border: 1px solid var(--border);
             background: transparent;
-            color: #a1a1aa;
-            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
             font-weight: 500;
+            cursor: pointer;
         }
 
         .cat-chip.active {
-            background: #fff !important;
-            color: #000 !important;
-            border-color: #fff !important;
+            background: var(--text-primary) !important;
+            color: var(--bg-base) !important;
+            border-color: var(--text-primary) !important;
+            font-weight: 600;
         }
 
         .cat-chip:hover:not(.active) {
-            background: #18181b;
-            color: #fff;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
         }
 
-        /* ===== 6. Navigation ===== */
+        .cat-chip .chip-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 0 4px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-left: 4px;
+        }
+
+        .cat-chip.active .chip-count {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== 7. Navigation ===== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             z-index: 100;
-            background: #0a0a0a;
-            border-top: 1px solid #27272a;
             padding-bottom: env(safe-area-inset-bottom);
         }
 
         .nav-item {
             transition: all 0.15s ease;
             cursor: pointer;
-            color: #71717a;
+            color: var(--text-faint);
+            position: relative;
         }
 
         .nav-item.active {
-            color: #fff;
+            color: var(--text-primary);
         }
 
-        .nav-item::before {
+        .nav-item::after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 50%;
             transform: translateX(-50%) scaleX(0);
-            width: 32px;
+            width: 20px;
             height: 2px;
-            background: #fff;
-            border-radius: 0 0 999px 999px;
-            transition: transform 0.15s ease;
+            background: var(--accent);
+            border-radius: 999px;
+            transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
         }
 
-        .nav-item.active::before {
+        .nav-item.active::after {
             transform: translateX(-50%) scaleX(1);
         }
 
-        /* ===== 7. Bottom Sheet ===== */
+        /* ===== 8. Bottom Sheet ===== */
         .bottom-sheet {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #18181b;
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
-            border-top: 1px solid #27272a;
+            background: var(--bg-elevated);
+            border-top-left-radius: var(--radius-xl);
+            border-top-right-radius: var(--radius-xl);
+            border-top: 1px solid var(--border);
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
             z-index: 200;
@@ -219,7 +284,9 @@
         .bottom-sheet-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 199;
             opacity: 0;
             pointer-events: none;
@@ -232,17 +299,21 @@
         }
 
         .bottom-sheet-handle {
-            width: 48px;
+            width: 36px;
             height: 4px;
-            background: #3f3f46;
+            background: var(--text-faint);
             border-radius: 999px;
-            margin: 12px auto;
+            margin: 10px auto;
         }
 
-        /* ===== 8. Pages & Transitions ===== */
+        .bottom-sheet.dragging {
+            transition: none !important;
+        }
+
+        /* ===== 9. Pages & Transitions ===== */
         .page {
             display: none;
-            animation: pageIn 0.3s ease;
+            animation: pageIn 0.25s ease;
         }
 
         .page.active {
@@ -252,7 +323,7 @@
         @keyframes pageIn {
             0% {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(8px);
             }
 
             100% {
@@ -261,133 +332,145 @@
             }
         }
 
-        .big-number {
-            font-variant-numeric: tabular-nums;
-            font-weight: 900;
-            letter-spacing: -0.02em;
+        /* ===== 10. Status Colors ===== */
+        .status-ok {
+            color: var(--success);
         }
 
-        .stock-green {
-            background: #22c55e;
+        .status-low {
+            color: var(--warning);
         }
 
-        .stock-yellow {
-            background: #eab308;
+        .status-out {
+            color: var(--danger);
         }
 
-        .stock-red {
-            background: #ef4444;
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .status-dot.ok {
+            background: var(--success);
+        }
+
+        .status-dot.low {
+            background: var(--warning);
+        }
+
+        .status-dot.out {
+            background: var(--danger);
         }
 
         .low-stock-alert {
-            border-color: #eab308 !important;
+            border-color: var(--warning) !important;
         }
 
         .out-of-stock {
-            border-color: #ef4444 !important;
-            background: rgba(239, 68, 68, 0.05) !important;
+            border-color: var(--danger) !important;
+            background: rgba(239, 68, 68, 0.04) !important;
         }
 
-        /* ===== 9. Dashboard Cards ===== */
+        /* ===== 11. Dashboard Visuals ===== */
+        .donut-chart {
+            position: relative;
+        }
+
+        .donut-chart svg {
+            transform: rotate(-90deg);
+        }
+
+        .donut-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .health-segment {
+            height: 8px;
+            transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        /* ===== 12. Quick Action Cards (Minimal) ===== */
         .quick-action-card {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 20px;
-            padding: 20px;
-            transition: all 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            transition: all 0.2s ease;
             cursor: pointer;
         }
 
         .quick-action-card:hover {
-            border-color: rgba(139, 92, 246, 0.6);
+            border-color: var(--border);
+            background: var(--bg-elevated);
         }
 
-        .photo-upload-area {
-            border: 2px dashed rgba(139, 92, 246, 0.4);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(139, 92, 246, 0.05);
+        .quick-action-card:active {
+            transform: scale(0.97);
         }
 
-        .photo-upload-area:hover {
-            border-color: rgba(139, 92, 246, 0.8);
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .photo-upload-area.dragover {
-            border-color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.2);
-        }
-
-        /* ===== 10. Text Remove & AI ===== */
-
+        /* ===== 13. Text Remove & AI ===== */
         .text-remove-area {
             width: 100%;
             min-height: 150px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             padding: 16px;
-            color: #fff;
-            font-size: 16px;
+            color: var(--text-primary);
+            font-size: 15px;
             resize: vertical;
+            font-family: inherit;
         }
 
         .text-remove-area:focus {
             outline: none;
-            border-color: rgba(139, 92, 246, 0.6);
-            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--accent);
+            background: var(--accent-muted);
         }
 
-        .ocr-result-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* ===== 11. List & Items ===== */
-
+        /* ===== 14. Batch Items ===== */
         .batch-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 10px 12px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             margin-bottom: 6px;
             font-size: 14px;
         }
 
         .batch-item.success {
-            background: rgba(34, 197, 94, 0.15);
+            background: rgba(34, 197, 94, 0.1);
             color: #4ade80;
         }
 
         .batch-item.warning {
-            background: rgba(245, 158, 11, 0.15);
+            background: rgba(245, 158, 11, 0.1);
             color: #fbbf24;
         }
 
         .batch-item.error {
-            background: rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, 0.1);
             color: #f87171;
         }
 
+        /* ===== 15. Loading Spinner ===== */
         .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #8b5cf6;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-top-color: var(--accent);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.7s linear infinite;
         }
 
         @keyframes spin {
@@ -396,34 +479,92 @@
             }
         }
 
-        /* ===== 12. Site Items ===== */
-        .site-item {
-            transition: all 0.3s ease;
+        /* ===== 16. Transfer UI ===== */
+        .transfer-input-number {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            font-size: 32px;
+            font-weight: 900;
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-family: inherit;
         }
 
-        .site-item:hover {
-            transform: translateX(4px);
-            background: rgba(255, 255, 255, 0.1) !important;
+        .transfer-input-number:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--accent-muted);
         }
 
-        .shortage-urgency-card {
+        .transfer-quick-btn {
+            padding: 14px 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .transfer-quick-btn:hover {
+            background: var(--accent-muted);
+            border-color: var(--accent);
+        }
+
+        .transfer-action-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .transfer-action-btn.confirm {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .transfer-action-btn.confirm:hover {
+            background: var(--accent-hover);
+        }
+
+        .transfer-action-btn.cancel {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ===== 17. Operator ===== */
+        .operator-btn {
             transition: all 0.2s ease;
         }
 
-        .shortage-urgency-card:hover {
-            transform: scale(1.05);
+        .operator-btn:hover {
+            transform: translateY(-1px);
         }
 
-        .shortage-urgency-card:active {
-            transform: scale(0.95);
-        }
-
-        .category-bar-item {
-            transition: width 0.8s ease;
+        /* ===== 18. Misc ===== */
+        .big-number {
+            font-variant-numeric: tabular-nums;
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
         .number-update {
-            animation: numberPop 0.4s ease;
+            animation: numberPop 0.35s ease;
         }
 
         @keyframes numberPop {
@@ -432,7 +573,7 @@
             }
 
             50% {
-                transform: scale(1.1);
+                transform: scale(1.12);
             }
 
             100% {
@@ -440,133 +581,101 @@
             }
         }
 
-        /* ===== 13. Editable Number ===== */
-        .editable-number {
-            cursor: pointer;
+        .site-item {
+            transition: all 0.2s ease;
         }
 
-        .editable-number:hover {
-            opacity: 0.8;
+        .site-item:hover {
+            background: var(--bg-hover) !important;
         }
 
-        .editable-number-input {
-            background: rgba(139, 92, 246, 0.2);
-            border: 2px solid rgba(139, 92, 246, 0.6);
-            border-radius: 12px;
-            padding: 8px 16px;
-            text-align: center;
-            font-size: inherit;
-            font-weight: inherit;
-            color: inherit;
-            width: 100%;
-            max-width: 200px;
+        .category-bar-item {
+            transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
         }
 
-        /* ===== 14. Transfer UI ===== */
-        .transfer-input-number {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(139, 92, 246, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            font-size: 32px;
-            font-weight: 900;
-            text-align: center;
-            color: #fff;
-            margin-bottom: 20px;
+        .health-segment {
+            height: 8px;
+            transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
         }
 
-        .transfer-input-number:focus {
-            outline: none;
-            background: rgba(139, 92, 246, 0.15);
-            border-color: rgba(139, 92, 246, 0.6);
+        .number-update {
+            animation: numPulse 0.4s ease;
         }
 
-        .transfer-quick-btn {
-            padding: 16px 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 16px;
+        @keyframes numPulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+                color: var(--accent);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .search-result-count {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: var(--accent);
             font-weight: 700;
-            text-align: center;
+            pointer-events: none;
+        }
+
+        .shortage-cat-chip {
+            transition: all 0.15s;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
-        .transfer-quick-btn:hover {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.4);
+        .shortage-cat-chip.active {
+            background: var(--text-primary) !important;
+            color: var(--bg-base) !important;
+            font-weight: 700;
         }
 
-        .transfer-action-btn {
-            flex: 1;
-            padding: 18px;
-            border-radius: 16px;
-            font-size: 18px;
-            font-weight: 800;
-            text-align: center;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .transfer-action-btn.confirm {
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            color: #fff;
-        }
-
-        .transfer-action-btn.cancel {
-            background: rgba(255, 255, 255, 0.05);
-            color: #9ca3af;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .operator-btn {
-            transition: all 0.3s ease;
-        }
-
-        .operator-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        /* ===== 15. Status Indicators ===== */
-        .sync-indicator {
+        /* ===== 19. Sort/Filter Controls ===== */
+        .filter-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
             font-size: 0.75rem;
             font-weight: 500;
-            padding: 4px 10px;
-            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
         }
 
-        .sync-indicator.synced {
-            background: rgba(34, 197, 94, 0.15);
-            color: #22c55e;
+        .filter-pill.active {
+            background: var(--accent-muted);
+            color: var(--accent);
+            border-color: var(--accent);
         }
 
-        .sync-indicator.pending {
-            background: rgba(245, 158, 11, 0.15);
-            color: #eab308;
+        .filter-pill:hover:not(.active) {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
         }
 
-        .sync-indicator.offline {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-        }
-
-        /* ===== 16. Mobile Touch Enhancements ===== */
+        /* ===== 20. Mobile Touch ===== */
         @media (hover: none) and (pointer: coarse) {
 
             .btn-interactive,
             .cat-chip,
             .nav-item,
             .quick-action-card,
-            .site-item,
-            .shortage-urgency-card,
-            .transfer-quick-btn {
+            .transfer-quick-btn,
+            .filter-pill {
                 -webkit-user-select: none;
                 user-select: none;
             }
@@ -582,49 +691,9 @@
             }
         }
 
-        .bottom-sheet.dragging {
-            transition: none !important;
-        }
-
-        .item-swipe-wrapper {
-            position: relative;
-            overflow: hidden;
-            border-radius: 1rem;
-        }
-
-        .item-swipe-actions {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding-right: 8px;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.2s ease;
-        }
-
-        .item-swipe-wrapper.swiped .item-swipe-actions {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
         .long-press-selected {
-            outline: 2px solid #8b5cf6;
+            outline: 2px solid var(--accent);
             outline-offset: 2px;
-        }
-
-        .search-result-count {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.75rem;
-            color: #8b5cf6;
-            font-weight: 700;
-            pointer-events: none;
         }
     </style>
 </head>
@@ -641,183 +710,210 @@
     <!-- 主容器 -->
     <div class="relative min-h-screen pb-24">
         <!-- Header -->
-        <header id="header" class="sticky top-0 z-40 bg-[#0A0A0B]/80 backdrop-blur-xl border-b border-zinc-800/60">
-            <div class="px-5 py-4">
-                <!-- Title Row -->
-                <div class="flex justify-between items-center mb-3">
-                    <div>
-                        <h1 class="text-2xl font-black text-gray-100 tracking-tight">物料戰情室</h1>
-                        <p class="text-[11px] text-gray-500 font-medium mt-0.5">v21.0 Pro · <span id="headerOperator"
-                                class="text-purple-400 font-bold cursor-pointer"
-                                onclick="switchPage('settings')">黃俊瑋</span></p>
+        <header id="header" class="sticky top-0 z-40"
+            style="background:rgba(9,9,11,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-subtle);">
+            <div class="px-5 py-3">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <h1 class="text-lg font-extrabold text-white tracking-tight">物料戰情室</h1>
+                        <span
+                            class="text-[10px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-500 font-semibold border border-zinc-700/50">v22.0</span>
                     </div>
-                    <div id="statusBadge"
-                        class="text-[11px] px-3 py-1.5 rounded-full bg-zinc-900 text-gray-400 border border-zinc-800 font-medium">
-                        連線中...
+                    <div class="flex items-center gap-2">
+                        <span id="headerOperator"
+                            class="text-[11px] text-zinc-500 font-medium cursor-pointer hover:text-zinc-300 transition-colors"
+                            onclick="switchPage('settings')">黃俊瑋</span>
+                        <div id="statusBadge"
+                            class="text-[10px] px-2.5 py-1 rounded-full bg-zinc-900 text-zinc-500 border border-zinc-800 font-medium">
+                            連線中...</div>
                     </div>
                 </div>
-                <!-- Stats Pills -->
-                <div class="flex gap-2">
-                    <div class="flex-1 bg-zinc-900/80 border border-zinc-800/60 rounded-2xl px-4 py-2.5 text-center">
-                        <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">總品項</p>
-                        <p id="headerTotalItems" class="text-2xl font-black text-white leading-tight">-</p>
-                    </div>
-                    <div class="flex-1 bg-zinc-900/80 border border-zinc-800/60 rounded-2xl px-4 py-2.5 text-center">
-                        <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">F22廠區</p>
-                        <p id="headerSiteItems" class="text-2xl font-black text-cyan-400 leading-tight">-</p>
-                    </div>
-                    <div class="flex-1 bg-zinc-900/80 border border-zinc-800/60 rounded-2xl px-4 py-2.5 text-center">
-                        <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">低庫存</p>
-                        <p id="headerLowStock" class="text-2xl font-black text-yellow-400 leading-tight">-</p>
-                    </div>
+                <div class="flex gap-4 mt-2.5">
+                    <div class="flex items-center gap-1.5"><span
+                            class="text-[10px] text-zinc-600 font-medium">品項</span><span id="headerTotalItems"
+                            class="text-sm font-bold text-zinc-300">-</span></div>
+                    <div class="flex items-center gap-1.5"><span
+                            class="text-[10px] text-zinc-600 font-medium">F22</span><span id="headerSiteItems"
+                            class="text-sm font-bold text-cyan-400">-</span></div>
+                    <div class="flex items-center gap-1.5"><span class="status-dot low"></span><span
+                            class="text-[10px] text-zinc-600 font-medium">低庫存</span><span id="headerLowStock"
+                            class="text-sm font-bold text-amber-400">-</span></div>
                 </div>
             </div>
         </header>
 
         <!-- Dashboard 頁面 -->
         <div id="page-dashboard" class="page active">
-            <div class="px-5 py-5 space-y-4">
+            <div class="px-5 py-4 space-y-3">
                 <!-- 快速操作 -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="relative overflow-hidden bg-gradient-to-br from-purple-900/40 to-purple-950/20 border border-purple-700/30 rounded-2xl p-4 cursor-pointer active:scale-[0.97] transition-transform"
-                        onclick="openTextRemove()">
-                        <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-purple-500/10 blur-xl"></div>
-                        <div class="relative">
-                            <div class="w-10 h-10 rounded-xl bg-purple-600/30 flex items-center justify-center mb-3">
-                                <span class="text-xl">🤖</span>
-                            </div>
-                            <p class="text-sm font-bold text-white">AI 智能移出</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">模糊輸入自動匹配</p>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div class="quick-action-card" onclick="openTextRemove()">
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+                                style="background:var(--accent-muted);"><span class="text-base">🤖</span></div>
+                            <p class="text-sm font-bold text-white">AI 移出</p>
                         </div>
+                        <p class="text-[11px] text-zinc-500">模糊輸入 · 智能匹配</p>
                     </div>
-                    <div class="relative overflow-hidden bg-gradient-to-br from-cyan-900/40 to-cyan-950/20 border border-cyan-700/30 rounded-2xl p-4 cursor-pointer active:scale-[0.97] transition-transform"
-                        onclick="copyPurchaseList()">
-                        <div class="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-cyan-500/10 blur-xl"></div>
-                        <div class="relative">
-                            <div class="w-10 h-10 rounded-xl bg-cyan-600/30 flex items-center justify-center mb-3"><span
-                                    class="text-xl">📋</span></div>
+                    <div class="quick-action-card" onclick="copyPurchaseList()">
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+                                style="background:rgba(6,182,212,0.12);"><span class="text-base">📋</span></div>
                             <p class="text-sm font-bold text-white">採購清單</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">一鍵複製缺料清單</p>
                         </div>
+                        <p class="text-[11px] text-zinc-500">一鍵複製缺料清單</p>
                     </div>
                 </div>
 
-                <!-- 缺料戰情中心 -->
-                <div class="bg-zinc-900/60 backdrop-blur-sm border border-zinc-800/60 rounded-2xl overflow-hidden">
-                    <div class="flex items-center justify-between p-4 border-b border-zinc-800/40">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center"><span
-                                    class="text-base">🚨</span></div>
-                            <div>
-                                <h3 class="text-sm font-bold text-white">缺料戰情中心</h3>
-                                <p class="text-[10px] text-gray-500">AI 智慧分類</p>
+                <!-- 庫存健康度 -->
+                <div class="card p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-semibold text-zinc-400">庫存健康度</p>
+                        <div class="flex items-center gap-3 text-[10px] text-zinc-500">
+                            <span class="flex items-center gap-1"><span class="status-dot ok"></span> 充足</span>
+                            <span class="flex items-center gap-1"><span class="status-dot low"></span> 偏低</span>
+                            <span class="flex items-center gap-1"><span class="status-dot out"></span> 缺貨</span>
+                        </div>
+                    </div>
+                    <div class="flex rounded-full overflow-hidden bg-zinc-800/50" id="healthBar">
+                        <div class="health-segment" id="healthOk" style="width:0;background:var(--success);"></div>
+                        <div class="health-segment" id="healthLow" style="width:0;background:var(--warning);"></div>
+                        <div class="health-segment" id="healthOut" style="width:0;background:var(--danger);"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 text-[10px] text-zinc-500">
+                        <span id="healthOkLabel">-</span>
+                        <span id="healthLowLabel">-</span>
+                        <span id="healthOutLabel">-</span>
+                    </div>
+                </div>
+
+                <!-- 分類甜甜圈 + 缺料中心 -->
+                <div class="grid grid-cols-5 gap-2.5">
+                    <div class="col-span-2 card p-3">
+                        <p class="text-[10px] font-semibold text-zinc-500 mb-2 text-center">分類佔比</p>
+                        <div class="donut-chart flex items-center justify-center" style="width:100%;aspect-ratio:1;">
+                            <svg id="donutSvg" viewBox="0 0 120 120" width="100%" height="100%"></svg>
+                            <div class="donut-center">
+                                <span id="donutTotal" class="text-lg font-extrabold text-white">-</span>
+                                <span class="text-[9px] text-zinc-500">品項</span>
                             </div>
                         </div>
-                        <button onclick="copyPurchaseList()"
-                            class="text-[11px] px-3 py-1.5 rounded-lg bg-zinc-800 text-gray-400 border border-zinc-700/50 font-medium">📋
-                            複製</button>
+                        <div id="donutLegend" class="mt-2 space-y-0.5"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-0 border-b border-zinc-800/40">
-                        <div onclick="filterShortageByUrgency('critical')"
-                            class="cursor-pointer p-3 text-center border-r border-zinc-800/40 active:bg-red-900/20 transition-colors">
-                            <p class="text-2xl font-black text-red-400" id="criticalCount">0</p>
-                            <p class="text-[10px] text-red-300/70 font-semibold mt-0.5">🔴 緊急</p>
+                    <div class="col-span-3 card overflow-hidden flex flex-col">
+                        <div class="flex items-center justify-between px-3 pt-3 pb-2">
+                            <p class="text-xs font-bold text-white">缺料預警</p>
+                            <button onclick="copyPurchaseList()"
+                                class="text-[10px] px-2 py-1 rounded-md bg-zinc-800/80 text-zinc-500 border border-zinc-700/40 font-medium">📋</button>
                         </div>
-                        <div onclick="filterShortageByUrgency('severe')"
-                            class="cursor-pointer p-3 text-center border-r border-zinc-800/40 active:bg-orange-900/20 transition-colors">
-                            <p class="text-2xl font-black text-orange-400" id="severeCount">0</p>
-                            <p class="text-[10px] text-orange-300/70 font-semibold mt-0.5">🟠 嚴重</p>
+                        <div class="grid grid-cols-3 gap-0 border-t border-b"
+                            style="border-color:var(--border-subtle);">
+                            <div onclick="filterShortageByUrgency('critical')"
+                                class="cursor-pointer py-2 text-center active:bg-red-900/10 transition-colors"
+                                style="border-right:1px solid var(--border-subtle);">
+                                <p class="text-xl font-extrabold text-red-400" id="criticalCount">0</p>
+                                <p class="text-[9px] text-red-400/60 font-semibold">緊急</p>
+                            </div>
+                            <div onclick="filterShortageByUrgency('severe')"
+                                class="cursor-pointer py-2 text-center active:bg-orange-900/10 transition-colors"
+                                style="border-right:1px solid var(--border-subtle);">
+                                <p class="text-xl font-extrabold text-orange-400" id="severeCount">0</p>
+                                <p class="text-[9px] text-orange-400/60 font-semibold">嚴重</p>
+                            </div>
+                            <div onclick="filterShortageByUrgency('low')"
+                                class="cursor-pointer py-2 text-center active:bg-yellow-900/10 transition-colors">
+                                <p class="text-xl font-extrabold text-amber-400" id="lowCount">0</p>
+                                <p class="text-[9px] text-amber-400/60 font-semibold">偏低</p>
+                            </div>
                         </div>
-                        <div onclick="filterShortageByUrgency('low')"
-                            class="cursor-pointer p-3 text-center active:bg-yellow-900/20 transition-colors">
-                            <p class="text-2xl font-black text-yellow-400" id="lowCount">0</p>
-                            <p class="text-[10px] text-yellow-300/70 font-semibold mt-0.5">� 低庫存</p>
+                        <div class="flex gap-1 overflow-x-auto px-2 py-1.5" id="shortageCategoryFilter"
+                            style="border-bottom:1px solid var(--border-subtle);">
+                            <button onclick="filterShortageByCategory('all')"
+                                class="shortage-cat-chip active px-2 py-0.5 rounded-full text-[10px] font-bold bg-white text-black whitespace-nowrap">全部</button>
+                            <button onclick="filterShortageByCategory('wire')"
+                                class="shortage-cat-chip px-2 py-0.5 rounded-full text-[10px] bg-white/5 text-zinc-500 whitespace-nowrap">電線</button>
+                            <button onclick="filterShortageByCategory('terminal')"
+                                class="shortage-cat-chip px-2 py-0.5 rounded-full text-[10px] bg-white/5 text-zinc-500 whitespace-nowrap">端子</button>
+                            <button onclick="filterShortageByCategory('consumable')"
+                                class="shortage-cat-chip px-2 py-0.5 rounded-full text-[10px] bg-white/5 text-zinc-500 whitespace-nowrap">耗材</button>
+
+                            <button onclick="filterShortageByCategory('hardware')"
+                                class="shortage-cat-chip px-2 py-0.5 rounded-full text-[10px] bg-white/5 text-zinc-500 whitespace-nowrap">五金</button>
+                            <button onclick="filterShortageByCategory('hose')"
+                                class="shortage-cat-chip px-2 py-0.5 rounded-full text-[10px] bg-white/5 text-zinc-500 whitespace-nowrap">軟管</button>
                         </div>
-                    </div>
-                    <div class="flex gap-1.5 overflow-x-auto p-3 border-b border-zinc-800/40"
-                        id="shortageCategoryFilter">
-                        <button onclick="filterShortageByCategory('all')"
-                            class="shortage-cat-chip active px-3 py-1.5 rounded-full text-[11px] font-bold bg-white text-black whitespace-nowrap">全部</button>
-                        <button onclick="filterShortageByCategory('wire')"
-                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔌
-                            電線</button>
-                        <button onclick="filterShortageByCategory('terminal')"
-                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔗
-                            端子</button>
-                        <button onclick="filterShortageByCategory('consumable')"
-                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">📦
-                            耗材</button>
-                        <button onclick="filterShortageByCategory('pipe')"
-                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔩
-                            管材</button>
-                        <button onclick="filterShortageByCategory('hardware')"
-                            class="shortage-cat-chip px-3 py-1.5 rounded-full text-[11px] bg-white/5 text-gray-400 whitespace-nowrap">🔧
-                            五金</button>
-                    </div>
-                    <div id="shortageList" class="p-3 space-y-2 max-h-[350px] overflow-y-auto">
-                        <p class="text-gray-500 text-xs text-center py-4">載入中...</p>
-                    </div>
-                    <div id="allStockOk" class="hidden text-center py-8">
-                        <div class="text-5xl mb-3">✅</div>
-                        <p class="text-green-400 text-sm font-bold">所有物料庫存充足！</p>
+                        <div id="shortageList" class="px-2 py-1.5 space-y-1.5 flex-1 overflow-y-auto"
+                            style="max-height:200px;">
+                            <p class="text-zinc-600 text-[10px] text-center py-3">載入中...</p>
+                        </div>
+                        <div id="allStockOk" class="hidden text-center py-6">
+                            <div class="text-3xl mb-1">✅</div>
+                            <p class="text-green-400 text-[11px] font-bold">庫存充足</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 分類統計 -->
-                <details class="bg-zinc-900/60 backdrop-blur-sm border border-zinc-800/60 rounded-2xl overflow-hidden">
-                    <summary class="p-4 cursor-pointer flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center"><span
-                                    class="text-base">📈</span></div>
-                            <h3 class="text-sm font-bold text-white">分類統計</h3>
-                        </div>
+                <details class="card overflow-hidden">
+                    <summary class="px-4 py-3 cursor-pointer flex items-center justify-between">
+                        <p class="text-xs font-semibold text-zinc-400">📊 分類統計</p>
                     </summary>
-                    <div class="px-4 pb-4">
-                        <div id="categoryBar" class="h-3 rounded-full bg-white/5 flex overflow-hidden mb-3"></div>
-                        <div id="categoryLegend" class="flex flex-wrap gap-3 text-xs text-gray-400"></div>
+                    <div class="px-4 pb-3">
+                        <div id="categoryBar" class="h-2 rounded-full bg-zinc-800/50 flex overflow-hidden mb-2"></div>
+                        <div id="categoryLegend" class="flex flex-wrap gap-2 text-[10px] text-zinc-500"></div>
                     </div>
                 </details>
             </div>
         </div>
 
 
+
         <!-- List 頁面 -->
         <div id="page-list" class="page">
-            <div class="px-6 py-6 space-y-6">
-                <!-- 搜尋 -->
-                <div
-                    class="sticky top-0 z-50 -mx-6 px-6 py-4 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/50">
-                    <div class="rounded-2xl p-4 min-h-[56px] bg-zinc-900 border border-zinc-800 mb-4">
-                        <div class="flex items-center gap-4">
-                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="px-5 py-4 space-y-3">
+                <!-- 搜尋 + 過濾 -->
+                <div class="sticky top-0 z-50 -mx-5 px-5 py-3"
+                    style="background:rgba(9,9,11,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-subtle);">
+                    <div class="flex items-center gap-2 rounded-xl px-3 py-2 bg-zinc-900 border border-zinc-800 mb-2.5">
+                        <svg class="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="search" id="searchInput" placeholder="搜尋品名、規格..."
+                            class="flex-1 bg-transparent text-zinc-200 placeholder-zinc-600 text-sm font-medium outline-none min-w-0">
+                        <span id="searchResultCount" class="search-result-count"></span>
+                        <button onclick="startVoiceSearch()"
+                            class="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z">
+                                </path>
                             </svg>
-                            <input type="search" id="searchInput" placeholder="搜尋品名、規格..."
-                                class="flex-1 bg-transparent text-gray-100 placeholder-gray-600 text-lg font-bold outline-none">
-                            <button onclick="startVoiceSearch()" class="p-2 rounded-xl bg-zinc-800 text-gray-400">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z">
-                                    </path>
-                                </svg>
-                            </button>
-                            <span id="searchResultCount" class="search-result-count"></span>
-                        </div>
+                        </button>
                     </div>
-                    <div class="flex gap-3 overflow-x-auto pb-2" id="categoryChips">
-                        <button class="cat-chip active px-5 py-3 text-sm font-bold bg-purple-600 text-white"
-                            data-cat="all">全部</button>
-                        <button class="cat-chip px-5 py-3 text-sm bg-zinc-900 text-gray-400" data-cat="wire">🔌
-                            電線</button>
-                        <button class="cat-chip px-5 py-3 text-sm bg-zinc-900 text-gray-400" data-cat="terminal">🔗
-                            端子</button>
-                        <button class="cat-chip px-5 py-3 text-sm bg-zinc-900 text-gray-400" data-cat="consumable">📦
-                            耗材</button>
-                        <button class="cat-chip px-5 py-3 text-sm bg-zinc-900 text-gray-400" data-cat="pipe">🔩
-                            管材</button>
-                        <button class="cat-chip px-5 py-3 text-sm bg-zinc-900 text-gray-400" data-cat="hardware">🔧
-                            五金</button>
+                    <!-- 分類 Chips -->
+                    <div class="flex gap-1.5 overflow-x-auto pb-1.5" id="categoryChips">
+                        <button class="cat-chip active px-3 py-1.5" data-cat="all">全部</button>
+                        <button class="cat-chip px-3 py-1.5" data-cat="wire">🔌 電線</button>
+                        <button class="cat-chip px-3 py-1.5" data-cat="terminal">🔗 端子</button>
+                        <button class="cat-chip px-3 py-1.5" data-cat="consumable">📦 耗材</button>
+
+                        <button class="cat-chip px-3 py-1.5" data-cat="hardware">🔧 五金</button>
+                        <button class="cat-chip px-3 py-1.5" data-cat="hose">〰️ 軟管</button>
+                    </div>
+                    <!-- 狀態過濾 + 排序 -->
+                    <div class="flex items-center gap-1.5 mt-1.5 overflow-x-auto">
+                        <button class="filter-pill" data-status="all" onclick="filterByStatus('all')">全部狀態</button>
+                        <button class="filter-pill" data-status="ok" onclick="filterByStatus('ok')"><span
+                                class="status-dot ok"></span> 充足</button>
+                        <button class="filter-pill" data-status="low" onclick="filterByStatus('low')"><span
+                                class="status-dot low"></span> 偏低</button>
+                        <button class="filter-pill" data-status="out" onclick="filterByStatus('out')"><span
+                                class="status-dot out"></span> 缺貨</button>
+                        <span class="text-zinc-700 text-xs mx-0.5">|</span>
+                        <button class="filter-pill" onclick="toggleSort('name')">品名 ↕</button>
+                        <button class="filter-pill" onclick="toggleSort('qty')">庫存 ↕</button>
                     </div>
                 </div>
 
@@ -1022,9 +1118,9 @@
                 var categoryConfig = {
                     wire: { keywords: ['電線', '電纜', 'cable', 'wire', 'XIPE', 'CSA', '細纜', '細芯', '控制電纜', 'PVC電線', '導線', '線材'], icon: '🔌', label: '電線', color: '#8b5cf6' },
                     terminal: { keywords: ['端子', 'terminal', '絕緣套管'], icon: '🔗', label: '端子', color: '#06b6d4' },
-                    consumable: { keywords: ['扎線帶', '紮線帶', '束線帶', '膠帶', '膠布', '絕緣膠帶', '電火布', '耗材', 'tape', '標籤', '標示', '貼紙'], icon: '📦', label: '耗材', color: '#ec4899' },
-                    hardware: { keywords: ['耐龍合接頭', '耐龍盒接頭', '盒接頭', '合接頭'], icon: '🔧', label: '五金', color: '#6366f1' },
-                    pipe: { keywords: ['管', 'pipe', '配管'], icon: '🔩', label: '管材', color: '#10b981' }
+                    consumable: { keywords: ['扎線帶', '紮線帶', '束線帶', '膠帶', '膠布', '絕緣膠帶', '電火布', '耗材', 'tape', '標籤', '標示', '貼紙', '止洩帶', '奇異筆', '紅筆', '筆'], icon: '📦', label: '耗材', color: '#ec4899' },
+                    hardware: { keywords: ['耐龍合接頭', '耐龍盒接頭', '盒接頭', '合接頭', '防水盒接頭', '防水接頭', '牙圈'], icon: '🔧', label: '五金', color: '#6366f1' },
+                    hose: { keywords: ['軟管'], icon: '〰️', label: '軟管', color: '#f59e0b' }
                 };
 
                 function getCategory(item) {
@@ -1158,24 +1254,41 @@
                 // ===== 8. Dashboard 模組 =====
                 function updateDashboard() {
                     $('settingsItemCount').textContent = state.stock.length;
-                    $('headerTotalItems').textContent = state.stock.length;
+                    animateNumber($('headerTotalItems'), state.stock.length);
 
-                    var lowCount = 0, siteCount = 0, categoryCounts = {}, totalQty = 0;
-                    for (var cat in categoryConfig) categoryCounts[cat] = 0;
+                    var lowCount = 0, outCount = 0, okCount = 0, siteCount = 0;
+                    var categoryCounts = {}, categoryItemCounts = {}, totalQty = 0;
+                    for (var cat in categoryConfig) { categoryCounts[cat] = 0; categoryItemCounts[cat] = 0; }
 
                     for (var i = 0; i < state.stock.length; i++) {
                         var item = state.stock[i];
                         var total = item.warehouseQty + item.siteQty;
-                        if (total < item.safeQty) lowCount++;
+                        if (total <= 0) outCount++;
+                        else if (total < item.safeQty) lowCount++;
+                        else okCount++;
                         if (item.siteQty > 0) siteCount++;
-                        categoryCounts[getCategory(item)] += total;
+                        var c = getCategory(item);
+                        categoryCounts[c] += total;
+                        categoryItemCounts[c]++;
                         totalQty += total;
                     }
 
-                    $('headerLowStock').textContent = lowCount;
-                    $('headerSiteItems').textContent = siteCount;
+                    animateNumber($('headerLowStock'), lowCount);
+                    animateNumber($('headerSiteItems'), siteCount);
 
-                    // 分類統計條
+                    // ===== Health Bar =====
+                    var total_items = state.stock.length || 1;
+                    $('healthOk').style.width = (okCount / total_items * 100) + '%';
+                    $('healthLow').style.width = (lowCount / total_items * 100) + '%';
+                    $('healthOut').style.width = (outCount / total_items * 100) + '%';
+                    $('healthOkLabel').textContent = '充足 ' + okCount;
+                    $('healthLowLabel').textContent = '偏低 ' + lowCount;
+                    $('healthOutLabel').textContent = '缺貨 ' + outCount;
+
+                    // ===== Donut Chart =====
+                    renderDonutChart(categoryItemCounts, state.stock.length);
+
+                    // ===== Category Bar =====
                     if (totalQty === 0) totalQty = 1;
                     var barHtml = '', legendHtml = '';
                     for (var cat in categoryCounts) {
@@ -1183,7 +1296,7 @@
                             var pct = (categoryCounts[cat] / totalQty * 100).toFixed(1);
                             var cfg = categoryConfig[cat];
                             barHtml += '<div class="category-bar-item cursor-pointer" style="width:' + pct + '%;background:' + cfg.color + '"></div>';
-                            legendHtml += '<span class="flex items-center gap-2 px-2 py-1 rounded-lg text-sm"><span>' + cfg.icon + '</span><span>' + cfg.label + '</span><span class="text-gray-500">' + pct + '%</span></span>';
+                            legendHtml += '<span class="flex items-center gap-1"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + cfg.color + '"></span>' + cfg.label + ' ' + pct + '%</span>';
                         }
                     }
                     $('categoryBar').innerHTML = barHtml;
@@ -1191,6 +1304,37 @@
 
                     updateShortageCenter();
                     renderSiteItems();
+                }
+
+                function animateNumber(el, target) {
+                    if (!el) return;
+                    var current = parseInt(el.textContent) || 0;
+                    if (current === target) return;
+                    el.textContent = target;
+                    el.classList.add('number-update');
+                    setTimeout(function () { el.classList.remove('number-update'); }, 400);
+                }
+
+                function renderDonutChart(counts, total) {
+                    var svg = $('donutSvg');
+                    if (!svg) return;
+                    $('donutTotal').textContent = total;
+                    var cx = 60, cy = 60, r = 42, circumference = 2 * Math.PI * r;
+                    var offset = 0;
+                    var paths = '';
+                    var legendHtml = '';
+                    for (var cat in counts) {
+                        if (counts[cat] <= 0) continue;
+                        var pct = counts[cat] / (total || 1);
+                        var dash = pct * circumference;
+                        var cfg = categoryConfig[cat];
+                        paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + cfg.color + '" stroke-width="14" stroke-dasharray="' + dash + ' ' + (circumference - dash) + '" stroke-dashoffset="-' + offset + '" style="transition:stroke-dasharray 0.8s,stroke-dashoffset 0.8s;"/>';
+                        offset += dash;
+                        legendHtml += '<div class="flex items-center gap-1.5 text-[9px]"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + cfg.color + '"></span><span class="text-zinc-500">' + cfg.label + '</span><span class="text-zinc-400 font-bold">' + counts[cat] + '</span></div>';
+                    }
+                    if (total === 0) paths = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#27272a" stroke-width="14"/>';
+                    svg.innerHTML = paths;
+                    $('donutLegend').innerHTML = legendHtml;
                 }
 
                 // ===== 9. 缺料中心模組 =====
@@ -1308,9 +1452,33 @@
                 }
 
                 // ===== 10. 列表與搜尋模組 =====
+                var statusFilter = 'all';
+                var sortMode = null;
+
+                function getItemStatus(item) {
+                    var total = item.warehouseQty + item.siteQty;
+                    if (total <= 0) return 'out';
+                    if (total < item.safeQty) return 'low';
+                    return 'ok';
+                }
+
+                function filterByStatus(s) {
+                    statusFilter = s;
+                    document.querySelectorAll('.filter-pill[data-status]').forEach(function (btn) {
+                        btn.classList.toggle('active', btn.getAttribute('data-status') === s);
+                    });
+                    applyFilters();
+                }
+
+                function toggleSort(field) {
+                    if (field === 'name') sortMode = sortMode === 'name-asc' ? 'name-desc' : 'name-asc';
+                    else if (field === 'qty') sortMode = sortMode === 'qty-asc' ? 'qty-desc' : 'qty-asc';
+                    applyFilters();
+                }
+
                 function applyFilters() {
                     var filtered = state.category === 'all' ? state.stock.slice() : state.stock.filter(function (item) { return getCategory(item) === state.category; });
-
+                    if (statusFilter !== 'all') filtered = filtered.filter(function (item) { return getItemStatus(item) === statusFilter; });
                     if (state.searchText.trim()) {
                         if (typeof Fuse !== 'undefined') {
                             fuseInstance = new Fuse(filtered, { keys: ['name', 'spec'], threshold: 0.3 });
@@ -1320,6 +1488,14 @@
                                 return (item.name + ' ' + item.spec).toLowerCase().indexOf(state.searchText.toLowerCase()) >= 0;
                             });
                         }
+                    }
+                    if (sortMode) {
+                        filtered.sort(function (a, b) {
+                            if (sortMode === 'name-asc') return (a.name || '').localeCompare(b.name || '');
+                            if (sortMode === 'name-desc') return (b.name || '').localeCompare(a.name || '');
+                            var aq = a.warehouseQty + a.siteQty, bq = b.warehouseQty + b.siteQty;
+                            return sortMode === 'qty-asc' ? aq - bq : bq - aq;
+                        });
                     }
                     state.filtered = filtered;
                     renderList();
@@ -1774,6 +1950,8 @@
                 window.openTextRemove = openTextRemove;
                 window.parseTextRemove = parseTextRemove;
                 window.confirmTextRemove = confirmTextRemove;
+                window.filterByStatus = filterByStatus;
+                window.toggleSort = toggleSort;
                 window.updateOCRQty = function () { };
                 window.toggleOCR = function () { };
 
