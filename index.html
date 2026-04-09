@@ -7,20 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>物料戰情室 v21.0 - 工程物料庫存管理系統</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="物料戰情室">
+    <title>物料戰情室 v23.0 - 工程物料庫存管理系統</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
     <link rel="icon" type="image/png"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📦%3C/text%3E%3C/svg%3E">
 
-    <!-- Inter Font -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap"
         rel="stylesheet">
-
-    <!-- Tippy.js Tooltips -->
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css">
 
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
@@ -31,10 +30,6 @@
 
     <!-- Hammer.js Touch Gestures -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-
-    <!-- Day.js -->
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/zh-tw.js"></script>
 
     <!-- Fuse.js -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
@@ -60,6 +55,7 @@
             --bg-base: #09090b;
             --bg-card: #111113;
             --bg-elevated: #18181b;
+            --bg-panel: rgba(17, 17, 19, 0.88);
             --bg-hover: #1f1f23;
             --border: #27272a;
             --border-subtle: #1e1e21;
@@ -99,9 +95,27 @@
         body {
             background: var(--bg-base);
             color: var(--text-primary);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 14px;
             line-height: 1.5;
+            background-image:
+                radial-gradient(circle at top right, rgba(6, 182, 212, 0.14), transparent 30%),
+                radial-gradient(circle at top left, rgba(139, 92, 246, 0.16), transparent 34%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 22%);
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 75%);
+            opacity: 0.28;
+            z-index: -1;
         }
 
         /* ===== 2. Scrollbar ===== */
@@ -139,10 +153,11 @@
 
         /* ===== 4. Cards & Surfaces ===== */
         .card {
-            background: var(--bg-card);
+            background: var(--bg-panel);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
             transition: border-color 0.2s;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
         }
 
         .card:hover {
@@ -150,7 +165,7 @@
         }
 
         .card-elevated {
-            background: var(--bg-elevated);
+            background: rgba(24, 24, 27, 0.95);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
         }
@@ -266,15 +281,16 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--bg-elevated);
+            background: linear-gradient(180deg, rgba(24, 24, 27, 0.98), rgba(12, 12, 14, 0.98));
             border-top-left-radius: var(--radius-xl);
             border-top-right-radius: var(--radius-xl);
             border-top: 1px solid var(--border);
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
             z-index: 200;
-            max-height: 85vh;
+            max-height: min(88vh, 820px);
             padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
+            box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.45);
         }
 
         .bottom-sheet.open {
@@ -399,12 +415,13 @@
 
         /* ===== 12. Quick Action Cards (Minimal) ===== */
         .quick-action-card {
-            background: var(--bg-card);
+            background: linear-gradient(180deg, rgba(17, 17, 19, 0.96), rgba(13, 13, 16, 0.96));
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
             padding: 16px;
             transition: all 0.2s ease;
             cursor: pointer;
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.18);
         }
 
         .quick-action-card:hover {
@@ -667,6 +684,211 @@
             color: var(--text-primary);
         }
 
+        .version-badge,
+        .metric-number {
+            font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        }
+
+        .pull-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: height 0.2s ease, opacity 0.2s ease;
+        }
+
+        .pull-indicator.visible {
+            height: 36px;
+            opacity: 1;
+        }
+
+        .pull-indicator.ready .pull-indicator-label {
+            color: var(--cyan);
+        }
+
+        .list-utility-bar {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .utility-pill {
+            min-height: 42px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .utility-pill:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .utility-pill.secondary {
+            color: var(--text-secondary);
+        }
+
+        .network-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(245, 158, 11, 0.26);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .network-banner.offline {
+            border-color: rgba(239, 68, 68, 0.28);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .inventory-card {
+            background: linear-gradient(180deg, rgba(18, 18, 21, 0.98), rgba(10, 10, 12, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 22px;
+            padding: 16px;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.16);
+        }
+
+        .inventory-card:active {
+            transform: scale(0.985);
+        }
+
+        .inventory-card.selected {
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.24), 0 18px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .inventory-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .inventory-status-pill.ok {
+            background: rgba(34, 197, 94, 0.1);
+            color: #86efac;
+        }
+
+        .inventory-status-pill.low {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fcd34d;
+        }
+
+        .inventory-status-pill.out {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5;
+        }
+
+        .inventory-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .inventory-metric {
+            padding: 10px 12px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .inventory-metric-label {
+            display: block;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .inventory-metric-value {
+            display: block;
+            font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .inventory-card-hint {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .selection-tray {
+            position: fixed;
+            left: 16px;
+            right: 16px;
+            bottom: calc(84px + env(safe-area-inset-bottom));
+            z-index: 120;
+            border-radius: 22px;
+            border: 1px solid rgba(6, 182, 212, 0.22);
+            background: rgba(10, 10, 12, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+        }
+
+        .selection-count-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: rgba(6, 182, 212, 0.12);
+            color: #67e8f9;
+            font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+            font-weight: 700;
+        }
+
+        .setting-note {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .install-cta[disabled] {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        @media (min-width: 768px) {
+            .list-utility-bar {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .selection-tray {
+                left: calc(50% - 260px);
+                right: calc(50% - 260px);
+            }
+        }
+
         /* ===== 20. Mobile Touch ===== */
         @media (hover: none) and (pointer: coarse) {
 
@@ -716,28 +938,31 @@
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <h1 class="text-lg font-extrabold text-white tracking-tight">物料戰情室</h1>
-                        <span
-                            class="text-[10px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-500 font-semibold border border-zinc-700/50">v22.0</span>
+                        <span id="headerVersion"
+                            class="version-badge text-[10px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-500 font-semibold border border-zinc-700/50">v23.0</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="headerOperator"
                             class="text-[11px] text-zinc-500 font-medium cursor-pointer hover:text-zinc-300 transition-colors"
                             onclick="switchPage('settings')">黃俊瑋</span>
-                        <div id="statusBadge"
-                            class="text-[10px] px-2.5 py-1 rounded-full bg-zinc-900 text-zinc-500 border border-zinc-800 font-medium">
-                            連線中...</div>
+                        <div class="flex flex-col items-end gap-1">
+                            <div id="statusBadge"
+                                class="text-[10px] px-2.5 py-1 rounded-full bg-zinc-900 text-zinc-500 border border-zinc-800 font-medium">
+                                連線中...</div>
+                            <p id="syncMeta" class="text-[10px] text-zinc-600">尚未同步</p>
+                        </div>
                     </div>
                 </div>
                 <div class="flex gap-4 mt-2.5">
                     <div class="flex items-center gap-1.5"><span
                             class="text-[10px] text-zinc-600 font-medium">品項</span><span id="headerTotalItems"
-                            class="text-sm font-bold text-zinc-300">-</span></div>
+                            class="metric-number text-sm font-bold text-zinc-300">-</span></div>
                     <div class="flex items-center gap-1.5"><span
                             class="text-[10px] text-zinc-600 font-medium">F22</span><span id="headerSiteItems"
-                            class="text-sm font-bold text-cyan-400">-</span></div>
+                            class="metric-number text-sm font-bold text-cyan-400">-</span></div>
                     <div class="flex items-center gap-1.5"><span class="status-dot low"></span><span
                             class="text-[10px] text-zinc-600 font-medium">低庫存</span><span id="headerLowStock"
-                            class="text-sm font-bold text-amber-400">-</span></div>
+                            class="metric-number text-sm font-bold text-amber-400">-</span></div>
                 </div>
             </div>
         </header>
@@ -871,9 +1096,31 @@
         <!-- List 頁面 -->
         <div id="page-list" class="page">
             <div class="px-5 py-4 space-y-3">
+                <div id="pullIndicator" class="pull-indicator">
+                    <div class="loading-spinner" style="width:14px;height:14px;border-width:2px;"></div>
+                    <span id="pullIndicatorLabel" class="pull-indicator-label text-[11px] text-zinc-500 font-medium">下拉更新資料</span>
+                </div>
                 <!-- 搜尋 + 過濾 -->
                 <div class="sticky top-0 z-50 -mx-5 px-5 py-3"
                     style="background:rgba(9,9,11,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-subtle);">
+                    <div class="list-utility-bar mb-2.5">
+                        <button onclick="loadData()" class="utility-pill">
+                            <span>↻</span><span>重新同步</span>
+                        </button>
+                        <button onclick="openTextRemove()" class="utility-pill">
+                            <span>🤖</span><span>AI 移出</span>
+                        </button>
+                        <button onclick="copyPurchaseList()" class="utility-pill secondary">
+                            <span>📋</span><span>採購清單</span>
+                        </button>
+                    </div>
+                    <div id="networkBanner" class="network-banner hidden mb-2.5">
+                        <div>
+                            <p id="networkBannerTitle" class="text-xs font-bold text-amber-300">目前使用快取資料</p>
+                            <p id="networkBannerText" class="text-[11px] text-zinc-400">離線時仍可查看上次同步內容。</p>
+                        </div>
+                        <button id="installPill" onclick="installApp()" class="utility-pill hidden">加入主畫面</button>
+                    </div>
                     <div class="flex items-center gap-2 rounded-xl px-3 py-2 bg-zinc-900 border border-zinc-800 mb-2.5">
                         <svg class="w-4 h-4 text-zinc-500 flex-shrink-0" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
@@ -891,6 +1138,14 @@
                                 </path>
                             </svg>
                         </button>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 mb-2">
+                        <div class="text-[11px] text-zinc-500">
+                            <span id="listSyncText">尚未同步</span>
+                        </div>
+                        <div class="text-[11px] text-zinc-600">
+                            長按卡片可多選
+                        </div>
                     </div>
                     <!-- 分類 Chips -->
                     <div class="flex gap-1.5 overflow-x-auto pb-1.5" id="categoryChips">
@@ -918,19 +1173,26 @@
                 </div>
 
                 <!-- 批量操作 -->
-                <div id="batchActions" class="hidden bg-zinc-900/70 border border-zinc-700/50 rounded-2xl p-4">
-                    <div class="flex items-center justify-between">
+                <div id="batchActions" class="selection-tray hidden p-4">
+                    <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <span class="text-base font-bold">已選擇 <span id="selectedCount">0</span> 項</span>
-                            <button onclick="clearSelection()" class="text-sm text-gray-400">清除</button>
+                            <span class="selection-count-pill" id="selectedCount">0</span>
+                            <div>
+                                <p class="text-sm font-bold text-white">已進入多選模式</p>
+                                <p class="text-[11px] text-zinc-500">適合手機快速連續調整</p>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="batchAdjust('w', 1)"
-                                class="btn-interactive px-4 py-2 text-sm bg-purple-600/20 text-purple-300">公司倉
-                                +1</button>
-                            <button onclick="batchAdjust('s', 1)"
-                                class="btn-interactive px-4 py-2 text-sm bg-cyan-600/20 text-cyan-300">F22廠區 +1</button>
-                        </div>
+                        <button onclick="clearSelection()" class="text-sm text-zinc-400">清除</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <button onclick="batchAdjust('w', 1)"
+                            class="btn-interactive px-4 py-3 text-sm bg-purple-600/20 text-purple-300">公司 +1</button>
+                        <button onclick="batchAdjust('s', 1)"
+                            class="btn-interactive px-4 py-3 text-sm bg-cyan-600/20 text-cyan-300">F22 +1</button>
+                        <button onclick="batchAdjust('w', -1)"
+                            class="btn-interactive px-4 py-3 text-sm bg-red-600/10 text-red-300">公司 -1</button>
+                        <button onclick="batchAdjust('s', -1)"
+                            class="btn-interactive px-4 py-3 text-sm bg-orange-600/10 text-orange-300">F22 -1</button>
                     </div>
                 </div>
 
@@ -979,10 +1241,24 @@
                     <div id="operatorSelector" class="flex flex-col gap-3"></div>
                 </div>
                 <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+                    <h3 class="text-lg font-extrabold text-white mb-4">📱 手機捷徑</h3>
+                    <div class="space-y-3">
+                        <button id="installAppButton" onclick="installApp()"
+                            class="install-cta btn-interactive w-full flex items-center justify-between p-4">
+                            <div class="flex items-center gap-3"><span class="text-2xl">📲</span><span>加入主畫面</span></div>
+                            <span class="text-xs text-zinc-500">PWA</span>
+                        </button>
+                        <p id="installHint" class="setting-note">安裝後會更像原生 App，手機開啟更快，也能保留離線快取。</p>
+                        <div class="flex justify-between py-2 border-t border-white/5"><span class="text-gray-400">最近同步</span><span
+                                class="text-white font-bold" id="settingsSyncTime">尚未同步</span></div>
+                        <p id="cacheStatusText" class="setting-note">離線時會優先顯示上次成功同步的資料。</p>
+                    </div>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
                     <h3 class="text-lg font-extrabold text-white mb-4">ℹ️ 關於</h3>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between py-2 border-b border-white/5"><span
-                                class="text-gray-400">版本</span><span class="text-white font-bold">v21.0 Pro</span></div>
+                                class="text-gray-400">版本</span><span id="settingsVersion" class="text-white font-bold">v23.0 Mobile</span></div>
                         <div class="flex justify-between py-2"><span class="text-gray-400">已載入品項</span><span
                                 class="text-white font-bold" id="settingsItemCount">-</span></div>
                     </div>
@@ -1074,10 +1350,14 @@
                 'use strict';
 
                 // ===== 1. 設定與常量 =====
+                var APP_VERSION = 'v23.0';
                 var API_URL = (window.APP_CONFIG && window.APP_CONFIG.apiUrl) || 'https://script.google.com/macros/s/AKfycbzOQx4W3SmewfhKSl2jSnQI4f29WzoNSqOLwnofb7T7vY06DzyEeUx6l2YSUieAOf-y-g/exec';
                 var TIMEOUT = (window.APP_CONFIG && Number(window.APP_CONFIG.timeout)) || 20000;
                 var DEBOUNCE_DELAY = 600;
                 var OPERATOR_STORAGE_KEY = 'officeInventory.currentOperator';
+                var PAGE_STORAGE_KEY = 'officeInventory.currentPage';
+                var STOCK_CACHE_KEY = 'officeInventory.stockCache';
+                var PULL_THRESHOLD = 78;
 
                 // ===== 2. 應用狀態 =====
                 var state = {
@@ -1091,7 +1371,13 @@
                     currentOperator: '黃俊瑋',
                     selectedItems: [],
                     textRemoveResults: [],
-                    transferItemId: null
+                    transferItemId: null,
+                    lastSyncAt: '',
+                    lastSyncSource: '',
+                    installPromptEvent: null,
+                    isStandalone: window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true,
+                    pullDistance: 0,
+                    preventClickUntil: 0
                 };
 
                 var OPERATORS = ['黃俊瑋', '戴庭宇', '徐伊恩'];
@@ -1134,6 +1420,180 @@
                     try {
                         window.localStorage.setItem(OPERATOR_STORAGE_KEY, op);
                     } catch (err) { }
+                }
+                function loadPagePreference() {
+                    try {
+                        var saved = window.localStorage.getItem(PAGE_STORAGE_KEY);
+                        if (saved === 'dashboard' || saved === 'list' || saved === 'settings') state.currentPage = saved;
+                    } catch (err) { }
+                }
+                function savePagePreference(page) {
+                    try {
+                        window.localStorage.setItem(PAGE_STORAGE_KEY, page);
+                    } catch (err) { }
+                }
+                function isIosSafari() {
+                    var ua = window.navigator.userAgent || '';
+                    var isIos = /iPad|iPhone|iPod/.test(ua);
+                    var isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+                    return isIos && isSafari;
+                }
+                function syncStaticUi() {
+                    document.title = '物料戰情室 ' + APP_VERSION + ' - 工程物料庫存管理系統';
+                    if ($('headerVersion')) $('headerVersion').textContent = APP_VERSION;
+                    if ($('settingsVersion')) $('settingsVersion').textContent = APP_VERSION + ' Mobile';
+                }
+                function sanitizeStockItems(stockList) {
+                    return stockList.map(function (it, i) {
+                        return {
+                            id: safeStr(it.id, 'i' + i),
+                            name: safeStr(it.name, '未命名'),
+                            spec: safeStr(it.spec, '-'),
+                            unit: safeStr(it.unit, '個'),
+                            warehouseQty: safeNum(it.warehouseQty),
+                            siteQty: safeNum(it.siteQty),
+                            safeQty: safeNum(it.safeQty, 1)
+                        };
+                    });
+                }
+                function saveStockCache(stockList, timestamp) {
+                    try {
+                        window.localStorage.setItem(STOCK_CACHE_KEY, JSON.stringify({
+                            stock: stockList,
+                            timestamp: timestamp || new Date().toISOString()
+                        }));
+                    } catch (err) { }
+                }
+                function loadStockCache() {
+                    try {
+                        var raw = window.localStorage.getItem(STOCK_CACHE_KEY);
+                        if (!raw) return null;
+                        var parsed = JSON.parse(raw);
+                        if (!parsed || !Array.isArray(parsed.stock)) return null;
+                        return parsed;
+                    } catch (err) {
+                        return null;
+                    }
+                }
+                function formatSyncTime(timestamp) {
+                    if (!timestamp) return '尚未同步';
+                    var date = new Date(timestamp);
+                    if (isNaN(date.getTime())) return '尚未同步';
+                    var diff = Date.now() - date.getTime();
+                    if (diff < 60000) return '剛剛';
+                    if (diff < 3600000) return Math.floor(diff / 60000) + ' 分鐘前';
+                    if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小時前';
+                    return new Intl.DateTimeFormat('zh-TW', {
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).format(date);
+                }
+                function refreshNetworkBanner() {
+                    var banner = $('networkBanner');
+                    if (!banner) return;
+                    var titleEl = $('networkBannerTitle');
+                    var textEl = $('networkBannerText');
+                    var showInstall = !state.isStandalone && (!!state.installPromptEvent || isIosSafari());
+                    if (state.lastSyncSource === 'cache') {
+                        banner.classList.remove('hidden');
+                        banner.classList.add('offline');
+                        titleEl.textContent = '目前顯示離線快取';
+                        textEl.textContent = state.lastSyncAt ? ('最後成功同步：' + formatSyncTime(state.lastSyncAt)) : '離線時仍可查看上次同步內容。';
+                    } else if (showInstall) {
+                        banner.classList.remove('hidden');
+                        banner.classList.remove('offline');
+                        titleEl.textContent = '可加入主畫面';
+                        textEl.textContent = '安裝後更像手機 App，開啟更快、操作更順手。';
+                    } else {
+                        banner.classList.add('hidden');
+                    }
+                    if ($('installPill')) $('installPill').classList.toggle('hidden', !showInstall);
+                }
+                function updateInstallUi() {
+                    var button = $('installAppButton');
+                    var hint = $('installHint');
+                    var installAvailable = !state.isStandalone && (!!state.installPromptEvent || isIosSafari());
+                    if (button) {
+                        button.disabled = !installAvailable;
+                        button.classList.toggle('opacity-60', !installAvailable);
+                    }
+                    if (hint) {
+                        if (state.isStandalone) hint.textContent = '已安裝為主畫面捷徑，之後可像 App 一樣直接開啟。';
+                        else if (state.installPromptEvent) hint.textContent = '這台裝置支援一鍵安裝，按上方按鈕即可加入主畫面。';
+                        else if (isIosSafari()) hint.textContent = '在 Safari 按下分享，再選「加入主畫面」，就能像 App 一樣使用。';
+                        else hint.textContent = '目前瀏覽環境尚未提供安裝提示，但仍可使用離線快取。';
+                    }
+                    refreshNetworkBanner();
+                }
+                function updateSyncUi(mode, customText) {
+                    var badge = $('statusBadge');
+                    var syncText = customText || formatSyncTime(state.lastSyncAt);
+                    if (badge) {
+                        if (mode === 'loading') {
+                            badge.textContent = '連線中...';
+                            badge.className = 'text-[10px] px-2.5 py-1 rounded-full bg-zinc-900 text-zinc-500 border border-zinc-800 font-medium';
+                        } else if (mode === 'online') {
+                            badge.textContent = '已同步';
+                            badge.className = 'text-[10px] px-2.5 py-1 rounded-full bg-green-900/20 text-green-400 border border-green-700/30 font-medium';
+                        } else if (mode === 'cache') {
+                            badge.textContent = '離線快取';
+                            badge.className = 'text-[10px] px-2.5 py-1 rounded-full bg-amber-900/20 text-amber-300 border border-amber-700/30 font-medium';
+                        } else if (mode === 'error') {
+                            badge.textContent = '同步失敗';
+                            badge.className = 'text-[10px] px-2.5 py-1 rounded-full bg-red-900/20 text-red-400 border border-red-700/30 font-medium';
+                        }
+                    }
+                    if ($('syncMeta')) $('syncMeta').textContent = syncText;
+                    if ($('listSyncText')) $('listSyncText').textContent = (mode === 'cache' ? '離線快取' : '最近同步') + ' · ' + syncText;
+                    if ($('settingsSyncTime')) $('settingsSyncTime').textContent = syncText;
+                    if ($('cacheStatusText')) {
+                        $('cacheStatusText').textContent = mode === 'cache'
+                            ? '目前使用上次成功同步的資料，恢復連線後可手動重新同步。'
+                            : '離線時會優先顯示上次成功同步的資料。';
+                    }
+                    refreshNetworkBanner();
+                }
+                function applyStockData(stockList, syncSource, syncAt) {
+                    state.stock = sanitizeStockItems(stockList);
+                    state.selectedItems = state.selectedItems.filter(function (selectedId) {
+                        return state.stock.some(function (item) { return String(item.id) === String(selectedId); });
+                    });
+                    state.lastSyncAt = syncAt || new Date().toISOString();
+                    state.lastSyncSource = syncSource || 'online';
+                    applyFilters();
+                    updateDashboard();
+                    updateBatchActions();
+                    $('loadingState').classList.add('hidden');
+                    $('errorState').classList.add('hidden');
+                    updateSyncUi(syncSource === 'cache' ? 'cache' : 'online');
+                }
+                function installApp() {
+                    if (state.installPromptEvent) {
+                        state.installPromptEvent.prompt();
+                        state.installPromptEvent.userChoice.finally(function () {
+                            state.installPromptEvent = null;
+                            updateInstallUi();
+                        });
+                        return;
+                    }
+                    if (isIosSafari() && !state.isStandalone) {
+                        Swal.fire({
+                            title: '加入主畫面',
+                            text: '請在 Safari 點分享，再選「加入主畫面」。',
+                            icon: 'info',
+                            confirmButtonText: '知道了',
+                            confirmButtonColor: '#06b6d4'
+                        });
+                        return;
+                    }
+                    toast('目前無法顯示安裝提示', 'info');
+                }
+                function registerServiceWorker() {
+                    if (!('serviceWorker' in navigator)) return;
+                    if (window.location.protocol === 'file:') return;
+                    navigator.serviceWorker.register('./service-worker.js').catch(function () { });
                 }
                 function fetchWithTimeout(url, options) {
                     options = options || {};
@@ -1210,7 +1670,7 @@
                     state.isLoading = true;
                     $('loadingState').classList.remove('hidden');
                     $('errorState').classList.add('hidden');
-                    $('statusBadge').textContent = '連線中...';
+                    updateSyncUi('loading', state.lastSyncAt ? formatSyncTime(state.lastSyncAt) : '正在連線');
 
                     fetchWithTimeout(API_URL + '?t=' + Date.now(), { cache: 'no-cache' })
                         .then(function (res) { return res.text(); })
@@ -1218,34 +1678,24 @@
                             var data = parseApiResponse(text);
                             if (data.status === 'error') throw new Error(data.msg);
                             if (!data.stock || !Array.isArray(data.stock)) throw new Error('資料格式錯誤');
-
-                            state.stock = data.stock.map(function (it, i) {
-                                return {
-                                    id: safeStr(it.id, 'i' + i),
-                                    name: safeStr(it.name, '未命名'),
-                                    spec: safeStr(it.spec, '-'),
-                                    unit: safeStr(it.unit, '個'),
-                                    warehouseQty: safeNum(it.warehouseQty),
-                                    siteQty: safeNum(it.siteQty),
-                                    safeQty: safeNum(it.safeQty, 1)
-                                };
-                            });
-
-                            applyFilters();
-                            updateDashboard();
-                            $('loadingState').classList.add('hidden');
-                            $('statusBadge').textContent = '線上';
-                            $('statusBadge').className = 'text-xs px-4 py-2 rounded-full bg-green-900/20 text-green-400 border border-green-700/30';
+                            var syncAt = data.timestamp || new Date().toISOString();
+                            applyStockData(data.stock, 'online', syncAt);
+                            saveStockCache(data.stock, syncAt);
                             toast('已載入 ' + state.stock.length + ' 筆資料', 'success');
                             state.isLoading = false;
                         })
                         .catch(function (err) {
                             state.isLoading = false;
+                            var cache = loadStockCache();
+                            if (cache) {
+                                applyStockData(cache.stock, 'cache', cache.timestamp);
+                                toast('目前離線，已載入上次同步資料', 'info');
+                                return;
+                            }
                             $('loadingState').classList.add('hidden');
                             $('errorState').classList.remove('hidden');
                             $('errorMsg').textContent = err.message;
-                            $('statusBadge').textContent = '連線失敗';
-                            $('statusBadge').className = 'text-xs px-4 py-2 rounded-full bg-red-900/20 text-red-400 border border-red-700/30';
+                            updateSyncUi('error', '尚未同步');
                         });
                 }
 
@@ -1273,6 +1723,8 @@
                     if (state.currentPage === page) return;
                     var oldPage = $('page-' + state.currentPage);
                     state.currentPage = page;
+                    savePagePreference(page);
+                    if (page !== 'list' && state.selectedItems.length) clearSelection();
                     document.querySelectorAll('.nav-item').forEach(function (item) { item.classList.remove('active'); });
                     var activeNav = document.querySelector('[data-page="' + page + '"]');
                     if (activeNav) {
@@ -1575,27 +2027,43 @@
                         return;
                     }
                     $('emptyState').classList.add('hidden');
-                    $('inventoryList').innerHTML = state.filtered.map(function (item) {
+                    var listEl = $('inventoryList');
+                    listEl.innerHTML = state.filtered.map(function (item) {
                         var total = item.warehouseQty + item.siteQty;
+                        var status = getItemStatus(item);
                         var alertClass = total === 0 ? 'out-of-stock' : (total < item.safeQty ? 'low-stock-alert' : '');
                         var itemId = escapeJsString(item.id);
                         var isSelected = state.selectedItems.indexOf(item.id) >= 0;
-                        var selectedClass = isSelected ? 'ring-2 ring-cyan-400/70 border-cyan-400/40' : '';
-                        return '<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 cursor-pointer ' + alertClass + ' ' + selectedClass + '" onclick="handleItemClick(event, \'' + itemId + '\')">' +
-                            '<div class="flex items-center gap-4">' +
-                            '<div class="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-xl">' + getCategoryIcon(getCategory(item)) + '</div>' +
-                            '<div class="flex-1"><p class="text-lg font-bold text-white">' + escapeHtml(item.spec) + '</p><p class="text-sm text-gray-500">' + escapeHtml(item.name) + '</p></div>' +
-                            '<div class="flex gap-4 text-right"><div><p class="text-xl font-bold text-purple-400">' + item.warehouseQty + '</p><p class="text-xs text-purple-400/70">公司</p></div>' +
-                            '<div><p class="text-xl font-bold text-cyan-400">' + item.siteQty + '</p><p class="text-xs text-cyan-400/70">F22</p></div></div>' +
+                        var selectedClass = isSelected ? ' selected' : '';
+                        var statusLabel = status === 'out' ? '缺貨' : (status === 'low' ? '低庫存' : '正常');
+                        return '<div class="inventory-card ' + alertClass + selectedClass + '" data-item-id="' + escapeHtml(item.id) + '" onclick="handleItemClick(event, \'' + itemId + '\')">' +
+                            '<div class="flex items-start gap-3">' +
+                            '<div class="w-11 h-11 rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center text-xl flex-shrink-0">' + getCategoryIcon(getCategory(item)) + '</div>' +
+                            '<div class="flex-1 min-w-0">' +
+                            '<div class="flex items-start justify-between gap-3">' +
+                            '<div class="min-w-0"><p class="text-lg font-bold text-white truncate">' + escapeHtml(item.spec) + '</p><p class="text-sm text-zinc-500 truncate">' + escapeHtml(item.name) + '</p></div>' +
+                            '<span class="inventory-status-pill ' + status + '"><span class="status-dot ' + (status === 'out' ? 'out' : (status === 'low' ? 'low' : 'ok')) + '"></span>' + statusLabel + '</span>' +
+                            '</div>' +
+                            '<div class="inventory-meta-grid">' +
+                            '<div class="inventory-metric"><span class="inventory-metric-label">公司</span><span class="inventory-metric-value text-purple-300">' + formatNumber(item.warehouseQty) + '</span></div>' +
+                            '<div class="inventory-metric"><span class="inventory-metric-label">F22</span><span class="inventory-metric-value text-cyan-300">' + formatNumber(item.siteQty) + '</span></div>' +
+                            '<div class="inventory-metric"><span class="inventory-metric-label">安全量</span><span class="inventory-metric-value text-zinc-200">' + formatNumber(item.safeQty) + '</span></div>' +
+                            '</div>' +
+                            '<div class="inventory-card-hint"><span>' + escapeHtml(item.unit) + ' · 總量 ' + formatNumber(total) + '</span><span>' + (isSelected ? '已選取' : '點一下查看') + '</span></div>' +
+                            '</div>' +
                             '</div></div>';
                     }).join('');
+                    listEl.querySelectorAll('[data-item-id]').forEach(function (card) {
+                        initLongPress(card, card.getAttribute('data-item-id'));
+                    });
                     var countEl = $('searchResultCount');
-                    if (countEl && state.searchText.trim()) countEl.textContent = state.filtered.length + ' 項';
+                    if (countEl && (state.searchText.trim() || state.category !== 'all' || statusFilter !== 'all')) countEl.textContent = state.filtered.length + ' 項';
                     else if (countEl) countEl.textContent = '';
                 }
 
                 function handleItemClick(e, id) {
-                    if (e.ctrlKey || e.metaKey) { toggleItemSelection(id); return; }
+                    if (Date.now() < state.preventClickUntil) return;
+                    if (e.ctrlKey || e.metaKey || state.selectedItems.length > 0) { toggleItemSelection(id); return; }
                     openBottomSheet(id);
                 }
 
@@ -1762,6 +2230,10 @@
 
                     return postAPI(type === 'w' ? 'warehouse_audit' : 'audit', { id: id, qty: newQty, person: state.currentOperator })
                         .then(function () {
+                            state.lastSyncAt = new Date().toISOString();
+                            state.lastSyncSource = 'online';
+                            saveStockCache(state.stock, state.lastSyncAt);
+                            updateSyncUi('online');
                             toast('已同步', 'success');
                             refreshInventoryViews();
                             refreshCurrentItemSheet(id);
@@ -1825,6 +2297,10 @@
                         .then(function () {
                             item.warehouseQty = roundQty(item.warehouseQty - qty);
                             item.siteQty = roundQty(item.siteQty + qty);
+                            state.lastSyncAt = new Date().toISOString();
+                            state.lastSyncSource = 'online';
+                            saveStockCache(state.stock, state.lastSyncAt);
+                            updateSyncUi('online');
                             refreshInventoryViews();
                             closeTransferInput();
                             closeAllSheets();
@@ -1985,6 +2461,12 @@
                         var successCount = results.filter(function (result) { return result.status === 'fulfilled'; }).length;
                         var failedCount = results.length - successCount;
                         refreshInventoryViews();
+                        if (successCount > 0) {
+                            state.lastSyncAt = new Date().toISOString();
+                            state.lastSyncSource = 'online';
+                            saveStockCache(state.stock, state.lastSyncAt);
+                            updateSyncUi('online');
+                        }
                         if (failedCount === 0) {
                             closeAllSheets();
                             toast('✅ 移出 ' + successCount + ' 項', 'success');
@@ -2028,15 +2510,74 @@
                 // Long-press to select items (mobile-friendly alternative to Ctrl+Click)
                 var longPressTimer = null;
                 function initLongPress(el, id) {
+                    if (!el || el.dataset.longPressBound === '1') return;
+                    el.dataset.longPressBound = '1';
+                    function clearLongPress() {
+                        clearTimeout(longPressTimer);
+                    }
                     el.addEventListener('touchstart', function (e) {
+                        if (e.touches.length !== 1) return;
                         longPressTimer = setTimeout(function () {
+                            state.preventClickUntil = Date.now() + 600;
                             if (navigator.vibrate) navigator.vibrate(30);
                             toggleItemSelection(id);
-                            renderList();
-                        }, 500);
+                        }, 450);
                     }, { passive: true });
-                    el.addEventListener('touchend', function () { clearTimeout(longPressTimer); });
-                    el.addEventListener('touchmove', function () { clearTimeout(longPressTimer); });
+                    el.addEventListener('touchend', clearLongPress);
+                    el.addEventListener('touchcancel', clearLongPress);
+                    el.addEventListener('touchmove', clearLongPress);
+                }
+
+                function setPullIndicator(distance, ready, label) {
+                    var indicator = $('pullIndicator');
+                    var labelEl = $('pullIndicatorLabel');
+                    if (!indicator || !labelEl) return;
+                    indicator.classList.toggle('visible', distance > 6);
+                    indicator.classList.toggle('ready', !!ready);
+                    labelEl.textContent = label || '下拉更新資料';
+                }
+
+                function initPullToRefresh() {
+                    var startY = 0;
+                    var active = false;
+
+                    function reset() {
+                        active = false;
+                        state.pullDistance = 0;
+                        setPullIndicator(0, false, '下拉更新資料');
+                    }
+
+                    window.addEventListener('touchstart', function (e) {
+                        if (state.currentPage !== 'list') return;
+                        if (window.scrollY > 2) return;
+                        if (document.querySelector('.bottom-sheet.open')) return;
+                        if (e.touches.length !== 1) return;
+                        startY = e.touches[0].clientY;
+                        active = true;
+                        state.pullDistance = 0;
+                    }, { passive: true });
+
+                    window.addEventListener('touchmove', function (e) {
+                        if (!active) return;
+                        var delta = e.touches[0].clientY - startY;
+                        if (delta <= 0) {
+                            reset();
+                            return;
+                        }
+                        state.pullDistance = Math.min(110, delta * 0.55);
+                        setPullIndicator(state.pullDistance, state.pullDistance >= PULL_THRESHOLD, state.pullDistance >= PULL_THRESHOLD ? '放開立即同步' : '下拉更新資料');
+                        if (state.pullDistance > 10) e.preventDefault();
+                    }, { passive: false });
+
+                    window.addEventListener('touchend', function () {
+                        if (!active) return;
+                        var shouldRefresh = state.pullDistance >= PULL_THRESHOLD;
+                        reset();
+                        if (shouldRefresh) {
+                            if (navigator.vibrate) navigator.vibrate(12);
+                            loadData();
+                        }
+                    });
                 }
 
                 // GSAP dashboard entrance animation
@@ -2068,15 +2609,55 @@
                     document.addEventListener('keydown', function (e) {
                         if (e.key === 'Escape') closeAllSheets();
                     });
+                    window.addEventListener('online', function () {
+                        state.lastSyncSource = 'online';
+                        updateSyncUi(state.lastSyncAt ? 'online' : 'loading');
+                        loadData();
+                    });
+                    window.addEventListener('offline', function () {
+                        if (state.lastSyncAt) {
+                            state.lastSyncSource = 'cache';
+                            updateSyncUi('cache');
+                        } else {
+                            updateSyncUi('error', '目前離線');
+                        }
+                    });
+                    window.addEventListener('beforeinstallprompt', function (e) {
+                        e.preventDefault();
+                        state.installPromptEvent = e;
+                        updateInstallUi();
+                    });
+                    window.addEventListener('appinstalled', function () {
+                        state.isStandalone = true;
+                        state.installPromptEvent = null;
+                        updateInstallUi();
+                        toast('已加入主畫面', 'success');
+                    });
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.hidden || !navigator.onLine || !state.lastSyncAt) return;
+                        if (Date.now() - new Date(state.lastSyncAt).getTime() > 300000) loadData();
+                    });
                     // Init gestures after a short delay to ensure DOM is ready
                     setTimeout(initGestures, 300);
+                    initPullToRefresh();
                 }
 
                 // ===== 初始化 =====
                 function init() {
                     loadOperatorPreference();
+                    loadPagePreference();
+                    syncStaticUi();
                     if ($('headerOperator')) $('headerOperator').textContent = state.currentOperator;
                     initEvents();
+                    registerServiceWorker();
+                    updateInstallUi();
+                    if (state.currentPage !== 'dashboard') {
+                        var savedPage = state.currentPage;
+                        state.currentPage = 'dashboard';
+                        switchPage(savedPage);
+                    } else {
+                        savePagePreference('dashboard');
+                    }
                     loadData();
                     setTimeout(animateDashboardEntrance, 800);
                 }
@@ -2108,6 +2689,7 @@
                 window.filterByStatus = filterByStatus;
                 window.toggleSort = toggleSort;
                 window.directEditQty = directEditQty;
+                window.installApp = installApp;
                 window.updateOCRQty = function () { };
                 window.toggleOCR = function () { };
 
