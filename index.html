@@ -1074,9 +1074,10 @@
                 'use strict';
 
                 // ===== 1. 設定與常量 =====
-                var API_URL = 'https://script.google.com/macros/s/AKfycbzOQx4W3SmewfhKSl2jSnQI4f29WzoNSqOLwnofb7T7vY06DzyEeUx6l2YSUieAOf-y-g/exec';
-                var TIMEOUT = 20000;
+                var API_URL = (window.APP_CONFIG && window.APP_CONFIG.apiUrl) || 'https://script.google.com/macros/s/AKfycbzOQx4W3SmewfhKSl2jSnQI4f29WzoNSqOLwnofb7T7vY06DzyEeUx6l2YSUieAOf-y-g/exec';
+                var TIMEOUT = (window.APP_CONFIG && Number(window.APP_CONFIG.timeout)) || 20000;
                 var DEBOUNCE_DELAY = 600;
+                var OPERATOR_STORAGE_KEY = 'officeInventory.currentOperator';
 
                 // ===== 2. 應用狀態 =====
                 var state = {
@@ -1089,7 +1090,8 @@
                     isLoading: false,
                     currentOperator: '黃俊瑋',
                     selectedItems: [],
-                    textRemoveResults: []
+                    textRemoveResults: [],
+                    transferItemId: null
                 };
 
                 var OPERATORS = ['黃俊瑋', '戴庭宇', '徐伊恩'];
@@ -1100,10 +1102,19 @@
                 function safeNum(v, d) { var n = Number(v); return isNaN(n) ? (d || 0) : n; }
                 function safeStr(v, d) { return (v == null || v === '') ? (d || '') : String(v); }
                 function formatNumber(num) { return num % 1 === 0 ? num : num.toFixed(1); }
+                function roundQty(num) { return Math.round(safeNum(num) * 1000) / 1000; }
                 function escapeHtml(str) {
                     var div = document.createElement('div');
                     div.textContent = str;
                     return div.innerHTML;
+                }
+                function escapeJsString(str) {
+                    return safeStr(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
+                }
+                function csvEscape(value) {
+                    var text = safeStr(value);
+                    if (/[",\n]/.test(text)) return '"' + text.replace(/"/g, '""') + '"';
+                    return text;
                 }
                 function debounce(func, delay) {
                     var timeoutId;
@@ -1112,6 +1123,52 @@
                         clearTimeout(timeoutId);
                         timeoutId = setTimeout(function () { func.apply(context, args); }, delay);
                     };
+                }
+                function loadOperatorPreference() {
+                    try {
+                        var saved = window.localStorage.getItem(OPERATOR_STORAGE_KEY);
+                        if (saved && OPERATORS.indexOf(saved) >= 0) state.currentOperator = saved;
+                    } catch (err) { }
+                }
+                function saveOperatorPreference(op) {
+                    try {
+                        window.localStorage.setItem(OPERATOR_STORAGE_KEY, op);
+                    } catch (err) { }
+                }
+                function fetchWithTimeout(url, options) {
+                    options = options || {};
+                    if (typeof AbortController === 'undefined') return fetch(url, options);
+                    var controller = new AbortController();
+                    var timerId = setTimeout(function () { controller.abort(); }, TIMEOUT);
+                    var nextOptions = Object.assign({}, options, { signal: controller.signal });
+                    return fetch(url, nextOptions)
+                        .then(function (res) {
+                            clearTimeout(timerId);
+                            return res;
+                        })
+                        .catch(function (err) {
+                            clearTimeout(timerId);
+                            if (err && err.name === 'AbortError') throw new Error('連線逾時，請稍後再試');
+                            throw err;
+                        });
+                }
+                function parseApiResponse(text) {
+                    if (text.indexOf('<!DOCTYPE') >= 0) throw new Error('收到 HTML 非 JSON');
+                    try {
+                        return JSON.parse(text);
+                    } catch (err) {
+                        throw new Error('API 回傳格式錯誤');
+                    }
+                }
+                function refreshInventoryViews() {
+                    applyFilters();
+                    updateDashboard();
+                }
+                function refreshCurrentItemSheet(id) {
+                    var bottomSheet = $('bottomSheet');
+                    if (!bottomSheet || !bottomSheet.classList.contains('open') || !state.currentItem) return;
+                    if (id && String(state.currentItem.id) !== String(id)) return;
+                    openBottomSheet(state.currentItem.id);
                 }
 
                 // ===== 4. 分類引擎 =====
@@ -1155,11 +1212,10 @@
                     $('errorState').classList.add('hidden');
                     $('statusBadge').textContent = '連線中...';
 
-                    fetch(API_URL + '?t=' + Date.now(), { cache: 'no-cache' })
+                    fetchWithTimeout(API_URL + '?t=' + Date.now(), { cache: 'no-cache' })
                         .then(function (res) { return res.text(); })
                         .then(function (text) {
-                            if (text.indexOf('<!DOCTYPE') >= 0) throw new Error('收到 HTML 非 JSON');
-                            var data = JSON.parse(text);
+                            var data = parseApiResponse(text);
                             if (data.status === 'error') throw new Error(data.msg);
                             if (!data.stock || !Array.isArray(data.stock)) throw new Error('資料格式錯誤');
 
@@ -1194,12 +1250,18 @@
                 }
 
                 function postAPI(action, params) {
-                    return fetch(API_URL, {
+                    return fetchWithTimeout(API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(Object.assign({ action: action }, params))
                     })
-                        .then(function (res) { return res.json(); })
+                        .then(function (res) {
+                            return res.text().then(function (text) {
+                                var data = parseApiResponse(text);
+                                if (!res.ok) throw new Error(data.msg || ('HTTP ' + res.status));
+                                return data;
+                            });
+                        })
                         .then(function (data) {
                             if (data.status === 'error') throw new Error(data.msg);
                             return data;
@@ -1391,7 +1453,7 @@
                         html += '<div class="mb-4"><p class="text-xs font-bold text-' + g.color + '-400 mb-2">' + g.label + ' (' + g.items.length + ')</p>';
                         g.items.forEach(function (data) {
                             var item = data.item;
-                            html += '<div class="flex items-center justify-between p-3 rounded-xl bg-' + g.color + '-900/20 border border-' + g.color + '-500/30 mb-2 cursor-pointer" onclick="openBottomSheet(\'' + item.id + '\')">' +
+                            html += '<div class="flex items-center justify-between p-3 rounded-xl bg-' + g.color + '-900/20 border border-' + g.color + '-500/30 mb-2 cursor-pointer" onclick="openBottomSheet(\'' + escapeJsString(item.id) + '\')">' +
                                 '<div><p class="text-white font-bold">' + escapeHtml(item.spec) + '</p><p class="text-xs text-gray-400">' + escapeHtml(item.name) + '</p></div>' +
                                 '<div class="text-right"><p class="text-' + g.color + '-400 font-bold">缺 ' + Math.ceil(data.shortage) + '</p><p class="text-xs text-gray-500">' + data.total + '/' + data.safe + '</p></div>' +
                                 '</div>';
@@ -1443,7 +1505,8 @@
                     $('siteItemsList').classList.remove('hidden');
 
                     $('siteItemsList').innerHTML = siteItems.map(function (item) {
-                        return '<div class="site-item flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 cursor-pointer" onclick="openBottomSheet(\'' + item.id + '\')">' +
+                        var itemId = escapeJsString(item.id);
+                        return '<div class="site-item flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 cursor-pointer" onclick="openBottomSheet(\'' + itemId + '\')">' +
                             '<div class="flex items-center gap-3"><span class="text-2xl">' + getCategoryIcon(getCategory(item)) + '</span>' +
                             '<div><p class="font-bold text-white">' + escapeHtml(item.name) + '</p><p class="text-sm text-gray-400">' + escapeHtml(item.spec) + '</p></div></div>' +
                             '<div class="text-right"><p class="text-3xl font-bold text-cyan-400">' + item.siteQty + '</p><p class="text-xs text-gray-400">件</p></div>' +
@@ -1501,7 +1564,7 @@
                     renderList();
                 }
 
-                var applyFiltersDebounced = debounce(applyFilters, 150);
+                var applyFiltersDebounced = debounce(applyFilters, DEBOUNCE_DELAY);
 
                 function renderList() {
                     if (state.filtered.length === 0) {
@@ -1515,7 +1578,10 @@
                     $('inventoryList').innerHTML = state.filtered.map(function (item) {
                         var total = item.warehouseQty + item.siteQty;
                         var alertClass = total === 0 ? 'out-of-stock' : (total < item.safeQty ? 'low-stock-alert' : '');
-                        return '<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 cursor-pointer ' + alertClass + '" onclick="handleItemClick(event, \'' + item.id + '\')">' +
+                        var itemId = escapeJsString(item.id);
+                        var isSelected = state.selectedItems.indexOf(item.id) >= 0;
+                        var selectedClass = isSelected ? 'ring-2 ring-cyan-400/70 border-cyan-400/40' : '';
+                        return '<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 cursor-pointer ' + alertClass + ' ' + selectedClass + '" onclick="handleItemClick(event, \'' + itemId + '\')">' +
                             '<div class="flex items-center gap-4">' +
                             '<div class="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-xl">' + getCategoryIcon(getCategory(item)) + '</div>' +
                             '<div class="flex-1"><p class="text-lg font-bold text-white">' + escapeHtml(item.spec) + '</p><p class="text-sm text-gray-500">' + escapeHtml(item.name) + '</p></div>' +
@@ -1557,16 +1623,22 @@
 
                 function batchAdjust(type, delta) {
                     if (state.selectedItems.length === 0) { toast('請先選擇物料', 'warning'); return; }
-                    state.selectedItems.forEach(function (id) {
+                    var tasks = state.selectedItems.map(function (id) {
                         var item = findItemById(id);
-                        if (!item) return;
+                        if (!item) return Promise.reject(new Error('找不到物料 ' + id));
                         var isW = type === 'w';
                         var oldQty = isW ? item.warehouseQty : item.siteQty;
-                        var newQty = Math.max(0, oldQty + delta);
-                        updateQty(id, type, newQty, oldQty, item);
+                        var newQty = roundQty(Math.max(0, oldQty + delta));
+                        return updateQty(id, type, newQty, oldQty, item);
                     });
-                    clearSelection();
-                    toast('批量調整完成', 'success');
+                    Promise.allSettled(tasks).then(function (results) {
+                        var successCount = results.filter(function (result) { return result.status === 'fulfilled'; }).length;
+                        var failedCount = results.length - successCount;
+                        clearSelection();
+                        if (failedCount === 0) toast('批量調整完成，共 ' + successCount + ' 項', 'success');
+                        else if (successCount > 0) toast('批量調整完成 ' + successCount + ' 項，失敗 ' + failedCount + ' 項', 'warning');
+                        else toast('批量調整失敗，請稍後再試', 'error');
+                    });
                 }
 
                 // ===== 11. Bottom Sheet 模組 =====
@@ -1574,14 +1646,15 @@
                     var item = findItemById(id);
                     if (!item) { toast('找不到該物料', 'error'); return; }
                     state.currentItem = item;
+                    var escapedId = escapeJsString(id);
 
                     var opButtons = OPERATORS.map(function (op) {
                         var isActive = op === state.currentOperator;
-                        return '<button onclick="setOperator(\'' + op + '\')" class="operator-btn px-4 py-3 rounded-xl text-sm font-bold border-2 ' + (isActive ? 'bg-purple-600 text-white border-purple-400' : 'bg-white/5 text-gray-300 border-white/10') + '">' + op + '</button>';
+                        return '<button onclick="setOperator(\'' + escapeJsString(op) + '\')" class="operator-btn px-4 py-3 rounded-xl text-sm font-bold border-2 ' + (isActive ? 'bg-purple-600 text-white border-purple-400' : 'bg-white/5 text-gray-300 border-white/10') + '">' + escapeHtml(op) + '</button>';
                     }).join('');
 
                     $('bottomSheetContent').innerHTML =
-                        '<div class="mb-6"><h2 class="text-3xl font-bold text-white mb-2">' + escapeHtml(item.name) + '</h2><p class="text-gray-400">' + escapeHtml(item.spec) + ' · ' + item.unit + '</p></div>' +
+                        '<div class="mb-6"><h2 class="text-3xl font-bold text-white mb-2">' + escapeHtml(item.name) + '</h2><p class="text-gray-400">' + escapeHtml(item.spec) + ' · ' + escapeHtml(item.unit) + '</p></div>' +
                         '<div class="bg-zinc-900 rounded-2xl p-4 mb-4"><p class="text-sm text-gray-400 mb-3">操作人員</p><div class="flex gap-2 flex-wrap">' + opButtons + '</div></div>' +
                         // 公司倉
                         '<div class="bg-zinc-900 rounded-2xl p-4 mb-4"><p class="text-sm text-gray-400 mb-3">公司倉庫存</p>' +
@@ -1597,7 +1670,7 @@
                         '<button onclick="adjustQty(\'w\', 5)" class="px-3 py-1.5 rounded-lg bg-green-600/10 text-green-400 text-xs font-bold border border-green-600/20">+5</button>' +
                         '<button onclick="adjustQty(\'w\', 10)" class="px-3 py-1.5 rounded-lg bg-green-600/10 text-green-400 text-xs font-bold border border-green-600/20">+10</button>' +
                         '</div></div>' +
-                        '<button onclick="transferToSite(\'' + id + '\')" class="w-full py-4 rounded-2xl bg-cyan-600 text-white font-bold mb-4">📦 轉移至 F22</button>' +
+                        '<button onclick="transferToSite(\'' + escapedId + '\')" class="w-full py-4 rounded-2xl bg-cyan-600 text-white font-bold mb-4">📦 轉移至 F22</button>' +
                         // F22 廠區
                         '<div class="bg-zinc-900 rounded-2xl p-4"><p class="text-sm text-gray-400 mb-3">F22廠區庫存</p>' +
                         '<div class="flex items-center justify-between gap-3">' +
@@ -1628,10 +1701,10 @@
 
                     Swal.fire({
                         title: label,
-                        text: escapeHtml(item.name) + ' (' + escapeHtml(item.spec) + ')',
+                        text: item.name + ' (' + item.spec + ')',
                         input: 'number',
                         inputValue: oldQty,
-                        inputAttributes: { min: 0, step: 1, style: 'font-size:28px;text-align:center;font-weight:bold;' },
+                        inputAttributes: { min: 0, step: 0.1, style: 'font-size:28px;text-align:center;font-weight:bold;' },
                         showCancelButton: true,
                         confirmButtonText: '確認修改',
                         cancelButtonText: '取消',
@@ -1642,17 +1715,22 @@
                         }
                     }).then(function (result) {
                         if (result.isConfirmed) {
-                            var newQty = parseInt(result.value) || 0;
+                            var newQty = roundQty(parseFloat(result.value));
                             updateQty(item.id, type, newQty, oldQty, item);
                         }
                     });
                 }
 
-                function setOperator(op) {
+                function setCurrentOperator(op) {
                     state.currentOperator = op;
-                    $('headerOperator').textContent = op;
+                    saveOperatorPreference(op);
+                    if ($('headerOperator')) $('headerOperator').textContent = op;
+                }
+
+                function setOperator(op) {
+                    setCurrentOperator(op);
                     renderOperatorSelector();
-                    openBottomSheet(state.currentItem.id);
+                    if (state.currentItem) openBottomSheet(state.currentItem.id);
                     toast('已切換：' + op, 'info');
                 }
 
@@ -1665,31 +1743,37 @@
 
                 function updateQty(id, type, newQty, oldQty, item) {
                     if (!item) item = findItemById(id);
-                    if (!item) return;
+                    if (!item) return Promise.reject(new Error('找不到該物料'));
+                    newQty = roundQty(newQty);
+                    if (!isFinite(newQty) || newQty < 0) {
+                        var quantityError = new Error('數量格式錯誤');
+                        toast(quantityError.message, 'error');
+                        return Promise.reject(quantityError);
+                    }
+                    if (newQty === oldQty) return Promise.resolve();
+
+                    var previousWarehouseQty = item.warehouseQty;
+                    var previousSiteQty = item.siteQty;
                     if (type === 'w') item.warehouseQty = newQty;
                     else item.siteQty = newQty;
-
-                    var elId = (type === 'w' ? 'bs-w-' : 'bs-s-') + id;
-                    var el = document.getElementById(elId);
-                    if (el) {
-                        el.textContent = newQty;
-                        if (typeof gsap !== 'undefined') {
-                            gsap.fromTo(el, { scale: 1.3 }, { scale: 1, duration: 0.35, ease: 'elastic.out(1, 0.5)' });
-                        } else {
-                            el.classList.add('number-update');
-                            setTimeout(function () { el.classList.remove('number-update'); }, 400);
-                        }
-                    }
                     if (navigator.vibrate) navigator.vibrate(15);
+                    refreshInventoryViews();
+                    refreshCurrentItemSheet(id);
 
-                    postAPI(type === 'w' ? 'warehouse_audit' : 'audit', { id: id, qty: newQty, person: state.currentOperator })
-                        .then(function () { toast('已同步', 'success'); updateDashboard(); })
+                    return postAPI(type === 'w' ? 'warehouse_audit' : 'audit', { id: id, qty: newQty, person: state.currentOperator })
+                        .then(function () {
+                            toast('已同步', 'success');
+                            refreshInventoryViews();
+                            refreshCurrentItemSheet(id);
+                        })
                         .catch(function (e) {
-                            if (type === 'w') item.warehouseQty = oldQty;
-                            else item.siteQty = oldQty;
+                            item.warehouseQty = previousWarehouseQty;
+                            item.siteQty = previousSiteQty;
+                            refreshInventoryViews();
+                            refreshCurrentItemSheet(id);
                             toast('同步失敗：' + e.message, 'error');
+                            throw e;
                         });
-                    updateDashboard();
                 }
 
                 function adjustQty(type, delta) {
@@ -1697,7 +1781,7 @@
                     var id = state.currentItem.id;
                     var isW = type === 'w';
                     var oldQty = isW ? state.currentItem.warehouseQty : state.currentItem.siteQty;
-                    var newQty = Math.max(0, oldQty + delta);
+                    var newQty = roundQty(Math.max(0, oldQty + delta));
                     updateQty(id, type, newQty, oldQty, state.currentItem);
                 }
 
@@ -1711,7 +1795,7 @@
                         .map(function (v) { return '<button onclick="setTransferQty(' + v + ')" class="transfer-quick-btn">' + (v % 1 === 0 ? v : v.toFixed(1)) + '</button>'; }).join('');
 
                     $('transferInputContent').innerHTML =
-                        '<h2 class="text-2xl font-bold text-white mb-4 text-center">' + item.name + '</h2>' +
+                        '<h2 class="text-2xl font-bold text-white mb-4 text-center">' + escapeHtml(item.name) + '</h2>' +
                         '<div class="bg-cyan-900/20 rounded-xl p-4 mb-4 text-center"><p class="text-sm text-cyan-400">公司倉庫存</p><p class="text-3xl font-bold text-white">' + item.warehouseQty + '</p></div>' +
                         '<p class="text-sm text-gray-400 mb-2">輸入轉移數量</p>' +
                         '<input type="number" id="transferQtyInput" class="transfer-input-number" min="0.1" max="' + item.warehouseQty + '" step="0.1" placeholder="0">' +
@@ -1734,14 +1818,14 @@
                     var id = state.transferItemId;
                     var item = findItemById(id);
                     if (!item) { closeTransferInput(); return; }
-                    var qty = parseFloat($('transferQtyInput').value);
+                    var qty = roundQty(parseFloat($('transferQtyInput').value));
                     if (isNaN(qty) || qty <= 0 || qty > item.warehouseQty) { toast('請輸入有效數量', 'error'); return; }
 
                     postAPI('move_to_site', { id: id, qty: qty, person: state.currentOperator })
                         .then(function () {
-                            item.warehouseQty -= qty;
-                            item.siteQty += qty;
-                            updateDashboard();
+                            item.warehouseQty = roundQty(item.warehouseQty - qty);
+                            item.siteQty = roundQty(item.siteQty + qty);
+                            refreshInventoryViews();
                             closeTransferInput();
                             closeAllSheets();
                             toast('✅ 已轉移 ' + qty + ' 件', 'success');
@@ -1753,14 +1837,13 @@
                 function renderOperatorSelector() {
                     $('operatorSelector').innerHTML = OPERATORS.map(function (op) {
                         var isActive = op === state.currentOperator;
-                        return '<button onclick="setOperatorGlobal(\'' + op + '\')" class="h-14 flex items-center justify-between px-4 rounded-xl border-2 ' + (isActive ? 'bg-purple-600 border-purple-400 text-white' : 'bg-zinc-800 border-zinc-700 text-gray-300') + '">' +
-                            '<span class="font-bold">' + op + '</span>' + (isActive ? '<span>✓</span>' : '') + '</button>';
+                        return '<button onclick="setOperatorGlobal(\'' + escapeJsString(op) + '\')" class="h-14 flex items-center justify-between px-4 rounded-xl border-2 ' + (isActive ? 'bg-purple-600 border-purple-400 text-white' : 'bg-zinc-800 border-zinc-700 text-gray-300') + '">' +
+                            '<span class="font-bold">' + escapeHtml(op) + '</span>' + (isActive ? '<span>✓</span>' : '') + '</button>';
                     }).join('');
                 }
 
                 function setOperatorGlobal(op) {
-                    state.currentOperator = op;
-                    $('headerOperator').textContent = op;
+                    setCurrentOperator(op);
                     renderOperatorSelector();
                     toast('已切換：' + op, 'success');
                 }
@@ -1769,7 +1852,7 @@
                     if (state.filtered.length === 0) { toast('沒有資料可匯出', 'warning'); return; }
                     var csv = 'ID,品名,規格,單位,公司倉,F22廠區,安全存量\n';
                     state.filtered.forEach(function (item) {
-                        csv += [item.id, item.name, item.spec, item.unit, item.warehouseQty, item.siteQty, item.safeQty].join(',') + '\n';
+                        csv += [item.id, item.name, item.spec, item.unit, item.warehouseQty, item.siteQty, item.safeQty].map(csvEscape).join(',') + '\n';
                     });
                     var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
                     var link = document.createElement('a');
@@ -1819,7 +1902,7 @@
 
                     // 傳送簡化的庫存清單給 AI
                     var stockListSimple = state.stock.map(function (item) {
-                        return { name: item.name, spec: item.spec };
+                        return { id: item.id, name: item.name, spec: item.spec };
                     });
 
                     postAPI('gemini_parse_text', { text: input, stockList: stockListSimple })
@@ -1828,19 +1911,21 @@
                                 // 將 AI 結果匹配回實際庫存物件
                                 var parsed = [];
                                 res.items.forEach(function (ai) {
-                                    if (!ai.matchedName) return; // AI 無法匹配
-                                    // 找到對應的庫存物件
-                                    var matchedItem = state.stock.find(function (item) {
-                                        return item.name === ai.matchedName && item.spec === ai.matchedSpec;
-                                    });
-                                    if (matchedItem) {
-                                        parsed.push({
-                                            rawName: ai.originalInput,
-                                            qty: ai.qty || 1,
-                                            matchedItem: matchedItem,
-                                            canRemove: matchedItem.siteQty >= (ai.qty || 1)
+                                    var qty = roundQty(Math.max(0, safeNum(ai.qty, 1)));
+                                    var matchedItem = ai.matchedId ? findItemById(ai.matchedId) : null;
+                                    if (!matchedItem && ai.matchedName) {
+                                        matchedItem = state.stock.find(function (item) {
+                                            return item.name === ai.matchedName && item.spec === ai.matchedSpec;
                                         });
                                     }
+                                    parsed.push({
+                                        rawName: ai.originalInput || ai.matchedName || ai.name || '',
+                                        qty: qty || 1,
+                                        matchedItem: matchedItem || null,
+                                        matchedName: ai.matchedName || '',
+                                        matchedSpec: ai.matchedSpec || '',
+                                        canRemove: !!(matchedItem && matchedItem.siteQty >= (qty || 1))
+                                    });
                                 });
                                 state.textRemoveResults = parsed;
                                 renderTextRemovePreview();
@@ -1864,10 +1949,12 @@
                     $('textRemoveList').innerHTML = state.textRemoveResults.map(function (r) {
                         var status = r.canRemove ? 'success' : (r.matchedItem ? 'warning' : 'error');
                         var statusText = r.canRemove ? '✅ 可移出' : (r.matchedItem ? '⚠️ 庫存不足 (現有 ' + r.matchedItem.siteQty + ')' : '❌ 未找到');
+                        var matchedName = r.matchedItem ? r.matchedItem.name : (r.matchedName || '未找到對應品項');
+                        var matchedSpec = r.matchedItem ? r.matchedItem.spec : (r.matchedSpec || '請調整文字後再試');
                         return '<div class="batch-item ' + status + ' p-3 rounded-xl bg-white/5 border border-white/10 mb-2">' +
                             '<div class="flex justify-between items-center">' +
-                            '<div><p class="font-bold text-white">' + escapeHtml(r.matchedItem.name) + '</p>' +
-                            '<p class="text-xs text-cyan-400">' + escapeHtml(r.matchedItem.spec) + '</p>' +
+                            '<div><p class="font-bold text-white">' + escapeHtml(matchedName) + '</p>' +
+                            '<p class="text-xs text-cyan-400">' + escapeHtml(matchedSpec) + '</p>' +
                             '<p class="text-xs text-gray-500">輸入: ' + escapeHtml(r.rawName) + '</p></div>' +
                             '<div class="text-right"><p class="text-2xl font-bold text-green-400">' + r.qty + '</p>' +
                             '<p class="text-xs ' + (r.canRemove ? 'text-green-400' : 'text-orange-400') + '">' + statusText + '</p></div>' +
@@ -1878,13 +1965,34 @@
                 function confirmTextRemove() {
                     var toRemove = state.textRemoveResults.filter(function (r) { return r.canRemove; });
                     if (toRemove.length === 0) { toast('沒有可移出的物料', 'warning'); return; }
-                    var count = 0;
+                    var grouped = {};
                     toRemove.forEach(function (r) {
-                        var item = r.matchedItem;
-                        var newQty = item.siteQty - r.qty;
-                        postAPI('audit', { id: item.id, qty: newQty, person: state.currentOperator })
-                            .then(function () { item.siteQty = newQty; count++; if (count === toRemove.length) { updateDashboard(); closeAllSheets(); toast('✅ 移出 ' + count + ' 項', 'success'); } })
-                            .catch(function () { });
+                        var key = String(r.matchedItem.id);
+                        if (!grouped[key]) grouped[key] = { item: r.matchedItem, qty: 0 };
+                        grouped[key].qty = roundQty(grouped[key].qty + r.qty);
+                    });
+                    var tasks = Object.keys(grouped).map(function (key) {
+                        var entry = grouped[key];
+                        var item = entry.item;
+                        var newQty = roundQty(item.siteQty - entry.qty);
+                        return postAPI('audit', { id: item.id, qty: newQty, person: state.currentOperator })
+                            .then(function () {
+                                item.siteQty = newQty;
+                                return entry;
+                            });
+                    });
+                    Promise.allSettled(tasks).then(function (results) {
+                        var successCount = results.filter(function (result) { return result.status === 'fulfilled'; }).length;
+                        var failedCount = results.length - successCount;
+                        refreshInventoryViews();
+                        if (failedCount === 0) {
+                            closeAllSheets();
+                            toast('✅ 移出 ' + successCount + ' 項', 'success');
+                        } else if (successCount > 0) {
+                            toast('部分移出成功 ' + successCount + ' 項，失敗 ' + failedCount + ' 項', 'warning');
+                        } else {
+                            toast('移出失敗，請稍後重試', 'error');
+                        }
                     });
                 }
 
@@ -1966,6 +2074,8 @@
 
                 // ===== 初始化 =====
                 function init() {
+                    loadOperatorPreference();
+                    if ($('headerOperator')) $('headerOperator').textContent = state.currentOperator;
                     initEvents();
                     loadData();
                     setTimeout(animateDashboardEntrance, 800);
