@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="物料戰情室">
-    <title>物料戰情室 v23.0 - 工程物料庫存管理系統</title>
+    <title>物料戰情室 v25.0 - 工程物料庫存管理系統</title>
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="apple-touch-icon" href="./icons/icon-192.png">
     <link rel="icon" type="image/png"
@@ -580,23 +580,7 @@
             letter-spacing: -0.02em;
         }
 
-        .number-update {
-            animation: numberPop 0.35s ease;
-        }
 
-        @keyframes numberPop {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.12);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
 
         .site-item {
             transition: all 0.2s ease;
@@ -610,10 +594,7 @@
             transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
         }
 
-        .health-segment {
-            height: 8px;
-            transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
-        }
+
 
         .number-update {
             animation: numPulse 0.4s ease;
@@ -711,7 +692,7 @@
 
         .list-utility-bar {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
         }
 
@@ -939,7 +920,7 @@
                     <div class="flex items-center gap-3">
                         <h1 class="text-lg font-extrabold text-white tracking-tight">物料戰情室</h1>
                         <span id="headerVersion"
-                            class="version-badge text-[10px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-500 font-semibold border border-zinc-700/50">v23.0</span>
+                            class="version-badge text-[10px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-500 font-semibold border border-zinc-700/50">v25.0</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="headerOperator"
@@ -979,6 +960,14 @@
                             <p class="text-sm font-bold text-white">AI 移出</p>
                         </div>
                         <p class="text-[11px] text-zinc-500">模糊輸入 · 智能匹配</p>
+                    </div>
+                    <div class="quick-action-card" onclick="openSiteReportImport()">
+                        <div class="flex items-center gap-2.5 mb-2">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+                                style="background:rgba(16,185,129,0.14);"><span class="text-base">📍</span></div>
+                            <p class="text-sm font-bold text-white">現場回報</p>
+                        </div>
+                        <p class="text-[11px] text-zinc-500">貼文字或截圖 · 自動盤點</p>
                     </div>
                     <div class="quick-action-card" onclick="copyPurchaseList()">
                         <div class="flex items-center gap-2.5 mb-2">
@@ -1107,6 +1096,9 @@
                         <button onclick="loadData()" class="utility-pill">
                             <span>↻</span><span>重新同步</span>
                         </button>
+                        <button onclick="openSiteReportImport()" class="utility-pill">
+                            <span>📍</span><span>現場回報</span>
+                        </button>
                         <button onclick="openTextRemove()" class="utility-pill">
                             <span>🤖</span><span>AI 移出</span>
                         </button>
@@ -1159,7 +1151,7 @@
                     </div>
                     <!-- 狀態過濾 + 排序 -->
                     <div class="flex items-center gap-1.5 mt-1.5 overflow-x-auto">
-                        <button class="filter-pill" data-status="all" onclick="filterByStatus('all')">全部狀態</button>
+                        <button class="filter-pill active" data-status="all" onclick="filterByStatus('all')">全部狀態</button>
                         <button class="filter-pill" data-status="ok" onclick="filterByStatus('ok')"><span
                                 class="status-dot ok"></span> 充足</button>
                         <button class="filter-pill" data-status="low" onclick="filterByStatus('low')"><span
@@ -1258,7 +1250,7 @@
                     <h3 class="text-lg font-extrabold text-white mb-4">ℹ️ 關於</h3>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between py-2 border-b border-white/5"><span
-                                class="text-gray-400">版本</span><span id="settingsVersion" class="text-white font-bold">v23.0 Mobile</span></div>
+                                class="text-gray-400">版本</span><span id="settingsVersion" class="text-white font-bold">v25.0 Mobile</span></div>
                         <div class="flex justify-between py-2"><span class="text-gray-400">已載入品項</span><span
                                 class="text-white font-bold" id="settingsItemCount">-</span></div>
                     </div>
@@ -1350,10 +1342,10 @@
                 'use strict';
 
                 // ===== 1. 設定與常量 =====
-                var APP_VERSION = 'v23.0';
+                var APP_VERSION = 'v25.0';
                 var API_URL = (window.APP_CONFIG && window.APP_CONFIG.apiUrl) || 'https://script.google.com/macros/s/AKfycbzOQx4W3SmewfhKSl2jSnQI4f29WzoNSqOLwnofb7T7vY06DzyEeUx6l2YSUieAOf-y-g/exec';
                 var TIMEOUT = (window.APP_CONFIG && Number(window.APP_CONFIG.timeout)) || 20000;
-                var DEBOUNCE_DELAY = 600;
+                var DEBOUNCE_DELAY = 250;
                 var OPERATOR_STORAGE_KEY = 'officeInventory.currentOperator';
                 var PAGE_STORAGE_KEY = 'officeInventory.currentPage';
                 var STOCK_CACHE_KEY = 'officeInventory.stockCache';
@@ -1371,6 +1363,10 @@
                     currentOperator: '黃俊瑋',
                     selectedItems: [],
                     textRemoveResults: [],
+                    siteReportResults: [],
+                    siteReportImageData: '',
+                    siteReportImageName: '',
+                    siteReportParseSource: '',
                     transferItemId: null,
                     lastSyncAt: '',
                     lastSyncSource: '',
@@ -1382,6 +1378,7 @@
 
                 var OPERATORS = ['黃俊瑋', '戴庭宇', '徐伊恩'];
                 var fuseInstance = null;
+                var stockMap = new Map();
 
                 // ===== 3. 工具函數 =====
                 function $(id) { return document.getElementById(id); }
@@ -1389,6 +1386,11 @@
                 function safeStr(v, d) { return (v == null || v === '') ? (d || '') : String(v); }
                 function formatNumber(num) { return num % 1 === 0 ? num : num.toFixed(1); }
                 function roundQty(num) { return Math.round(safeNum(num) * 1000) / 1000; }
+                function formatPreciseQty(num) {
+                    var rounded = roundQty(num);
+                    if (rounded % 1 === 0) return String(rounded);
+                    return rounded.toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
+                }
                 function escapeHtml(str) {
                     var div = document.createElement('div');
                     div.textContent = str;
@@ -1557,8 +1559,15 @@
                 }
                 function applyStockData(stockList, syncSource, syncAt) {
                     state.stock = sanitizeStockItems(stockList);
+                    // Rebuild O(1) lookup Map
+                    stockMap = new Map();
+                    state.stock.forEach(function (item) { stockMap.set(String(item.id), item); });
+                    // Rebuild Fuse search index once on data change
+                    if (typeof Fuse !== 'undefined') {
+                        fuseInstance = new Fuse(state.stock, { keys: ['name', 'spec'], threshold: 0.3 });
+                    }
                     state.selectedItems = state.selectedItems.filter(function (selectedId) {
-                        return state.stock.some(function (item) { return String(item.id) === String(selectedId); });
+                        return stockMap.has(String(selectedId));
                     });
                     state.lastSyncAt = syncAt || new Date().toISOString();
                     state.lastSyncSource = syncSource || 'online';
@@ -1995,12 +2004,14 @@
                     var filtered = state.category === 'all' ? state.stock.slice() : state.stock.filter(function (item) { return getCategory(item) === state.category; });
                     if (statusFilter !== 'all') filtered = filtered.filter(function (item) { return getItemStatus(item) === statusFilter; });
                     if (state.searchText.trim()) {
-                        if (typeof Fuse !== 'undefined') {
-                            fuseInstance = new Fuse(filtered, { keys: ['name', 'spec'], threshold: 0.3 });
-                            filtered = fuseInstance.search(state.searchText).map(function (r) { return r.item; });
+                        if (fuseInstance) {
+                            var fuseResults = fuseInstance.search(state.searchText);
+                            var fuseMatchIds = new Set(fuseResults.map(function (r) { return String(r.item.id); }));
+                            filtered = filtered.filter(function (item) { return fuseMatchIds.has(String(item.id)); });
                         } else {
+                            var lowerSearch = state.searchText.toLowerCase();
                             filtered = filtered.filter(function (item) {
-                                return (item.name + ' ' + item.spec).toLowerCase().indexOf(state.searchText.toLowerCase()) >= 0;
+                                return (item.name + ' ' + item.spec).toLowerCase().indexOf(lowerSearch) >= 0;
                             });
                         }
                     }
@@ -2053,8 +2064,10 @@
                             '</div>' +
                             '</div></div>';
                     }).join('');
-                    listEl.querySelectorAll('[data-item-id]').forEach(function (card) {
-                        initLongPress(card, card.getAttribute('data-item-id'));
+                    requestAnimationFrame(function () {
+                        listEl.querySelectorAll('[data-item-id]').forEach(function (card) {
+                            initLongPress(card, card.getAttribute('data-item-id'));
+                        });
                     });
                     var countEl = $('searchResultCount');
                     if (countEl && (state.searchText.trim() || state.category !== 'all' || statusFilter !== 'all')) countEl.textContent = state.filtered.length + ' 項';
@@ -2203,10 +2216,7 @@
                 }
 
                 function findItemById(id) {
-                    for (var i = 0; i < state.stock.length; i++) {
-                        if (state.stock[i].id == id) return state.stock[i];
-                    }
-                    return null;
+                    return stockMap.get(String(id)) || null;
                 }
 
                 function updateQty(id, type, newQty, oldQty, item) {
@@ -2479,6 +2489,258 @@
                 }
 
                 // ===== 15. 手勢與觸控模組 =====
+                function openSiteReportImport() {
+                    state.siteReportResults = [];
+                    state.siteReportImageData = '';
+                    state.siteReportImageName = '';
+                    state.siteReportParseSource = '';
+                    $('quickActionContent').innerHTML = [
+                        '<h2 class="text-2xl font-bold text-white mb-3">📍 現場回報匯入</h2>',
+                        '<p class="text-sm text-gray-400 mb-3">貼上同事回報文字或上傳截圖，先預覽再套用到 F22 現場數量。</p>',
+                        '<textarea id="siteReportInput" class="text-remove-area mb-3" placeholder="4/11\nF22場內餘料\n25.1: 1/2\n3.5*3: 3, 1/5\n3.5*4: 1/3\nMF小*1\n小束: 20"></textarea>',
+                        '<div class="rounded-2xl border border-white/10 bg-white/5 p-3 mb-3">',
+                        '<div class="flex items-center justify-between gap-3 flex-wrap">',
+                        '<div><p class="text-sm font-semibold text-white">圖片匯入</p><p class="text-xs text-gray-500 mt-1">支援同事傳來的截圖，會先 AI 解析再讓你確認。</p></div>',
+                        '<label class="px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-white cursor-pointer">選擇圖片<input id="siteReportImageInput" type="file" accept="image/*" class="hidden" onchange="handleSiteReportImageSelect(event)"></label>',
+                        '</div>',
+                        '<p id="siteReportImageName" class="text-xs text-cyan-400 mt-2">尚未選擇圖片</p>',
+                        '</div>',
+                        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">',
+                        '<button onclick="parseSiteReport(\'text\')" class="w-full py-3 rounded-xl bg-cyan-600 text-white font-bold">解析文字回報</button>',
+                        '<button onclick="parseSiteReport(\'image\')" class="w-full py-3 rounded-xl bg-zinc-800 text-white font-bold border border-zinc-700">解析圖片回報</button>',
+                        '</div>',
+                        '<div class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-3 mb-4 text-xs text-emerald-100 leading-5">這個流程會把每一列視為 F22 現場目前的剩餘量。像 <span class="font-bold">3, 1/5</span> 會自動算成 <span class="font-bold">3.2</span>，套用前也可以手動修正數量與品項。</div>',
+                        '<div id="siteReportPreview" class="hidden"><div class="flex items-center justify-between gap-3 mb-2"><h3 class="font-bold text-white">預覽</h3><p id="siteReportMeta" class="text-xs text-gray-500"></p></div><div id="siteReportList" class="space-y-3"></div></div>',
+                        '<div id="siteReportActions" class="hidden flex gap-2 mt-4"><button onclick="closeAllSheets()" class="flex-1 py-3 rounded-xl bg-zinc-700">取消</button><button onclick="confirmSiteReportApply()" class="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold">套用到 F22</button></div>'
+                    ].join('');
+                    $('quickActionSheet').classList.add('open');
+                    $('bottomSheetOverlay').classList.add('open');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function handleSiteReportImageSelect(event) {
+                    var file = event && event.target && event.target.files ? event.target.files[0] : null;
+                    if (!file) {
+                        state.siteReportImageData = '';
+                        state.siteReportImageName = '';
+                        if ($('siteReportImageName')) $('siteReportImageName').textContent = '尚未選擇圖片';
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        state.siteReportImageData = e.target.result || '';
+                        state.siteReportImageName = file.name || '未命名圖片';
+                        if ($('siteReportImageName')) $('siteReportImageName').textContent = '已選擇：' + state.siteReportImageName;
+                    };
+                    reader.onerror = function () {
+                        state.siteReportImageData = '';
+                        state.siteReportImageName = '';
+                        if ($('siteReportImageName')) $('siteReportImageName').textContent = '圖片讀取失敗';
+                        toast('圖片讀取失敗，請重新選擇', 'error');
+                    };
+                    reader.readAsDataURL(file);
+                }
+
+                function parseSiteReport(mode) {
+                    var action = mode === 'image' ? 'gemini_parse_site_report_image' : 'gemini_parse_site_report';
+                    var payload = {};
+                    var stockListSimple = state.stock.map(function (item) {
+                        return { id: item.id, name: item.name, spec: item.spec };
+                    });
+
+                    if (mode === 'image') {
+                        if (!state.siteReportImageData) { toast('請先選擇圖片', 'warning'); return; }
+                        payload.image = state.siteReportImageData;
+                    } else {
+                        var input = $('siteReportInput').value;
+                        if (!input.trim()) { toast('請先貼上現場回報', 'warning'); return; }
+                        payload.text = input;
+                    }
+
+                    payload.stockList = stockListSimple;
+                    state.siteReportResults = [];
+                    $('siteReportPreview').classList.remove('hidden');
+                    $('siteReportActions').classList.add('hidden');
+                    $('siteReportMeta').textContent = mode === 'image' ? '圖片解析中...' : '文字解析中...';
+                    $('siteReportList').innerHTML = '<div class="flex items-center gap-2 py-5 justify-center"><div class="loading-spinner"></div><span class="text-gray-400">正在整理 F22 回報...</span></div>';
+
+                    postAPI(action, payload)
+                        .then(function (res) {
+                            if (res.status === 'success' && res.items) {
+                                state.siteReportResults = normalizeSiteReportResults(res.items);
+                                state.siteReportParseSource = res.source || '';
+                                renderSiteReportPreview();
+                            } else {
+                                throw new Error(res.msg || '解析失敗');
+                            }
+                        })
+                        .catch(function (err) {
+                            state.siteReportResults = [];
+                            $('siteReportMeta').textContent = '';
+                            $('siteReportList').innerHTML = '<p class="text-red-400 text-center py-4">解析失敗，請檢查內容後再試</p>';
+                            toast('回報解析失敗: ' + err.message, 'error');
+                        });
+                }
+
+                function normalizeSiteReportResults(items) {
+                    var parsed = [];
+                    (items || []).forEach(function (row) {
+                        var qty = roundQty(Math.max(0, safeNum(row.qty, 0)));
+                        var matchedItem = row.matchedId ? findItemById(row.matchedId) : null;
+                        if (!matchedItem && row.matchedName) {
+                            matchedItem = state.stock.find(function (item) {
+                                return item.name === row.matchedName && item.spec === row.matchedSpec;
+                            }) || null;
+                        }
+                        parsed.push({
+                            originalInput: row.originalInput || row.label || '',
+                            label: row.label || row.originalInput || '',
+                            qty: qty,
+                            matchedItem: matchedItem,
+                            matchedName: matchedItem ? matchedItem.name : (row.matchedName || ''),
+                            matchedSpec: matchedItem ? matchedItem.spec : (row.matchedSpec || ''),
+                            note: row.note || ''
+                        });
+                    });
+                    return parsed.filter(function (row) {
+                        return !!row.label;
+                    });
+                }
+
+                function buildSiteReportItemOptionsHtml(selectedId) {
+                    var target = selectedId == null ? '' : String(selectedId);
+                    var options = ['<option value="">請選擇物料</option>'];
+                    state.stock.forEach(function (item) {
+                        var label = item.name + (item.spec ? ' / ' + item.spec : '');
+                        options.push('<option value="' + escapeHtml(String(item.id)) + '"' + (String(item.id) === target ? ' selected' : '') + '>' + escapeHtml(label) + '</option>');
+                    });
+                    return options.join('');
+                }
+
+                function renderSiteReportPreview() {
+                    $('siteReportPreview').classList.remove('hidden');
+                    if (state.siteReportResults.length === 0) {
+                        $('siteReportActions').classList.add('hidden');
+                        $('siteReportMeta').textContent = '';
+                        $('siteReportList').innerHTML = '<p class="text-gray-400 text-center py-4">沒有辨識到可套用的資料</p>';
+                        return;
+                    }
+
+                    var matchedCount = state.siteReportResults.filter(function (row) { return !!row.matchedItem; }).length;
+                    var sourceLabel = state.siteReportParseSource === 'fallback' ? '規則解析' : (state.siteReportParseSource === 'gemini-image' ? 'AI 圖片解析' : 'AI 文字解析');
+                    $('siteReportMeta').textContent = sourceLabel + ' · 共 ' + state.siteReportResults.length + ' 筆，已匹配 ' + matchedCount + ' 筆';
+                    $('siteReportActions').classList.remove('hidden');
+                    $('siteReportList').innerHTML = state.siteReportResults.map(function (row, index) {
+                        var matchedItem = row.matchedItem;
+                        var currentQty = matchedItem ? safeNum(matchedItem.siteQty, 0) : 0;
+                        var diff = matchedItem ? roundQty(row.qty - currentQty) : 0;
+                        var badgeClass = matchedItem ? 'bg-emerald-500/10 text-emerald-300' : 'bg-amber-500/10 text-amber-300';
+                        var badgeText = matchedItem ? '已匹配' : '待確認';
+                        var diffText = matchedItem
+                            ? (diff === 0 ? '套用後不變' : (diff > 0 ? '套用後 + ' + formatPreciseQty(diff) : '套用後 - ' + formatPreciseQty(Math.abs(diff))))
+                            : '請先選擇對應物料';
+
+                        return [
+                            '<div class="rounded-2xl border border-white/10 bg-white/5 p-3">',
+                            '<div class="flex items-start justify-between gap-3">',
+                            '<div class="min-w-0">',
+                            '<p class="text-sm font-semibold text-white">' + escapeHtml(row.label) + '</p>',
+                            '<p class="text-xs text-zinc-500 mt-1 break-all">原文：' + escapeHtml(row.originalInput || row.label) + '</p>',
+                            (row.note ? '<p class="text-xs text-amber-300 mt-1">' + escapeHtml(row.note) + '</p>' : ''),
+                            '</div>',
+                            '<span class="px-2 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap ' + badgeClass + '">' + badgeText + '</span>',
+                            '</div>',
+                            '<div class="grid grid-cols-1 gap-2 mt-3">',
+                            '<label class="text-xs text-zinc-400">F22 目標數量</label>',
+                            '<input type="number" step="0.001" min="0" value="' + escapeHtml(String(row.qty)) + '" onchange="setSiteReportQty(' + index + ', this.value)" class="w-full rounded-xl bg-zinc-900 border border-zinc-700 px-3 py-2 text-white">',
+                            '<label class="text-xs text-zinc-400 mt-1">對應物料</label>',
+                            '<select onchange="setSiteReportMatch(' + index + ', this.value)" class="w-full rounded-xl bg-zinc-900 border border-zinc-700 px-3 py-2 text-white">',
+                            buildSiteReportItemOptionsHtml(matchedItem ? matchedItem.id : ''),
+                            '</select>',
+                            '</div>',
+                            matchedItem
+                                ? '<div class="flex items-center justify-between gap-3 mt-3 text-xs"><p class="text-cyan-300 break-all">' + escapeHtml(matchedItem.name + (matchedItem.spec ? ' / ' + matchedItem.spec : '')) + '</p><p class="text-emerald-300 whitespace-nowrap">目前 F22 ' + formatPreciseQty(currentQty) + ' · ' + diffText + '</p></div>'
+                                : '<p class="text-xs text-zinc-500 mt-3">請指定對應物料後再套用，避免把庫存寫錯。</p>',
+                            '</div>'
+                        ].join('');
+                    }).join('');
+                }
+
+                function setSiteReportQty(index, value) {
+                    var row = state.siteReportResults[index];
+                    var qty = roundQty(parseFloat(value));
+                    if (!row) return;
+                    if (isNaN(qty) || qty < 0) {
+                        toast('數量格式錯誤', 'warning');
+                        renderSiteReportPreview();
+                        return;
+                    }
+                    row.qty = qty;
+                    renderSiteReportPreview();
+                }
+
+                function setSiteReportMatch(index, itemId) {
+                    var row = state.siteReportResults[index];
+                    var matchedItem = itemId ? findItemById(itemId) : null;
+                    if (!row) return;
+                    row.matchedItem = matchedItem || null;
+                    row.matchedName = matchedItem ? matchedItem.name : '';
+                    row.matchedSpec = matchedItem ? matchedItem.spec : '';
+                    renderSiteReportPreview();
+                }
+
+                function confirmSiteReportApply() {
+                    var unresolved = state.siteReportResults.filter(function (row) { return !row.matchedItem; });
+                    if (!state.siteReportResults.length) { toast('沒有可套用的回報', 'warning'); return; }
+                    if (unresolved.length) {
+                        toast('還有 ' + unresolved.length + ' 筆未確認物料，請先補齊', 'warning');
+                        return;
+                    }
+
+                    var grouped = {};
+                    state.siteReportResults.forEach(function (row) {
+                        var key = String(row.matchedItem.id);
+                        if (!grouped[key]) grouped[key] = { item: row.matchedItem, qty: 0 };
+                        grouped[key].qty = roundQty(grouped[key].qty + row.qty);
+                    });
+
+                    $('siteReportActions').classList.add('hidden');
+                    $('siteReportMeta').textContent = '正在套用到 F22...';
+
+                    var tasks = Object.keys(grouped).map(function (key) {
+                        var entry = grouped[key];
+                        return postAPI('audit', { id: entry.item.id, qty: entry.qty, person: state.currentOperator })
+                            .then(function () {
+                                entry.item.siteQty = entry.qty;
+                                return entry;
+                            });
+                    });
+
+                    Promise.allSettled(tasks).then(function (results) {
+                        var successCount = results.filter(function (result) { return result.status === 'fulfilled'; }).length;
+                        var failedCount = results.length - successCount;
+                        refreshInventoryViews();
+                        if (successCount > 0) {
+                            state.lastSyncAt = new Date().toISOString();
+                            state.lastSyncSource = 'online';
+                            saveStockCache(state.stock, state.lastSyncAt);
+                            updateSyncUi('online');
+                        }
+
+                        if (failedCount === 0) {
+                            closeAllSheets();
+                            toast('已套用 ' + successCount + ' 項 F22 盤點', 'success');
+                        } else if (successCount > 0) {
+                            renderSiteReportPreview();
+                            toast('部分套用完成，成功 ' + successCount + ' 項，失敗 ' + failedCount + ' 項', 'warning');
+                        } else {
+                            renderSiteReportPreview();
+                            toast('套用失敗，請稍後再試', 'error');
+                        }
+                    });
+                }
+
                 function initGestures() {
                     // Bottom Sheet swipe-to-close
                     if (typeof Hammer !== 'undefined') {
@@ -2683,6 +2945,12 @@
                 window.filterShortageByUrgency = filterShortageByUrgency;
                 window.filterShortageByCategory = filterShortageByCategory;
                 window.copyPurchaseList = copyPurchaseList;
+                window.openSiteReportImport = openSiteReportImport;
+                window.handleSiteReportImageSelect = handleSiteReportImageSelect;
+                window.parseSiteReport = parseSiteReport;
+                window.setSiteReportQty = setSiteReportQty;
+                window.setSiteReportMatch = setSiteReportMatch;
+                window.confirmSiteReportApply = confirmSiteReportApply;
                 window.openTextRemove = openTextRemove;
                 window.parseTextRemove = parseTextRemove;
                 window.confirmTextRemove = confirmTextRemove;
